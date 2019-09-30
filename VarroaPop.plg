@@ -1,0 +1,335 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: VarroaPop - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP38E.bat" with contents
+[
+@echo off
+call ".\makehelp.bat"
+]
+Creating command line "C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP38E.bat"
+Creating command line "rc.exe /l 0x409 /fo"Debug/VarroaPop.res" /d "_DEBUG" /d "_AFXDLL" "C:\My Projects\VarroaPopBack\VarroaPop.rc"" 
+Making help file...
+Building Win32 Help files
+
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+
+
+Creating temporary file "C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP38F.tmp" with contents
+[
+/nologo /MDd /W3 /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /Fp"Debug/VarroaPop.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /c 
+"C:\My Projects\VarroaPopBack\accountingvf.cpp"
+"C:\My Projects\VarroaPopBack\actionmap.cpp"
+"C:\My Projects\VarroaPopBack\actionmapcollection.cpp"
+"C:\My Projects\VarroaPopBack\ActionPage.cpp"
+"C:\My Projects\VarroaPopBack\Adult.cpp"
+"C:\My Projects\VarroaPopBack\axis.cpp"
+"C:\My Projects\VarroaPopBack\axiscollection.cpp"
+"C:\My Projects\VarroaPopBack\axisstyle.cpp"
+"C:\My Projects\VarroaPopBack\bar.cpp"
+"C:\My Projects\VarroaPopBack\Bee.cpp"
+"C:\My Projects\VarroaPopBack\border.cpp"
+"C:\My Projects\VarroaPopBack\Brood.cpp"
+"C:\My Projects\VarroaPopBack\bubble.cpp"
+"C:\My Projects\VarroaPopBack\candle.cpp"
+"C:\My Projects\VarroaPopBack\chart2d.cpp"
+"C:\My Projects\VarroaPopBack\chart2dchecknewpointsresult.cpp"
+"C:\My Projects\VarroaPopBack\chart2dcoordresult.cpp"
+"C:\My Projects\VarroaPopBack\chart2ddata.cpp"
+"C:\My Projects\VarroaPopBack\chart2ddatacoordresult.cpp"
+"C:\My Projects\VarroaPopBack\chart2ddataindexresult.cpp"
+"C:\My Projects\VarroaPopBack\chartarea.cpp"
+"C:\My Projects\VarroaPopBack\chartgroup.cpp"
+"C:\My Projects\VarroaPopBack\chartgroupcollection.cpp"
+"C:\My Projects\VarroaPopBack\chartlabel.cpp"
+"C:\My Projects\VarroaPopBack\chartlabelcollection.cpp"
+"C:\My Projects\VarroaPopBack\chartstyle.cpp"
+"C:\My Projects\VarroaPopBack\chartstylecollection.cpp"
+"C:\My Projects\VarroaPopBack\Colony.cpp"
+"C:\My Projects\VarroaPopBack\ColonyDataPage.cpp"
+"C:\My Projects\VarroaPopBack\CombRemDlg.cpp"
+"C:\My Projects\VarroaPopBack\coord.cpp"
+"C:\My Projects\VarroaPopBack\CreateWeatherHdr.cpp"
+"C:\My Projects\VarroaPopBack\currencyvf.cpp"
+"C:\My Projects\VarroaPopBack\datacoord.cpp"
+"C:\My Projects\VarroaPopBack\dataindex.cpp"
+"C:\My Projects\VarroaPopBack\derivedboolean.cpp"
+"C:\My Projects\VarroaPopBack\deriveddouble.cpp"
+"C:\My Projects\VarroaPopBack\derivedenum.cpp"
+"C:\My Projects\VarroaPopBack\derivedlong.cpp"
+"C:\My Projects\VarroaPopBack\derivedstring.cpp"
+"C:\My Projects\VarroaPopBack\Egg.cpp"
+"C:\My Projects\VarroaPopBack\fillstyle.cpp"
+"C:\My Projects\VarroaPopBack\font.cpp"
+"C:\My Projects\VarroaPopBack\fractionvf.cpp"
+"C:\My Projects\VarroaPopBack\gridlines.cpp"
+"C:\My Projects\VarroaPopBack\hiloopenclose.cpp"
+"C:\My Projects\VarroaPopBack\image.cpp"
+"C:\My Projects\VarroaPopBack\ImmigrationDlg.cpp"
+"C:\My Projects\VarroaPopBack\interior.cpp"
+"C:\My Projects\VarroaPopBack\label.cpp"
+"C:\My Projects\VarroaPopBack\labelcollection.cpp"
+"C:\My Projects\VarroaPopBack\Larva.cpp"
+"C:\My Projects\VarroaPopBack\legend.cpp"
+"C:\My Projects\VarroaPopBack\linestyle.cpp"
+"C:\My Projects\VarroaPopBack\location.cpp"
+"C:\My Projects\VarroaPopBack\MainFrm.cpp"
+"C:\My Projects\VarroaPopBack\marker.cpp"
+"C:\My Projects\VarroaPopBack\markercollection.cpp"
+"C:\My Projects\VarroaPopBack\Matrix.cpp"
+"C:\My Projects\VarroaPopBack\Mite.cpp"
+"C:\My Projects\VarroaPopBack\MyPropSheet.cpp"
+"C:\My Projects\VarroaPopBack\numbervf.cpp"
+"C:\My Projects\VarroaPopBack\OlectraGraphDlg.cpp"
+"C:\My Projects\VarroaPopBack\Options.cpp"
+"C:\My Projects\VarroaPopBack\percentagevf.cpp"
+"C:\My Projects\VarroaPopBack\pie.cpp"
+"C:\My Projects\VarroaPopBack\plotarea.cpp"
+"C:\My Projects\VarroaPopBack\pointstylecollection.cpp"
+"C:\My Projects\VarroaPopBack\polar.cpp"
+"C:\My Projects\VarroaPopBack\Queen.cpp"
+"C:\My Projects\VarroaPopBack\scientificvf.cpp"
+"C:\My Projects\VarroaPopBack\SelGraph.cpp"
+"C:\My Projects\VarroaPopBack\SimulationPage.cpp"
+"C:\My Projects\VarroaPopBack\slicestyle.cpp"
+"C:\My Projects\VarroaPopBack\stringcollection.cpp"
+"C:\My Projects\VarroaPopBack\symbolstyle.cpp"
+"C:\My Projects\VarroaPopBack\timescale.cpp"
+"C:\My Projects\VarroaPopBack\title.cpp"
+"C:\My Projects\VarroaPopBack\valueformat.cpp"
+"C:\My Projects\VarroaPopBack\valuelabel.cpp"
+"C:\My Projects\VarroaPopBack\valuelabelcollection.cpp"
+"C:\My Projects\VarroaPopBack\VarroaPop.cpp"
+"C:\My Projects\VarroaPopBack\VarroaPopDoc.cpp"
+"C:\My Projects\VarroaPopBack\VarroaPopView.cpp"
+"C:\My Projects\VarroaPopBack\view3d.cpp"
+"C:\My Projects\VarroaPopBack\VPCommandLineInfo.cpp"
+"C:\My Projects\VarroaPopBack\WeatherEditor.cpp"
+"C:\My Projects\VarroaPopBack\WeatherEvents.cpp"
+"C:\My Projects\VarroaPopBack\WeatherPage.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP38F.tmp" 
+Creating temporary file "C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP390.tmp" with contents
+[
+/nologo /MDd /W3 /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /Fp"Debug/VarroaPop.pch" /Yc"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /c 
+"C:\My Projects\VarroaPopBack\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP390.tmp" 
+Creating temporary file "C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP391.tmp" with contents
+[
+/nologo /subsystem:windows /profile /debug /machine:I386 /out:"Debug/VarroaPop.exe" 
+".\Debug\accountingvf.obj"
+".\Debug\actionmap.obj"
+".\Debug\actionmapcollection.obj"
+".\Debug\ActionPage.obj"
+".\Debug\Adult.obj"
+".\Debug\axis.obj"
+".\Debug\axiscollection.obj"
+".\Debug\axisstyle.obj"
+".\Debug\bar.obj"
+".\Debug\Bee.obj"
+".\Debug\border.obj"
+".\Debug\Brood.obj"
+".\Debug\bubble.obj"
+".\Debug\candle.obj"
+".\Debug\chart2d.obj"
+".\Debug\chart2dchecknewpointsresult.obj"
+".\Debug\chart2dcoordresult.obj"
+".\Debug\chart2ddata.obj"
+".\Debug\chart2ddatacoordresult.obj"
+".\Debug\chart2ddataindexresult.obj"
+".\Debug\chartarea.obj"
+".\Debug\chartgroup.obj"
+".\Debug\chartgroupcollection.obj"
+".\Debug\chartlabel.obj"
+".\Debug\chartlabelcollection.obj"
+".\Debug\chartstyle.obj"
+".\Debug\chartstylecollection.obj"
+".\Debug\Colony.obj"
+".\Debug\ColonyDataPage.obj"
+".\Debug\CombRemDlg.obj"
+".\Debug\coord.obj"
+".\Debug\CreateWeatherHdr.obj"
+".\Debug\currencyvf.obj"
+".\Debug\datacoord.obj"
+".\Debug\dataindex.obj"
+".\Debug\derivedboolean.obj"
+".\Debug\deriveddouble.obj"
+".\Debug\derivedenum.obj"
+".\Debug\derivedlong.obj"
+".\Debug\derivedstring.obj"
+".\Debug\Egg.obj"
+".\Debug\fillstyle.obj"
+".\Debug\font.obj"
+".\Debug\fractionvf.obj"
+".\Debug\gridlines.obj"
+".\Debug\hiloopenclose.obj"
+".\Debug\image.obj"
+".\Debug\ImmigrationDlg.obj"
+".\Debug\interior.obj"
+".\Debug\label.obj"
+".\Debug\labelcollection.obj"
+".\Debug\Larva.obj"
+".\Debug\legend.obj"
+".\Debug\linestyle.obj"
+".\Debug\location.obj"
+".\Debug\MainFrm.obj"
+".\Debug\marker.obj"
+".\Debug\markercollection.obj"
+".\Debug\Matrix.obj"
+".\Debug\Mite.obj"
+".\Debug\MyPropSheet.obj"
+".\Debug\numbervf.obj"
+".\Debug\OlectraGraphDlg.obj"
+".\Debug\Options.obj"
+".\Debug\percentagevf.obj"
+".\Debug\pie.obj"
+".\Debug\plotarea.obj"
+".\Debug\pointstylecollection.obj"
+".\Debug\polar.obj"
+".\Debug\Queen.obj"
+".\Debug\scientificvf.obj"
+".\Debug\SelGraph.obj"
+".\Debug\SimulationPage.obj"
+".\Debug\slicestyle.obj"
+".\Debug\StdAfx.obj"
+".\Debug\stringcollection.obj"
+".\Debug\symbolstyle.obj"
+".\Debug\timescale.obj"
+".\Debug\title.obj"
+".\Debug\valueformat.obj"
+".\Debug\valuelabel.obj"
+".\Debug\valuelabelcollection.obj"
+".\Debug\VarroaPop.obj"
+".\Debug\VarroaPopDoc.obj"
+".\Debug\VarroaPopView.obj"
+".\Debug\view3d.obj"
+".\Debug\VPCommandLineInfo.obj"
+".\Debug\WeatherEditor.obj"
+".\Debug\WeatherEvents.obj"
+".\Debug\WeatherPage.obj"
+".\Debug\VarroaPop.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\Bob\LOCALS~1\Temp\RSP391.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+accountingvf.cpp
+actionmap.cpp
+actionmapcollection.cpp
+ActionPage.cpp
+Adult.cpp
+axis.cpp
+axiscollection.cpp
+axisstyle.cpp
+bar.cpp
+Bee.cpp
+border.cpp
+Brood.cpp
+bubble.cpp
+candle.cpp
+chart2d.cpp
+chart2dchecknewpointsresult.cpp
+chart2dcoordresult.cpp
+chart2ddata.cpp
+chart2ddatacoordresult.cpp
+chart2ddataindexresult.cpp
+Generating Code...
+Compiling...
+chartarea.cpp
+chartgroup.cpp
+chartgroupcollection.cpp
+chartlabel.cpp
+chartlabelcollection.cpp
+chartstyle.cpp
+chartstylecollection.cpp
+Colony.cpp
+ColonyDataPage.cpp
+CombRemDlg.cpp
+coord.cpp
+CreateWeatherHdr.cpp
+currencyvf.cpp
+datacoord.cpp
+dataindex.cpp
+derivedboolean.cpp
+deriveddouble.cpp
+derivedenum.cpp
+derivedlong.cpp
+derivedstring.cpp
+Generating Code...
+Compiling...
+Egg.cpp
+fillstyle.cpp
+font.cpp
+fractionvf.cpp
+gridlines.cpp
+hiloopenclose.cpp
+image.cpp
+ImmigrationDlg.cpp
+interior.cpp
+label.cpp
+labelcollection.cpp
+Larva.cpp
+legend.cpp
+linestyle.cpp
+location.cpp
+MainFrm.cpp
+marker.cpp
+markercollection.cpp
+Matrix.cpp
+Mite.cpp
+Generating Code...
+Compiling...
+MyPropSheet.cpp
+numbervf.cpp
+OlectraGraphDlg.cpp
+Options.cpp
+percentagevf.cpp
+pie.cpp
+plotarea.cpp
+pointstylecollection.cpp
+polar.cpp
+Queen.cpp
+scientificvf.cpp
+SelGraph.cpp
+SimulationPage.cpp
+slicestyle.cpp
+stringcollection.cpp
+symbolstyle.cpp
+timescale.cpp
+title.cpp
+valueformat.cpp
+valuelabel.cpp
+Generating Code...
+Compiling...
+valuelabelcollection.cpp
+VarroaPop.cpp
+C:\My Projects\VarroaPopBack\VarroaPop.cpp(303) : warning C4101: 'e' : unreferenced local variable
+C:\My Projects\VarroaPopBack\VarroaPop.cpp(322) : warning C4101: 'e' : unreferenced local variable
+C:\My Projects\VarroaPopBack\VarroaPop.cpp(337) : warning C4101: 'e' : unreferenced local variable
+VarroaPopDoc.cpp
+VarroaPopView.cpp
+view3d.cpp
+VPCommandLineInfo.cpp
+WeatherEditor.cpp
+WeatherEvents.cpp
+WeatherPage.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+VarroaPop.exe - 0 error(s), 3 warning(s)
+</pre>
+</body>
+</html>

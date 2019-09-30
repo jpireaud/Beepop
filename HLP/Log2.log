@@ -1,0 +1,24 @@
+Microsoft HTML Help Compiler 4.74.8702
+
+Compiling d:\Libraries\Documents\Visual Studio 2008 Projects\VarroaPop3.2.6.12\HLP\VarroaPop.chm
+
+
+Compile time: 0 minutes, 1 second
+73	Topics
+48	Local links
+0	Internet links
+1	Graphic
+
+
+Created d:\Libraries\Documents\Visual Studio 2008 Projects\VarroaPop3.2.6.12\HLP\VarroaPop.chm, 32,399 bytes
+Compression decreased file by 21,994 bytes.
+Microsoft HTML Help Compiler 4.74.8702
+
+Compiling d:\Libraries\Documents\Visual Studio 2008 Projects\VarroaPop3.2.6.12\HLP\VarroaPop.chm
+
+VarroaPop.hhc
+HHC6000: Error: An internal file could not be created. Make certain there is enough disk space on the drive where you are compiling your file.
+HHC5007: Error: Fatal navigational compilation error. This is likely the result of an invalid contents (.hhc) file.
+
+
+The following files were not compiled:
