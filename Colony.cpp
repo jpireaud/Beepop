@@ -1164,6 +1164,8 @@ CColony:: CColony(CColony& col)  // Copy Constructor
 	while (pos!=NULL) Deggs.AddTail(col.Deggs.GetNext(pos));
 
 
+
+
 }
 
 
@@ -1232,7 +1234,215 @@ void CColony::AddEventNotification(CString DateStg, CString Msg)
 
 
 
-void CColony::Serialize(CArchive& ar, int FileFormatVersion) 
+//void CColony::Serialize(CArchive& ar, int FileFormatVersion) 
+//{
+//	if (ar.IsStoring())
+//	{	// storing code
+//		//  First store the Colony initial condition data
+//		ar << name;
+//		ar << m_InitCond.m_droneAdultInfestField;
+//		ar << m_InitCond.m_droneBroodInfestField;
+//		ar << m_InitCond.m_droneMiteOffspringField;
+//		ar << m_InitCond.m_droneMiteSurvivorshipField;
+//		ar << m_InitCond.m_workerAdultInfestField;
+//		ar << m_InitCond.m_workerBroodInfestField;
+//		ar << m_InitCond.m_workerMiteOffspring;
+//		ar << m_InitCond.m_workerMiteSurvivorship;
+//		ar << m_InitCond.m_droneAdultsField;
+//		ar << m_InitCond.m_droneBroodField;
+//		ar << m_InitCond.m_droneEggsField;
+//		ar << m_InitCond.m_droneLarvaeField;
+//		ar << m_InitCond.m_workerAdultsField;
+//		ar << m_InitCond.m_workerBroodField;
+//		ar << m_InitCond.m_workerEggsField;
+//		ar << m_InitCond.m_workerLarvaeField;
+//		ar << m_InitCond.m_totalEggsField;
+//		if (FileFormatVersion <= 14) // Eliminated internal queen variables - now just double QueenStrength
+//		{
+//			ar << (int)m_InitCond.m_QueenSperm; // FIX - THIS NEEDS TO CONVERT TO DOUBLE
+//		}
+//		ar << m_InitCond.m_ForagerLifespan;
+//		ar << m_InitCond.m_SimStart;
+//		ar << m_InitCond.m_SimEnd;
+//		if (FileFormatVersion <= 14) // Eliminated internal queen variables - now just double QueenStrength
+//		{
+//			ar << (int)m_InitCond.m_MaxEggs;
+//		}
+//		if (FileFormatVersion >= 15) // Eliminated internal queen variables - now just double QueenStrength
+//		{
+//			ar << m_InitCond.m_QueenStrength;
+//		}
+//		if (FileFormatVersion >= 16) // Added Supplemental Feeding variables
+//		{
+//			ar << m_SuppPollen.m_StartingAmount;
+//			ar << m_SuppPollen.m_BeginDate;
+//			ar << m_SuppPollen.m_EndDate;
+//			ar << (m_SuppPollenEnabled ? 1:0);
+//			ar << m_SuppNectar.m_StartingAmount;
+//			ar << m_SuppNectar.m_BeginDate;
+//			ar << m_SuppNectar.m_EndDate;
+//			ar << (m_SuppNectarEnabled ? 1:0);
+//			ar << m_ColonyPolInitAmount;
+//			ar << m_ColonyNecInitAmount;
+//		}
+//		if (FileFormatVersion >= 17) // Added Proportion of Actual Foragers and some spares
+//		{
+//			ar << foragers.GetPropActualForagers();
+//			ar << m_ColonyPolMaxAmount;  // Added 3.2.8.8 - decremented rannge for dTemp below
+//			ar << m_ColonyNecMaxAmount;   //
+//
+//			// Store some integers, some doubles, and dates as place holders
+//			// As we need to store/retrieve new actual variables, reduce these placeholders appropriately
+//			int iTemp = 0;
+//			double dTemp = 0.0;
+//			COleDateTime dateTemp = COleDateTime(2001,9,11,0,0,0);
+//			int i = 0;
+//			for (i=0;i<8;i++) ar << iTemp;
+//			for (i=0;i<8;i++) ar << dTemp;
+//			for (i=0;i<10;i++) ar << dateTemp;
+//		}
+//
+//		if (FileFormatVersion >= 19)
+//		{
+//			ar << (m_NoResourceKillsColony ? 1 : 0);
+//			ar << (m_SuppPollenAnnual ? 1 : 0);
+//			ar << (m_SuppNectarAnnual ? 1 : 0);
+//		}
+//
+//	}
+//	else
+//	{	// loading code
+//		int TEMP;  //FIX
+//		ar >> name;
+//		ar >> m_InitCond.m_droneAdultInfestField;
+//		ar >> m_InitCond.m_droneBroodInfestField;
+//		ar >> m_InitCond.m_droneMiteOffspringField;
+//		ar >> m_InitCond.m_droneMiteSurvivorshipField;
+//		ar >> m_InitCond.m_workerAdultInfestField;
+//		ar >> m_InitCond.m_workerBroodInfestField;
+//		ar >> m_InitCond.m_workerMiteOffspring;
+//		ar >> m_InitCond.m_workerMiteSurvivorship;
+//		ar >> m_InitCond.m_droneAdultsField;
+//		ar >> m_InitCond.m_droneBroodField;
+//		ar >> m_InitCond.m_droneEggsField;
+//		ar >> m_InitCond.m_droneLarvaeField;
+//		ar >> m_InitCond.m_workerAdultsField;
+//		ar >> m_InitCond.m_workerBroodField;
+//		ar >> m_InitCond.m_workerEggsField;
+//		ar >> m_InitCond.m_workerLarvaeField;
+//		ar >> m_InitCond.m_totalEggsField;
+//		if (FileFormatVersion <= 14) // Eliminated internal queen variables - now just double QueenStrength
+//		{
+//			ar >> TEMP;
+//			m_InitCond.m_QueenSperm = TEMP;
+//		}
+//		ar >> m_InitCond.m_ForagerLifespan;
+//		ar >> m_InitCond.m_SimStart;
+//		ar >> m_InitCond.m_SimEnd;
+//		if (FileFormatVersion <= 14) // Eliminated internal queen variables - now just double QueenStrength
+//		{
+//		ar >> TEMP;
+//		m_InitCond.m_MaxEggs = TEMP;
+//		}
+//		if (FileFormatVersion >= 15)
+//		{
+//			ar >> m_InitCond.m_QueenStrength;
+//			queen.SetStrength(m_InitCond.m_QueenStrength);
+//		}
+//		if (FileFormatVersion >= 16) // Added Supplemental Feeding variables
+//		{
+//			int bval;
+//			ar >> m_SuppPollen.m_StartingAmount;
+//			ar >> m_SuppPollen.m_BeginDate;
+//			ar >> m_SuppPollen.m_EndDate;
+//			ar >> bval;
+//			m_SuppPollenEnabled = (bval == 1);
+//			ar >> m_SuppNectar.m_StartingAmount;
+//			ar >> m_SuppNectar.m_BeginDate;
+//			ar >> m_SuppNectar.m_EndDate;
+//			ar >> bval;
+//			m_SuppNectarEnabled = (bval == 1);
+//			ar >> m_ColonyPolInitAmount;
+//			ar >> m_ColonyNecInitAmount;
+//		}
+//
+//		if (FileFormatVersion >= 17) // Added Proportion of Actual Foragers and some spares
+//		{
+//			double paf;
+//			ar >> paf;
+//			foragers.SetPropActualForagers(paf);
+//			ar >> m_ColonyPolMaxAmount;  // Added in 3.2.8.8  Decremented range in dTemp below
+//			ar >> m_ColonyNecMaxAmount;  //
+//
+//			// Load some integers, some doubles, and dates as place holders
+//			// As we need to store/retrieve new actual variables, reduce these placeholders appropriately
+//			int iTemp = 0;
+//			double dTemp = 0.0;
+//			COleDateTime dateTemp = COleDateTime(2001,9,11,0,0,0);
+//			int i = 0;
+//			for (i=0;i<8;i++) ar >> iTemp;
+//			for (i=0;i<8;i++) ar >> dTemp;
+//			for (i=0;i<10;i++) ar >> dateTemp;
+//		}
+//
+//		if (FileFormatVersion >= 19)
+//		{
+//			int bval;
+//			ar >> bval;
+//			m_NoResourceKillsColony = (bval == 1);
+//			
+//			// Added in version 3.2.8.4
+//			ar >> bval;
+//			m_SuppPollenAnnual = (bval == 1);
+//			ar >> bval;
+//			m_SuppNectarAnnual = (bval == 1);
+//		}
+//
+//
+//		Clear();
+//
+//
+//	}
+//
+//	// Now serialize the lists
+//
+//	Wadl.Serialize(ar);
+//	Dadl.Serialize(ar);
+//	foragers.Serialize(ar);
+//	Wlarv.Serialize(ar);
+//	Dlarv.Serialize(ar);
+//	Weggs.Serialize(ar);
+//	Deggs.Serialize(ar);
+//	queen.Serialize(ar);
+//	
+//	if (FileFormatVersion >= 6)
+//	{
+//		m_InitCond.m_EggTransitionDRV.Serialize(ar, FileFormatVersion);
+//		m_InitCond.m_LarvaeTransitionDRV.Serialize(ar, FileFormatVersion);
+//		m_InitCond.m_BroodTransitionDRV.Serialize(ar, FileFormatVersion);
+//		m_InitCond.m_AdultTransitionDRV.Serialize(ar, FileFormatVersion);	
+//		m_InitCond.m_ForagerLifespanDRV.Serialize(ar, FileFormatVersion);	
+//	}	
+//
+//	if (FileFormatVersion >= 12)
+//	{
+//		m_InitCond.m_AdultLifespanDRV.Serialize(ar, FileFormatVersion);	
+//	}	
+//
+//	if (FileFormatVersion >= 8)
+//	{
+//		m_EPAData.Serialize(ar, FileFormatVersion);
+//	}
+//
+//	if (FileFormatVersion >= 14)
+//	{
+//		m_NutrientCT.Serialize(ar);
+//	}
+//
+//	SetInitialized(true);
+//}
+
+void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 {
 	if (ar.IsStoring())
 	{	// storing code
@@ -1274,11 +1484,11 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 			ar << m_SuppPollen.m_StartingAmount;
 			ar << m_SuppPollen.m_BeginDate;
 			ar << m_SuppPollen.m_EndDate;
-			ar << (m_SuppPollenEnabled ? 1:0);
+			ar << (m_SuppPollenEnabled ? 1 : 0);
 			ar << m_SuppNectar.m_StartingAmount;
 			ar << m_SuppNectar.m_BeginDate;
 			ar << m_SuppNectar.m_EndDate;
-			ar << (m_SuppNectarEnabled ? 1:0);
+			ar << (m_SuppNectarEnabled ? 1 : 0);
 			ar << m_ColonyPolInitAmount;
 			ar << m_ColonyNecInitAmount;
 		}
@@ -1292,11 +1502,11 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 			// As we need to store/retrieve new actual variables, reduce these placeholders appropriately
 			int iTemp = 0;
 			double dTemp = 0.0;
-			COleDateTime dateTemp = COleDateTime(2001,9,11,0,0,0);
+			COleDateTime dateTemp = COleDateTime(2001, 9, 11, 0, 0, 0);
 			int i = 0;
-			for (i=0;i<8;i++) ar << iTemp;
-			for (i=0;i<8;i++) ar << dTemp;
-			for (i=0;i<10;i++) ar << dateTemp;
+			for (i = 0;i < 8;i++) ar << iTemp;
+			for (i = 0;i < 8;i++) ar << dTemp;
+			for (i = 0;i < 10;i++) ar << dateTemp;
 		}
 
 		if (FileFormatVersion >= 19)
@@ -1337,8 +1547,8 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 		ar >> m_InitCond.m_SimEnd;
 		if (FileFormatVersion <= 14) // Eliminated internal queen variables - now just double QueenStrength
 		{
-		ar >> TEMP;
-		m_InitCond.m_MaxEggs = TEMP;
+			ar >> TEMP;
+			m_InitCond.m_MaxEggs = TEMP;
 		}
 		if (FileFormatVersion >= 15)
 		{
@@ -1374,11 +1584,11 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 			// As we need to store/retrieve new actual variables, reduce these placeholders appropriately
 			int iTemp = 0;
 			double dTemp = 0.0;
-			COleDateTime dateTemp = COleDateTime(2001,9,11,0,0,0);
+			COleDateTime dateTemp = COleDateTime(2001, 9, 11, 0, 0, 0);
 			int i = 0;
-			for (i=0;i<8;i++) ar >> iTemp;
-			for (i=0;i<8;i++) ar >> dTemp;
-			for (i=0;i<10;i++) ar >> dateTemp;
+			for (i = 0;i < 8;i++) ar >> iTemp;
+			for (i = 0;i < 8;i++) ar >> dTemp;
+			for (i = 0;i < 10;i++) ar >> dateTemp;
 		}
 
 		if (FileFormatVersion >= 19)
@@ -1386,7 +1596,7 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 			int bval;
 			ar >> bval;
 			m_NoResourceKillsColony = (bval == 1);
-			
+
 			// Added in version 3.2.8.4
 			ar >> bval;
 			m_SuppPollenAnnual = (bval == 1);
@@ -1410,20 +1620,20 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 	Weggs.Serialize(ar);
 	Deggs.Serialize(ar);
 	queen.Serialize(ar);
-	
+
 	if (FileFormatVersion >= 6)
 	{
 		m_InitCond.m_EggTransitionDRV.Serialize(ar, FileFormatVersion);
 		m_InitCond.m_LarvaeTransitionDRV.Serialize(ar, FileFormatVersion);
 		m_InitCond.m_BroodTransitionDRV.Serialize(ar, FileFormatVersion);
-		m_InitCond.m_AdultTransitionDRV.Serialize(ar, FileFormatVersion);	
-		m_InitCond.m_ForagerLifespanDRV.Serialize(ar, FileFormatVersion);	
-	}	
+		m_InitCond.m_AdultTransitionDRV.Serialize(ar, FileFormatVersion);
+		m_InitCond.m_ForagerLifespanDRV.Serialize(ar, FileFormatVersion);
+	}
 
 	if (FileFormatVersion >= 12)
 	{
-		m_InitCond.m_AdultLifespanDRV.Serialize(ar, FileFormatVersion);	
-	}	
+		m_InitCond.m_AdultLifespanDRV.Serialize(ar, FileFormatVersion);
+	}
 
 	if (FileFormatVersion >= 8)
 	{
@@ -1437,6 +1647,7 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 
 	SetInitialized(true);
 }
+
 
 COleDateTime* CColony::GetDayNumDate(int DayNum)
 {
@@ -1559,6 +1770,7 @@ void CColony::Clear()
 		delete temp;
 		Deggs.ClearCaboose();
 	}
+
 	
 	// Empty the MiteTreatment list
 	m_MiteTreatmentInfo.ClearAll();
@@ -1620,6 +1832,7 @@ void CColony::InitializeBees()
 		else  theEggs = new CEgg(e+del);
 		Weggs.AddHead(theEggs);
 	}
+
 
 	// Larvae
 	e = m_InitCond.m_droneLarvaeField/Dlarv.GetLength();
@@ -1866,6 +2079,11 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
    //
    ///////////////////////////////////////////////////////////////////////////////////////////////
 
+}
+
+int CColony::GetEggsToday()
+{
+	return queen.GetTeggs();
 }
 
 void CColony::AddMites(CMite NewMites)

@@ -27,6 +27,7 @@ CQueen::CQueen() {
 	CumWeggs = 0;
 	m_CurQueenDay_1 = 1;
 	m_EggLayingDelay = 0;
+	m_Teggs = 0;
 	m_InitialSperm = initialSperm;
 	m_Strength = 1;
 
@@ -118,11 +119,13 @@ void CQueen::LayEggs(int LayDays, double DegreeDays, double DaylightHours, int N
 	{
 		m_Weggs = 0;
 		m_Deggs = 0;
+		m_Teggs = 0;
 	}
 	else if (--m_EggLayingDelay > 0) // Still some egg laying delay from re-queening?
 	{
 		m_Weggs = 0;
 		m_Deggs = 0;
+		m_Teggs = 0;
 	}
 	else
 	{
@@ -172,12 +175,14 @@ void CQueen::LayEggs(int LayDays, double DegreeDays, double DaylightHours, int N
 
 		m_Deggs = int(E*Z);
 		m_Weggs = int(E - m_Deggs);
+		m_Teggs = int(E);
 		m_CurrentSperm -= 10*m_Weggs;
 		if (m_CurrentSperm < 0) m_CurrentSperm = 0;
 
 		// Only 85% of eggs become adults
 		m_Deggs = int(m_Deggs*0.85);
 		m_Weggs = int(m_Weggs*0.85);
+		m_Teggs = int(m_Teggs*0.85);
 
 
 		CumWeggs += m_Weggs;
@@ -190,14 +195,12 @@ CEgg* CQueen::GetDeggs()
 {
 	CEgg* theEggs = new CEgg(m_Deggs);
 	return theEggs;
-//	return NULL;
 }
 
 CEgg* CQueen::GetWeggs()
 {
 	CEgg* theEggs = new CEgg(m_Weggs);
 	return theEggs;
-//	return NULL;
 }
 
 

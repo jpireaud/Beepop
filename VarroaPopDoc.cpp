@@ -86,6 +86,7 @@ CVarroaPopDoc::CVarroaPopDoc()
 	m_IM = FALSE;
 	m_MD = FALSE;
 	m_PMD = FALSE;
+	m_TE = FALSE;
 	m_AutoScaleChart = 0;
 	m_YAxisMin = 0;
 	m_YAxisMax = 0;
@@ -107,6 +108,7 @@ CVarroaPopDoc::CVarroaPopDoc()
 	m_ResultsHeader.AddTail("WkrLrv");
 	m_ResultsHeader.AddTail("DrnEggs");
 	m_ResultsHeader.AddTail("WkrEggs");
+	m_ResultsHeader.AddTail("TotalEggs");
 	m_ResultsHeader.AddTail("FreeMts");
 	m_ResultsHeader.AddTail("DBrdMts");
 	m_ResultsHeader.AddTail("WBrdMts");
@@ -299,6 +301,7 @@ int CVarroaPopDoc::GetNumSeries()
 	if (m_DDA) count++;
 	if (m_DWA) count++;
 	if (m_DFG) count++;
+	if (m_TE) count++;
 	return count;
 }
 
@@ -608,6 +611,11 @@ void CVarroaPopDoc::UpdateResults(int DayCount, CEvent* pEvent)
 		if (m_FirstResultEntry) m_SimLabels.AddTail("Dead Foragers ");
 
 	}
+	if (m_TE)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetEggsToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("Total Eggs");
+	}
 
 	m_FirstResultEntry = false;
 //	if (pEvent != NULL) m_AxisLabels.AddTail(pEvent->GetDateStg("%b/%d/%y"));
@@ -665,15 +673,15 @@ void CVarroaPopDoc::Simulate()
 		// Set results data format string
 		if (m_FieldDelimiter == 1)		// Comma Delimited
 		{
-			m_ResultsFileFormatStg = "%s,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6.2f,%6.2f,%6d,%6.2f,%6.1f,%6.3f,%6.1f,%6.3f,%6d,%6d,%6d,%6d,%6d,%6.3f,%6.3f,%6.3f";
+			m_ResultsFileFormatStg = "%s,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6.2f,%6.2f,%6d,%6.2f,%6.1f,%6.3f,%6.1f,%6.3f,%6d,%6d,%6d,%6d,%6d,%6.3f,%6.3f,%6.3f";
 		}
 		else if (m_FieldDelimiter == 2) // Tab Delimited
 		{
-			m_ResultsFileFormatStg = "%s\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6.2f\t%6.2f\t%6d\t%6.2f\t%6.1f\t%6.3f\t%6.1f\t%6.3f\t%6d\t%6d\t%6d\t%6d\t%6d\t%6.3f\t%6.3f\t%6.3f";
+			m_ResultsFileFormatStg = "%s\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6.2f\t%6.2f\t%6d\t%6.2f\t%6.1f\t%6.3f\t%6.1f\t%6.3f\t%6d\t%6d\t%6d\t%6d\t%6d\t%6.3f\t%6.3f\t%6.3f";
 		}
 		else	// Otherwise space delimited
 		{
-			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3f";
+			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3f";
 		}
 
 		CEvent* pEvent = m_pWeather->GetDayEvent(GetSimStart());
@@ -685,9 +693,9 @@ void CVarroaPopDoc::Simulate()
 		CString CurSize;
 		CurSize.Format("                                        Capped  Capped                                                                      Prop           Conc          Conc                                             ");
 		m_ResultsFileHeader.AddTail(CurSize);
-		CurSize.Format("            Colony  Adult  Adult         Drone   Wkr    Drone  Wkr    Drone  Wkr  Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony Pollen Colony Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave");
+		CurSize.Format("            Colony  Adult  Adult         Drone   Wkr    Drone  Wkr    Drone  Wkr  Total  Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony Pollen Colony Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave");
 		m_ResultsFileHeader.AddTail(CurSize);
-		CurSize.Format("     Date   Size   Drones   Wkr   Forgrs Brood  Brood   Larv   Larv    Eggs  Eggs Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest  Nectar  Pest    DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp   Rain");
+		CurSize.Format("     Date   Size   Drones   Wkr   Forgrs Brood  Brood   Larv   Larv    Eggs  Eggs  Eggs  Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest  Nectar  Pest    DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp   Rain");
 		m_ResultsFileHeader.AddTail(CurSize);
 		CurSize.Format(m_ResultsFileFormatStg,
 				//pEvent->GetDateStg("%m/%d/%Y"), 
@@ -702,6 +710,7 @@ void CVarroaPopDoc::Simulate()
 				theColony.Wlarv.GetQuantity(),
 				theColony.Deggs.GetQuantity(),
 				theColony.Weggs.GetQuantity(),
+				theColony.GetEggsToday(),
 				theColony.RunMite.GetTotal(),
 				theColony.CapDrn.GetMiteCount(),
 				theColony.CapWkr.GetMiteCount(),
@@ -793,6 +802,7 @@ void CVarroaPopDoc::Simulate()
 					theColony.Wlarv.GetQuantity(),
 					theColony.Deggs.GetQuantity(),
 					theColony.Weggs.GetQuantity(),
+					theColony.GetEggsToday(),
 					theColony.RunMite.GetTotal(),
 					theColony.CapDrn.GetMiteCount(),
 					theColony.CapWkr.GetMiteCount(),
@@ -847,7 +857,6 @@ void CVarroaPopDoc::Simulate()
 		m_SimulationComplete = false;
 	}
 }
-
 
 
 
@@ -923,7 +932,7 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 		ar << m_RQEggLayingDelay;
 		ar << m_RQWkrDrnRatio;
 		ar << m_RQReQueenDate;
-		bval = (m_RQEnableReQueen)?0:1;
+		bval = (m_RQEnableReQueen) ? 0 : 1;
 		ar << bval;
 		ar << m_RQScheduled;
 		if (FileFormatVersion >= 15)
@@ -941,7 +950,7 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 		ar << m_VTEnable;
 		ar << m_VTTreatmentStart;
 		ar << int(m_InitMitePctResistant);
-		
+
 		ar << m_SPEnable;
 		ar << m_SPTreatmentStart;
 		ar << m_SPInitial;
@@ -958,42 +967,42 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 		ar << m_IEDItem.m_MortBrood;
 		ar << m_IEDItem.m_MortAdults;
 		ar << m_IEDItem.m_MortForagers;
-		
 
-		bval = (m_ImmigrationEnabled)?0:1;
+
+		bval = (m_ImmigrationEnabled) ? 0 : 1;
 		ar << bval;
-		ar << (m_TM ? 1:0);
-		ar << (m_AD ? 1:0);
-		ar << (m_AW ? 1:0);
-		ar << (m_CS ? 1:0);
-		ar << (m_DB ? 1:0);
-		ar << (m_DE ? 1:0);
-		ar << (m_DL ? 1:0);
-		ar << (m_F  ? 1:0);
-		ar << (m_MDB ? 1:0);
-		ar << (m_MWB ? 1:0);
-		ar << (m_PDB ? 1:0);
-		ar << (m_PWB ? 1:0);
-		ar << (m_PRM ? 1:0);
-		ar << (m_RM ? 1:0);
-		ar << (m_WB ? 1:0);
-		ar << (m_WE ? 1:0);
-		ar << (m_WL ? 1:0);
-		ar << (m_IM ? 1:0);
+		ar << (m_TM ? 1 : 0);
+		ar << (m_AD ? 1 : 0);
+		ar << (m_AW ? 1 : 0);
+		ar << (m_CS ? 1 : 0);
+		ar << (m_DB ? 1 : 0);
+		ar << (m_DE ? 1 : 0);
+		ar << (m_DL ? 1 : 0);
+		ar << (m_F ? 1 : 0);
+		ar << (m_MDB ? 1 : 0);
+		ar << (m_MWB ? 1 : 0);
+		ar << (m_PDB ? 1 : 0);
+		ar << (m_PWB ? 1 : 0);
+		ar << (m_PRM ? 1 : 0);
+		ar << (m_RM ? 1 : 0);
+		ar << (m_WB ? 1 : 0);
+		ar << (m_WE ? 1 : 0);
+		ar << (m_WL ? 1 : 0);
+		ar << (m_IM ? 1 : 0);
 		//  Added with Version 1
-		ar << (m_MD ? 1:0);
-		ar << (m_PMD ? 1:0);
+		ar << (m_MD ? 1 : 0);
+		ar << (m_PMD ? 1 : 0);
 		// Added with Version 9
-		ar << (m_NS ? 1:0);
-		ar << (m_PS ? 1:0);
-		ar << (m_NPC ? 1:0);
-		ar << (m_PPC ? 1:0);
+		ar << (m_NS ? 1 : 0);
+		ar << (m_PS ? 1 : 0);
+		ar << (m_NPC ? 1 : 0);
+		ar << (m_PPC ? 1 : 0);
 		// Added with Version 11
-		ar << (m_DDL ? 1:0);
-		ar << (m_DWL ? 1:0);
-		ar << (m_DDA ? 1:0);
-		ar << (m_DWA ? 1:0);
-		ar << (m_DFG ? 1:0);
+		ar << (m_DDL ? 1 : 0);
+		ar << (m_DWL ? 1 : 0);
+		ar << (m_DDA ? 1 : 0);
+		ar << (m_DWA ? 1 : 0);
+		ar << (m_DFG ? 1 : 0);
 
 		// Added with Version 13
 		ar << m_AutoScaleChart;
@@ -1161,7 +1170,7 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 
 		// Set Default Path name = SessionFile Path
 		CString pathname = ar.GetFile()->GetFilePath();
-		SetDefaultPathName(SplitPath(pathname,DRV) + SplitPath(pathname,DIR));
+		SetDefaultPathName(SplitPath(pathname, DRV) + SplitPath(pathname, DIR));
 
 
 		if ((m_ImmigrationEnabled) && (gl_RunGUI))
@@ -1177,35 +1186,35 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 			MyMessageBox(msg);
 			((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_WeatherFileName = "";
 		}
-		else 
+		else
 		{
 			// Early versions store weather filename only
 			// If this is the case, add path name and extension info
 			if (FileFormatVersion == 0) temp = GetDefaultPathName() + temp + ".wth";
 
 			// Version 1 and 5+ stores entire path of weather file so temp contains path
-			if ((FileFormatVersion == 1) || (FileFormatVersion >= 5)) ;  // do nothing
+			if ((FileFormatVersion == 1) || (FileFormatVersion >= 5));  // do nothing
 
 			// Version 2 thru 4 stores filename and extension only so must add Default Path
 			if ((FileFormatVersion >= 2) && (FileFormatVersion <= 4))
 				temp = GetDefaultPathName() + temp;
-			
+
 			// Version 2.3.1 of VarroaPop changed back to store the entire path+filename.
 			// Session Files that were created with version 2 - 4 will have the default path name 
 			// appended to the file name.  Session files version 5 and up have the entire path name stored
-				
-				
+
+
 			m_WeatherFileName = temp;
 			m_WeatherLoaded = LoadWeatherFile(m_WeatherFileName); // Try to load using
-			if (m_WeatherLoaded)   
+			if (m_WeatherLoaded)
 			{
 				if (gl_RunGUI)
-					((CMainFrame*)(AfxGetApp()->m_pMainWnd))->InitializeDateCtrls(); 
+					((CMainFrame*)(AfxGetApp()->m_pMainWnd))->InitializeDateCtrls();
 			}
 			else
 			{
 				CString msg = "  Reading Session File: The Specified Weather file  ";
-				msg += temp+" was not found\n";
+				msg += temp + " was not found\n";
 				msg += "You will have to specify one before you run a simulation";
 				MyMessageBox(msg);
 			}
@@ -1215,7 +1224,7 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 	}
 
 	theColony.Serialize(ar, FileFormatVersion);  // Added colony check for FileFormatVersion
-	
+
 	if (FileFormatVersion >= 4)  // Version with multiple mite-treatment dates
 	{
 		m_MiteTreatments.Serialize(ar);
@@ -1225,7 +1234,7 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 	// After reading .vrp file, update any variables which were changed
 	// by the command line input file
 	CString InputFileName = ((CVarroaPopApp*)AfxGetApp())->m_InputFileName;
-	if ((!ar.IsStoring()) & (InputFileName.GetLength()>0))
+	if ((!ar.IsStoring()) & (InputFileName.GetLength() > 0))
 	{
 		ProcessInputFile(InputFileName);
 	}
@@ -1237,6 +1246,7 @@ void CVarroaPopDoc::Serialize(CArchive& ar)
 	//TRACE("***Leaving VarroaPopDoc::Serialize\n");
 
 }
+
 
 bool CVarroaPopDoc::LoadWeatherFile(CString WeatherFileName)
 {
@@ -1454,6 +1464,7 @@ void CVarroaPopDoc::ProcessInputFile(CString FileName)
 				m_WE = FALSE;
 				m_WL = FALSE;
 				m_IM = FALSE;
+				m_TE = FALSE;
 				continue;
 			}
 			if (Name == "plotad")
@@ -2062,6 +2073,11 @@ void CVarroaPopDoc::ProcessInputFile(CString FileName)
 				continue;
 
 			}
+			if (Name == "plotte")
+			{
+				m_TE = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
 /*
 EToLXition=
 LToBXition=
@@ -2443,6 +2459,8 @@ void CVarroaPopDoc::StoreResultsFile(CString PathName)
 			OutStg.Format("Maximum Eggs per Day=%d\n",(int)(theColony.m_InitCond.m_MaxEggs));
 			theFile.WriteString(OutStg);
 			OutStg.Format("Forager Lifespan=%d\n",theColony.m_InitCond.m_ForagerLifespan);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Total Eggs=%d\n", theColony.m_InitCond.m_totalEggsField);
 			theFile.WriteString(OutStg);
 
 			if (m_ImmigrationEnabled) theFile.WriteString("Immigration Enabled=TRUE\n");

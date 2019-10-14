@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VarroaPop", "VarroaPop.vcproj", "{85A6451C-0B03-4E89-B865-833D8DC2A3F7}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VPPSetup", "..\VPPSetup\VPPSetup.vdproj", "{C91FE136-8C0B-44B6-95E1-98D165B5B633}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Debug|Win32.Build.0 = Debug|Win32
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Release|Win32.ActiveCfg = Release|Win32
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Release|Win32.Build.0 = Release|Win32
+		{C91FE136-8C0B-44B6-95E1-98D165B5B633}.Debug|Win32.ActiveCfg = Debug
+		{C91FE136-8C0B-44B6-95E1-98D165B5B633}.Release|Win32.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

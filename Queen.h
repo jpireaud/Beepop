@@ -19,6 +19,7 @@ class CQueen : public CBee  {
 	double m_Strength;
 	int m_Weggs;
 	int m_Deggs;
+	int m_Teggs; // Maintains total number of eggs laid on a day
 	double m_MaxEggs;
 	int m_CurQueenDay_1;  // The simulation day # on which the current queen started
 	int m_EggLayingDelay;
@@ -37,6 +38,7 @@ class CQueen : public CBee  {
 		double LarvPerBee);
 	CEgg* GetWeggs();
 	CEgg* GetDeggs();
+	int GetTeggs() { return m_Teggs; }
 	void SetInitialSperm(double sperm) {m_InitialSperm = sperm;}
 	void SetCurrentSperm(double sperm) {m_CurrentSperm = sperm;}
 	double GetInitialSperm() {return m_InitialSperm;}

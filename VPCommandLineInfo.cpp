@@ -87,6 +87,6 @@ void CVPCommandLineInfo::ParseParam( LPCTSTR lpszParam, BOOL bFlag, BOOL bLast )
 		}
 	}
 
-	TRACE(" Parameter is %s\n",lpszParam);
+	//TRACE(" Parameter is %s\n",lpszParam);
 
 }

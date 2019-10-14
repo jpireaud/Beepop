@@ -15,7 +15,8 @@
 #include "timescale.h"
 #include "labelcollection.h"
 #include "label.h"
-#include "2DCONST.H"
+#include "2dconst.h"
+//#include "c:\olectra\include\2dconst.h"
 #include "OlectraGraphDlg.h"
 
 #ifdef _DEBUG
@@ -24,8 +25,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// Originally was 4000.  Changed to 10000
-#define MAXPOINTS 10000
+// Originally was 4000.  Changed to 10000, then changed to 100000 9/7/2019
+#define MAXPOINTS 100000
 /////////////////////////////////////////////////////////////////////////////
 // COlectraGraphDlg dialog
 

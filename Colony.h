@@ -224,6 +224,7 @@ struct ColonyInitCond
 	int		m_workerBroodField;
 	int		m_workerEggsField;
 	int		m_workerLarvaeField;
+	int		m_totalEggsField;
 	//  From Simulation Initial Conditions
 	double	m_QueenStrength;
 	double	m_QueenSperm;
@@ -380,6 +381,7 @@ public:
 	void SetMitePctResistance(double pct) {m_InitMitePctResistant = pct;}
 	int GetColonySize();
 	void RemoveDroneComb(double pct);
+	int GetEggsToday();
 	void ReQueenIfNeeded(
 		int		DayNum,
 		CEvent* theEvent,

@@ -453,7 +453,7 @@ bool CWeatherFile::GetValidLine(COleDateTime& theTime, CString& theLine)
 			theDate += "1999 ";
 			theDateTime = theDate+theTime;
 		}
-		TRACE("The Date Stg = ***%s***\n",theDateTime);
+		TRACE("GetValidLine - The Date Stg = ***%s***\n",theDateTime);
 		COleDateTime ODateTime;
 		ODateTime.ParseDateTime(LPCTSTR(theDateTime));
 
@@ -512,14 +512,19 @@ bool CWeatherFile::IsLineValid(CString theLine)
 		int year = 0;
 		if (slashpos2!=slashpos)
 		{
-			year = atoi(theDate.Mid(slashpos2 + 1));
+			//year = atoi(theDate.Mid(slashpos2 + 1));
+			CString StgYear = theDate.Right(theDate.GetLength() - slashpos2 - 1);
+			year = atoi(StgYear);
 		}
 
 		if ((month > 0) && (month < 13) && (day > 0) && (day < 32)) 
 		{
-			if (year > 0) m_DateType = MMDDYY;
-			else if ((year == 0)&&(theDate.Mid(slashpos2 + 1).Find("00") >=0 )) 
-				m_DateType = MMDDYY;
+			if ((year == 0)&&(theDate.Mid(slashpos2 + 1).Find("00") >=0 )) m_DateType = MMDDYY;  // Year is 2-digit string "00"
+			else if (year > 0)
+			{
+				if (year < 100) m_DateType = MMDDYY; // A 2-digit year.  Make some assumptions about which century later
+				else m_DateType = MMDDYYYY; // A 4-digit year.
+			}
 			else m_DateType = MMDD;
 			return true;
 		}
@@ -707,10 +712,12 @@ CEvent* CWeatherFile::LineToEvent()
 	theLine.TrimLeft();
 	if (m_DateType == MMDD) Offset = 0;
 	else if (m_DateType == MMDDYY) Offset = -1;
+	else if (m_DateType == MMDDYYYY) Offset = -1;
 	else if (m_DateType == MONTHNAME) Offset = 1;
 	else Offset = 1;  //  doy
 
 	CEvent* tempEvent = new CEvent;
+
 
 	//  Set the values of the temperatures and the rainfall
 	float maxtemp=(float)atof(TokenStgArray[m_HeaderMaxTempCol-Offset]);
@@ -768,6 +775,15 @@ CEvent* CWeatherFile::LineToEvent()
 		COleDateTime tempTime(yr,
 			atoi(TokenStgArray[0]),
 			atoi(TokenStgArray[1]),0,0,0);
+		tempEvent->SetTime(tempTime);
+	}
+	else if (m_DateType == MMDDYYYY)
+	{
+		CString stg = TokenStgArray[2];
+		int yr = atoi(TokenStgArray[2]);
+		COleDateTime tempTime(yr,
+			atoi(TokenStgArray[0]),
+			atoi(TokenStgArray[1]), 0, 0, 0);
 		tempEvent->SetTime(tempTime);
 	}
 	else  // Month name, day
@@ -885,6 +901,8 @@ COleDateTime CWeatherEvents::GetBeginningTime()
 {
 	ASSERT(!m_EventList.IsEmpty());
 	CEvent* event = m_EventList.GetHead();
+	COleDateTime theTime = event->GetTime();
+	TRACE("Read Begining Time from head of eventList = %s\n", theTime.Format("%m/%d/%Y"));
 	return event->GetTime();
 }
 
@@ -894,6 +912,8 @@ COleDateTime CWeatherEvents::GetEndingTime()
 {
 	ASSERT(!m_EventList.IsEmpty());
 	CEvent* event = m_EventList.GetTail();
+	COleDateTime theTime = event->GetTime();
+	TRACE("Read ENDING Time from head of eventList = %s\n", theTime.Format("%m/%d/%Y"));
 	return event->GetTime();
 }
 
@@ -1042,7 +1062,9 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 					pProgress->StepIt();
 					Step++;
 				}
+				//TRACE("Adding a weather event \n");
 				AddEvent(pEvent);
+				TRACE("Weather Date: %s\n", pEvent->GetDateStg());
 				pEvent = theFile.GetNextEvent();
 			}
 		if (gl_RunGUI) ProgressDlg.DestroyWindow();

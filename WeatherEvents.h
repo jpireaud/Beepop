@@ -80,7 +80,7 @@ private:
 	int m_HeaderSolarRadCol;
 	int m_HeaderInterval;
 	int m_CurrentLine; // The file line number that was just read in
-	enum DateType {UNDEFINED, DOY, MMDD, MMDDYY, MONTHNAME};
+	enum DateType {UNDEFINED, DOY, MMDD, MMDDYY, MMDDYYYY, MONTHNAME};
 	DateType m_DateType;
 	CString m_ErrorStg;
 	DWORD m_PrevValidLinePos;
@@ -129,8 +129,8 @@ public:
 	void ClearAllEvents();
 	bool AddEvent(CEvent* theEvent);
 	bool RemoveCurrentEvent();
-	COleDateTime GetBeginningTime();
-	COleDateTime GetEndingTime();
+	COleDateTime GetBeginningTime(); // Returns the first date in the actual weather file
+	COleDateTime GetEndingTime();    // Returns the last date in the actual weather file
 	COleDateTime GetCurrentTime();
 	double CalcDaylightFromLatitude(double Lat, int DayNum);
 	int GetCurrentLineNumber();

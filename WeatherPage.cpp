@@ -14,9 +14,9 @@ IMPLEMENT_DYNAMIC(CWeatherPage, CPropertyPage)
 
 CWeatherPage::CWeatherPage(CVarroaPopDoc* pDoc)
 	: CPropertyPage(CWeatherPage::IDD)
-    , m_WeatherFileName(_T(""))
+	, m_WeatherFileName(_T(""))
 {
-    m_pDoc = pDoc;
+	m_pDoc = pDoc;
 }
 
 CWeatherPage::~CWeatherPage()
@@ -25,21 +25,21 @@ CWeatherPage::~CWeatherPage()
 
 BOOL CWeatherPage::OnInitDialog()
 {
-    m_WeatherFileName = m_pDoc->GetWeatherFileName();
+	m_WeatherFileName = m_pDoc->GetWeatherFileName();
 	m_pMyPropSheet->SetLastPageNumber(THISPAGENUMBER);
-    CDialog::OnInitDialog();
-    return true;
+	CDialog::OnInitDialog();
+	return true;
 }
 
 void CWeatherPage::DoDataExchange(CDataExchange* pDX)
 {
-    CPropertyPage::DoDataExchange(pDX);
-    DDX_Text(pDX, IDC_STATIC_WF_NAME, m_WeatherFileName);
+	CPropertyPage::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_STATIC_WF_NAME, m_WeatherFileName);
 }
 
 
 BEGIN_MESSAGE_MAP(CWeatherPage, CPropertyPage)
-    ON_BN_CLICKED(IDC_BUTTON_SEL_WEATHER, &CWeatherPage::OnBnClickedButtonSelWeather)
+	ON_BN_CLICKED(IDC_BUTTON_SEL_WEATHER, &CWeatherPage::OnBnClickedButtonSelWeather)
 END_MESSAGE_MAP()
 
 
@@ -47,7 +47,7 @@ END_MESSAGE_MAP()
 
 void CWeatherPage::OnBnClickedButtonSelWeather()
 {
-    CFileDialog fd(TRUE,
+	CFileDialog fd(TRUE,
 					NULL,
 					NULL,
 					OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
@@ -55,9 +55,9 @@ void CWeatherPage::OnBnClickedButtonSelWeather()
 					
 	if (fd.DoModal() == IDOK)
 	{
-	    m_WeatherFileName = fd.GetPathName();
-	    UpdateData(FALSE);
-	    m_pDoc->LoadWeatherFile(m_WeatherFileName);
+		m_WeatherFileName = fd.GetPathName();
+		UpdateData(FALSE);
+		m_pDoc->LoadWeatherFile(m_WeatherFileName);
 		m_pDoc->SetSimStart(m_pDoc->GetWeather()->GetBeginningTime());
 		m_pDoc->SetSimEnd(m_pDoc->GetWeather()->GetEndingTime());
 		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->InitializeDateCtrls(); 
@@ -66,13 +66,13 @@ void CWeatherPage::OnBnClickedButtonSelWeather()
 
 void CWeatherPage::UpdateDocument()
 {
-    m_pDoc->SetWeatherFileName(m_WeatherFileName);
+	m_pDoc->SetWeatherFileName(m_WeatherFileName);
 }
 
 BOOL CWeatherPage::OnKillActive()
 {
-    UpdateDocument();
-    return (CPropertyPage::OnKillActive());
+	UpdateDocument();
+	return (CPropertyPage::OnKillActive());
 }
 
 

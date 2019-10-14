@@ -178,7 +178,7 @@ void CMainFrame::ClearLogEvents()
 void CMainFrame::AddLogEvents(CString EventString)
 {
 	CEdit* pLB = (CEdit*)m_SimulationBar.GetDlgItem(IDC_LIST_EVENT_LOG);
-	TRACE("Added String:  "+EventString);
+	//TRACE("Added String:  "+EventString);
 	pLB->SetWindowTextA(EventString);
 }
 
@@ -316,6 +316,10 @@ void CMainFrame::InitializeDateCtrls()
 	CDateTimeCtrl* StopCtrl = (CDateTimeCtrl*)m_SimulationBar.GetDlgItem(IDC_EDIT_STOP);
 	CVarroaPopDoc* pDoc = (CVarroaPopDoc*)GetActiveDocument();
 
+
+	CString begintime = pDoc->GetWeather()->GetBeginningTime().Format("%m/%d/%Y");
+	CString endtime = pDoc->GetWeather()->GetEndingTime().Format("%m/%d/%Y");
+
 	StartCtrl->SetRange(&(pDoc->GetWeather()->GetBeginningTime()),
 		&(pDoc->GetWeather()->GetEndingTime()));
 	
@@ -325,6 +329,7 @@ void CMainFrame::InitializeDateCtrls()
 		&(pDoc->GetWeather()->GetEndingTime()));
 	
 	StopCtrl->SetTime((pDoc->GetSimEnd()));
+	
 }
 
 

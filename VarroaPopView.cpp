@@ -359,7 +359,7 @@ void CVarroaPopView::GetColumnInfo()
 
 void CVarroaPopView::OnDraw(CDC* pDC)
  {
-	TRACE("In OnDraw\n");
+	//TRACE("In OnDraw\n");
 
 	
 	// Display the simulation results table
@@ -376,7 +376,7 @@ void CVarroaPopView::OnDraw(CDC* pDC)
 	TEXTMETRIC Metrics;
 	if (!pDC->GetTextMetrics(&Metrics))
 	{
-		TRACE("FAILED TO GET TEXTMETRICS\n");
+		//TRACE("FAILED TO GET TEXTMETRICS\n");
 	}
 	else 
 	{
@@ -585,7 +585,7 @@ void CVarroaPopView::ChartData(CVarroaPopDoc *pDoc, bool Display)
 void CVarroaPopView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
 {
 	// TODO: Add your message handler code here and/or call default
-	TRACE("In OnHScroll\n");
+	//TRACE("In OnHScroll\n");
 	
 	CListView::OnHScroll(nSBCode, nPos, pScrollBar);
 }

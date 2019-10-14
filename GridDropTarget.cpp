@@ -111,7 +111,7 @@ DROPEFFECT CGridDropTarget::OnDragScroll(CWnd* pWnd, DWORD dwKeyState, CPoint /*
 DROPEFFECT CGridDropTarget::OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject, 
                                         DWORD dwKeyState, CPoint point)
 {
-    TRACE(_T("In CGridDropTarget::OnDragEnter\n"));
+    //TRACE(_T("In CGridDropTarget::OnDragEnter\n"));
     ASSERT(m_pGridCtrl);
 
     if (pWnd->GetSafeHwnd() == m_pGridCtrl->GetSafeHwnd())
@@ -122,7 +122,7 @@ DROPEFFECT CGridDropTarget::OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject,
 
 void CGridDropTarget::OnDragLeave(CWnd* pWnd)
 {
-    TRACE(_T("In CGridDropTarget::OnDragLeave\n"));
+    //TRACE(_T("In CGridDropTarget::OnDragLeave\n"));
     ASSERT(m_pGridCtrl);
 
     if (pWnd->GetSafeHwnd() == m_pGridCtrl->GetSafeHwnd())

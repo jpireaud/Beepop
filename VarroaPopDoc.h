@@ -70,6 +70,7 @@ public:
 	BOOL	m_DDA;	// Dead Drone Adults from Pesticide
 	BOOL	m_DWA;	// Dead Worker Adults from Pesticide
 	BOOL	m_DFG;	// Dead Foragers from Pesticide
+	BOOL	m_TE;	// Total Eggs
 	int		m_AutoScaleChart; //0 if autoscale, 1 if manual scale
 	double	m_YAxisMax; // If not autoscaled, the Y-axis maximum
 	double  m_YAxisMin; // If not autoscaled, the Y-axis minimum

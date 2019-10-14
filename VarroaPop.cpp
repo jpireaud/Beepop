@@ -277,12 +277,15 @@ bool CVarroaPopApp::RunBackground()
 		CDocTemplate* pDocTemplate = GetNextDocTemplate(pos);
 		CVarroaPopDoc* pDoc = 
 			(CVarroaPopDoc*)pDocTemplate->OpenDocumentFile(m_SessionFileName,FALSE);
-		if (pDoc == NULL) TRACE("Document Open Failed\n");
+		if (pDoc == NULL)
+		{
+			//TRACE("Document Open Failed\n");
+		}	
 		else 
 		{
-			TRACE("Opened Document %s\n",m_SessionFileName);
+			//TRACE("Opened Document %s\n",m_SessionFileName);
 			pDoc->Simulate();
-			TRACE("Ran Simulation\n");
+			//TRACE("Ran Simulation\n");
 		}
 	}
 	return true;

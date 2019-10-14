@@ -69,6 +69,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+//IDR_MAINFRAME           ICON                    "D:\\Libraries\\Documents\\Visual Studio 2017 Projects\\VarroaPop3.2.8.15\\RES\\VarroaPop.ico"
 IDR_MAINFRAME           ICON                    "RES\\VarroaPop.ico"
 
 IDR_VARROATYPE          ICON                    "res\\VarroaPopDoc.ico"
