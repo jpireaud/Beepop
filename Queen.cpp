@@ -28,6 +28,13 @@ CQueen::CQueen() {
 	m_CurQueenDay_1 = 1;
 	m_EggLayingDelay = 0;
 	m_Teggs = 0;
+	m_DD = 0;
+	m_L = 0;
+	m_N = 0;
+	m_P = 0;
+	m_dd = 0;
+	m_l = 0;
+	m_n = 0;
 	m_InitialSperm = initialSperm;
 	m_Strength = 1;
 
@@ -120,12 +127,26 @@ void CQueen::LayEggs(int LayDays, double DegreeDays, double DaylightHours, int N
 		m_Weggs = 0;
 		m_Deggs = 0;
 		m_Teggs = 0;
+		m_DD = 0;
+		m_L = 0;
+		m_N = 0;
+		m_P = 0;
+		m_dd = 0;
+		m_l = 0;
+		m_n = 0;
 	}
 	else if (--m_EggLayingDelay > 0) // Still some egg laying delay from re-queening?
 	{
 		m_Weggs = 0;
 		m_Deggs = 0;
 		m_Teggs = 0;
+		m_DD = 0;
+		m_L = 0;
+		m_N = 0;
+		m_P = 0;
+		m_dd = 0;
+		m_l = 0;
+		m_n = 0;
 	}
 	else
 	{
@@ -154,6 +175,14 @@ void CQueen::LayEggs(int LayDays, double DegreeDays, double DaylightHours, int N
 		if (N>1) N = 1;
 
 		E = DD*L*N*P;
+
+		m_DD = DD;
+		m_L = L;
+		m_N = N;
+		m_P = P;
+		m_dd = DegreeDays;
+		m_l = DaylightHours;
+		m_n = NumForagers;
 
 		// Proportion of Drone Eggs = Z
 		S = GetPropDroneEggs();

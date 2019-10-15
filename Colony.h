@@ -225,6 +225,13 @@ struct ColonyInitCond
 	int		m_workerEggsField;
 	int		m_workerLarvaeField;
 	int		m_totalEggsField;
+	double  m_DDField;
+	double  m_LField;
+	double  m_NField;
+	double  m_PField;
+	double  m_ddField;
+	double  m_lField;
+	double  m_nField;
 	//  From Simulation Initial Conditions
 	double	m_QueenStrength;
 	double	m_QueenSperm;
@@ -382,6 +389,13 @@ public:
 	int GetColonySize();
 	void RemoveDroneComb(double pct);
 	int GetEggsToday();
+	double GetDDToday();
+	double GetLToday();
+	double GetNToday();
+	double GetPToday();
+	double GetddToday();
+	double GetlToday();
+	double GetnToday();
 	void ReQueenIfNeeded(
 		int		DayNum,
 		CEvent* theEvent,

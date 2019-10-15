@@ -2086,6 +2086,41 @@ int CColony::GetEggsToday()
 	return queen.GetTeggs();
 }
 
+double CColony::GetDDToday()
+{
+	return queen.GetDD();
+}
+
+double CColony::GetLToday()
+{
+	return queen.GetL();
+}
+
+double CColony::GetNToday()
+{
+	return queen.GetN();
+}
+
+double CColony::GetPToday()
+{
+	return queen.GetP();
+}
+
+double CColony::GetddToday()
+{
+	return queen.Getdd();
+}
+
+double CColony::GetlToday()
+{
+	return queen.Getl();
+}
+
+double CColony::GetnToday()
+{
+	return queen.Getn();
+}
+
 void CColony::AddMites(CMite NewMites)
 {
 	//Assume new mites are "virgins"

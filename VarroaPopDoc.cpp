@@ -87,6 +87,13 @@ CVarroaPopDoc::CVarroaPopDoc()
 	m_MD = FALSE;
 	m_PMD = FALSE;
 	m_TE = FALSE;
+	m_DD = FALSE;
+	m_L = FALSE;
+	m_N = FALSE;
+	m_P = FALSE;
+	m_dd = FALSE;
+	m_l = FALSE;
+	m_n = FALSE;
 	m_AutoScaleChart = 0;
 	m_YAxisMin = 0;
 	m_YAxisMax = 0;
@@ -109,6 +116,13 @@ CVarroaPopDoc::CVarroaPopDoc()
 	m_ResultsHeader.AddTail("DrnEggs");
 	m_ResultsHeader.AddTail("WkrEggs");
 	m_ResultsHeader.AddTail("TotalEggs");
+	m_ResultsHeader.AddTail("DD");
+	m_ResultsHeader.AddTail("L");
+	m_ResultsHeader.AddTail("N");
+	m_ResultsHeader.AddTail("P");
+	m_ResultsHeader.AddTail("dd");
+	m_ResultsHeader.AddTail("l");
+	m_ResultsHeader.AddTail("n");
 	m_ResultsHeader.AddTail("FreeMts");
 	m_ResultsHeader.AddTail("DBrdMts");
 	m_ResultsHeader.AddTail("WBrdMts");
@@ -302,6 +316,13 @@ int CVarroaPopDoc::GetNumSeries()
 	if (m_DWA) count++;
 	if (m_DFG) count++;
 	if (m_TE) count++;
+	if (m_DD) count++;
+	if (m_L) count++;
+	if (m_N) count++;
+	if (m_P) count++;
+	if (m_dd) count++;
+	if (m_l) count++;
+	if (m_n) count++;
 	return count;
 }
 
@@ -616,6 +637,41 @@ void CVarroaPopDoc::UpdateResults(int DayCount, CEvent* pEvent)
 		m_SimResults[seriesID++][DayCount - 1] = theColony.GetEggsToday();
 		if (m_FirstResultEntry) m_SimLabels.AddTail("Total Eggs");
 	}
+	if (m_DD)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetDDToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("DD");
+	}
+	if (m_L)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetLToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("L");
+	}
+	if (m_N)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetNToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("N");
+	}
+	if (m_P)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetPToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("P");
+	}
+	if (m_dd)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetddToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("dd");
+	}
+	if (m_l)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetlToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("l");
+	}
+	if (m_n)	// Worker Eggs
+	{
+		m_SimResults[seriesID++][DayCount - 1] = theColony.GetnToday();
+		if (m_FirstResultEntry) m_SimLabels.AddTail("n");
+	}
 
 	m_FirstResultEntry = false;
 //	if (pEvent != NULL) m_AxisLabels.AddTail(pEvent->GetDateStg("%b/%d/%y"));
@@ -673,15 +729,15 @@ void CVarroaPopDoc::Simulate()
 		// Set results data format string
 		if (m_FieldDelimiter == 1)		// Comma Delimited
 		{
-			m_ResultsFileFormatStg = "%s,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6.2f,%6.2f,%6d,%6.2f,%6.1f,%6.3f,%6.1f,%6.3f,%6d,%6d,%6d,%6d,%6d,%6.3f,%6.3f,%6.3f";
+			m_ResultsFileFormatStg = "%s,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%6d,%.2f,%.2f,%.2f,%04.2f,%.2f,%.2f,%05.2f,%6d,%6d,%6d,%6.2f,%6.2f,%6d,%6.2f,%6.1f,%6.3f,%6.1f,%6.3f,%6d,%6d,%6d,%6d,%6d,%6.3f,%6.3f,%6.3f";
 		}
 		else if (m_FieldDelimiter == 2) // Tab Delimited
 		{
-			m_ResultsFileFormatStg = "%s\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6.2f\t%6.2f\t%6d\t%6.2f\t%6.1f\t%6.3f\t%6.1f\t%6.3f\t%6d\t%6d\t%6d\t%6d\t%6d\t%6.3f\t%6.3f\t%6.3f";
+			m_ResultsFileFormatStg = "%s\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%6d\t%.2f\t%.2f\t%.2f\t%04.2f\t%.2f\t%.2f\t%05.2f\t%6d\t%6d\t%6d\t%6.2f\t%6.2f\t%6d\t%6.2f\t%6.1f\t%6.3f\t%6.1f\t%6.3f\t%6d\t%6d\t%6d\t%6d\t%6d\t%6.3f\t%6.3f\t%6.3f";
 		}
 		else	// Otherwise space delimited
 		{
-			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3f";
+			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %.2f %.2f %.2f %04.2f %.2f %.2f %05.2f %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3f";
 		}
 
 		CEvent* pEvent = m_pWeather->GetDayEvent(GetSimStart());
@@ -691,11 +747,11 @@ void CVarroaPopDoc::Simulate()
 		int TotForagingDays = 0;
 
 		CString CurSize;
-		CurSize.Format("                                        Capped  Capped                                                                      Prop           Conc          Conc                                             ");
+		CurSize.Format("                                        Capped  Capped                                                                                                                     Prop           Conc          Conc                                             ");
 		m_ResultsFileHeader.AddTail(CurSize);
-		CurSize.Format("            Colony  Adult  Adult         Drone   Wkr    Drone  Wkr    Drone  Wkr  Total  Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony Pollen Colony Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave");
+		CurSize.Format("            Colony  Adult  Adult         Drone   Wkr    Drone  Wkr    Drone  Wkr  Total                                          Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony Pollen Colony Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave");
 		m_ResultsFileHeader.AddTail(CurSize);
-		CurSize.Format("     Date   Size   Drones   Wkr   Forgrs Brood  Brood   Larv   Larv    Eggs  Eggs  Eggs  Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest  Nectar  Pest    DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp   Rain");
+		CurSize.Format("     Date   Size   Drones   Wkr   Forgrs Brood  Brood   Larv   Larv    Eggs  Eggs  Eggs  DD    L    N     P      dd    l    n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest  Nectar  Pest    DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp   Rain");
 		m_ResultsFileHeader.AddTail(CurSize);
 		CurSize.Format(m_ResultsFileFormatStg,
 				//pEvent->GetDateStg("%m/%d/%Y"), 
@@ -711,6 +767,13 @@ void CVarroaPopDoc::Simulate()
 				theColony.Deggs.GetQuantity(),
 				theColony.Weggs.GetQuantity(),
 				theColony.GetEggsToday(),
+				theColony.GetDDToday(),
+				theColony.GetLToday(),
+				theColony.GetNToday(),
+				theColony.GetPToday(),
+				theColony.GetddToday(),
+				theColony.GetlToday(),
+				theColony.GetnToday(),
 				theColony.RunMite.GetTotal(),
 				theColony.CapDrn.GetMiteCount(),
 				theColony.CapWkr.GetMiteCount(),
@@ -803,6 +866,13 @@ void CVarroaPopDoc::Simulate()
 					theColony.Deggs.GetQuantity(),
 					theColony.Weggs.GetQuantity(),
 					theColony.GetEggsToday(),
+					theColony.GetDDToday(),
+					theColony.GetLToday(),
+					theColony.GetNToday(),
+					theColony.GetPToday(),
+					theColony.GetddToday(),
+					theColony.GetlToday(),
+					theColony.GetnToday(),
 					theColony.RunMite.GetTotal(),
 					theColony.CapDrn.GetMiteCount(),
 					theColony.CapWkr.GetMiteCount(),
@@ -1465,6 +1535,13 @@ void CVarroaPopDoc::ProcessInputFile(CString FileName)
 				m_WL = FALSE;
 				m_IM = FALSE;
 				m_TE = FALSE;
+				m_DD = FALSE;
+				m_L = FALSE;
+				m_N = FALSE;
+				m_P = FALSE;
+				m_dd = FALSE;
+				m_l = FALSE;
+				m_n = FALSE;
 				continue;
 			}
 			if (Name == "plotad")
@@ -2078,6 +2155,41 @@ void CVarroaPopDoc::ProcessInputFile(CString FileName)
 				m_TE = (Value == "true") ? TRUE : FALSE;
 				continue;
 			}
+			if (Name == "plotDD")
+			{
+				m_DD = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
+			if (Name == "plotN")
+			{
+				m_N = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
+			if (Name == "plotL")
+			{
+				m_L = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
+			if (Name == "plotP")
+			{
+				m_P = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
+			if (Name == "plotdd")
+			{
+				m_dd = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
+			if (Name == "plotl")
+			{
+				m_l = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
+			if (Name == "plotn")
+			{
+				m_n = (Value == "true") ? TRUE : FALSE;
+				continue;
+			}
 /*
 EToLXition=
 LToBXition=
@@ -2461,6 +2573,20 @@ void CVarroaPopDoc::StoreResultsFile(CString PathName)
 			OutStg.Format("Forager Lifespan=%d\n",theColony.m_InitCond.m_ForagerLifespan);
 			theFile.WriteString(OutStg);
 			OutStg.Format("Total Eggs=%d\n", theColony.m_InitCond.m_totalEggsField);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Daily DD=%.2f\n", theColony.m_InitCond.m_DDField);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Daily L=%.2f\n", theColony.m_InitCond.m_LField);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Daily N=%.2f\n", theColony.m_InitCond.m_NField);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Daily P=%.2f\n", theColony.m_InitCond.m_PField);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Daily dd=%.2f\n", theColony.m_InitCond.m_ddField);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Daily l=%.2f\n", theColony.m_InitCond.m_lField);
+			theFile.WriteString(OutStg);
+			OutStg.Format("Daily n=%.2f\n", theColony.m_InitCond.m_nField);
 			theFile.WriteString(OutStg);
 
 			if (m_ImmigrationEnabled) theFile.WriteString("Immigration Enabled=TRUE\n");

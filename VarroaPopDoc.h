@@ -71,6 +71,13 @@ public:
 	BOOL	m_DWA;	// Dead Worker Adults from Pesticide
 	BOOL	m_DFG;	// Dead Foragers from Pesticide
 	BOOL	m_TE;	// Total Eggs
+	BOOL	m_DD;	// Daily DD
+	BOOL	m_L;	// Daily L
+	BOOL	m_N;	// Daily N
+	BOOL	m_P;	// Daily P
+	BOOL	m_dd;	// Daily dd
+	BOOL	m_l;	// Daily l
+	BOOL	m_n;	// Daily n
 	int		m_AutoScaleChart; //0 if autoscale, 1 if manual scale
 	double	m_YAxisMax; // If not autoscaled, the Y-axis maximum
 	double  m_YAxisMin; // If not autoscaled, the Y-axis minimum
