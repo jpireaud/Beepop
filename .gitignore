@@ -1,3 +1,11 @@
 Debug/
+Release/
 .vs/
+.vscode/
 *.htm
+# excluse Linux build directory
+Linux/*build*
+# exclude everything in the Linux/DataModel folder except CMakeLists.txt.template file
+Linux/datamodel/*
+!Linux/datamodel/CMakeLists.txt.template
+
