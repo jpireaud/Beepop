@@ -11,8 +11,6 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-#include <afxtempl.h>
-
 class MyCol : public CArray<double,double&> {};
 
 class CMatrix : public CObject  
@@ -28,7 +26,7 @@ public:
 	void Serialize (CArchive& ar);
 	CMatrix();
 	CMatrix(int Col, int Row);
-	CMatrix(CMatrix& mat);  // Copy Constructor
+	CMatrix(const CMatrix& mat);  // Copy Constructor
 	virtual ~CMatrix();
 	CMatrix operator = (CMatrix& mat);  // assignment operator
 	CMatrix operator + (CMatrix mat);   // addition operator
