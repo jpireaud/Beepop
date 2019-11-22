@@ -173,10 +173,9 @@ CString CBeelist::Status()
 //
 // CForagerlist - this is a type of CAdultList implementing Forager behaviors
 //
-CForagerlist::CForagerlist()
+CForagerlist::CForagerlist() : CAdultlist::CAdultlist()
 {
 	PendingForagers.RemoveAll();
-	CAdultlist::CAdultlist();
 	m_PropActualForagers = .8;
 }
 
@@ -429,10 +428,9 @@ void CForagerlist::SetLength(int len)
 // CForagerlistA - An update from CForagerlist (created in version 3.2.8.0) to implement a new data structure logic for foragers.
 // The design intent is to maintain the same interface as CForagerlist but implement to the new data structure which is a longer CAdultlist.
 //
-CForagerlistA::CForagerlistA()
+CForagerlistA::CForagerlistA() : CAdultlist::CAdultlist()
 {
 	PendingForagers.RemoveAll();
-	CAdultlist::CAdultlist();
 	m_PropActualForagers = .3;
 }
 

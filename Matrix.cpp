@@ -7,7 +7,6 @@
 // use.  Considering exceptions.  Anyway, for now, the calling routine
 // must ensure the proper conditions are true.
 //////////////////////////////////////////////////////////////////////
-#include <afxtempl.h>
 #include <stdafx.h>
 #include <math.h>
 #include "Matrix.h"
@@ -33,7 +32,7 @@ CMatrix::CMatrix(int Col, int Row)
 }
 
 
-CMatrix::CMatrix(CMatrix& mat) // Copy Constructor
+CMatrix::CMatrix(const CMatrix& mat) // Copy Constructor
 {
 	int i,j;
 	m_nCol = mat.m_nCol;
