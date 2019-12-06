@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.10)
 include("cmake/HunterGate.cmake")
 
 HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.232.tar.gz"
-    SHA1 "413fcd1a89b7b484e89e9ab6bf7996550335a7e8"
+    URL "https://github.com/Huolju/hunter/archive/v0.23.235.tar.gz"
+    SHA1 "7627e6bb45424a26cb87794b8d9b4737a130089d"
 )
 
 project(VarroaPop)

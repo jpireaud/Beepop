@@ -25,8 +25,7 @@
 #define DEBUG_NEW new
 
 #include "fmt/printf.h"
-// #define TRACE(...) fmt::printf(__VA_ARGS__)
-#define TRACE(...) // void
+#define TRACE(...) fmt::printf(__VA_ARGS__)
 
 #include <cstdint>
 typedef int32_t BOOL;
@@ -65,23 +64,19 @@ typedef size_t POSITION;
 #include "cuintarray.h"
 
 #include "fmt/format.h"
-FMT_BEGIN_NAMESPACE
-template <> struct formatter<CString>
+template<>
+struct fmt::formatter<CString>
 {
-	auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-		return ctx.begin();
-	}
-	auto format(const CString& str, format_context& ctx) -> decltype(ctx.out()) {
-		return format_to(ctx.out(), "%s", str.ToString());
-	}
-};
-FMT_END_NAMESPACE
+  template<typename ParseContext>
+  constexpr auto parse(ParseContext& ctx);
 
+  template<typename FormatContext>
+  auto format(CString const& number, FormatContext& ctx);
+};
 #include "fmt/ostream.h"
-std::ostream &operator<<(std::ostream &stream, const CString& string)
-{
-    return stream << string.ToString();
-}
+std::ostream &operator<<(std::ostream &stream, const CString& string);
+
+#include "cstring.format.h"
 
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__STDC_LIB_EXT1__)
 #define strcpy_s strcpy

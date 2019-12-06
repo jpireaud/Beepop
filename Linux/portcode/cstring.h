@@ -15,29 +15,29 @@ public:
 	bool operator==(const CString& str) const;
 	bool operator==(const char* str) const;
 
-	CString MakeLower() const;
-	CString MakeUpper() const;
+	CString& operator+=(const CString& str);
+	CString& operator=(const CString& str);
+
+	const std::string& ToString() const;
 
 	operator const char* () const;
 
-	// To be implemented...
+	int GetLength() const;
 
-	std::string ToString() const;
-
-	CString& operator+=(const CString& str);
-	CString& operator=(const CString& str);
+	CString MakeLower() const;
+	CString MakeUpper() const;
 
 	void Trim();
 	void TrimLeft();
 	void TrimRight();
+
+	// To be implemented...
 	
 	template<typename... Args>
 	void Format(const char* format, Args... args);
 
 	char& operator[](const size_t& index);
 	const char& operator[](const size_t& index) const;
-
-	int GetLength() const;
 
 	int Find(char element) const;
 	int Find(const char* element) const;
