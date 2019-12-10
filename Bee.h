@@ -16,6 +16,7 @@ class CBee : public CCmdTarget
 {
 	DECLARE_DYNCREATE(CBee)
 
+protected:
 	CBee();           // protected constructor used by dynamic creation
 
 // Attributes
@@ -28,8 +29,8 @@ public:
 public:
 	virtual ~CBee();
 	CBee operator = (CBee& bee);
-	CBee::CBee(CBee& bee);
-	CBee::CBee(int Num);
+	CBee(CBee& bee);
+	CBee(int Num);
 	void SetNumber(int Num) {number = Num;}
 	int GetNumber() {return number;}
 	void Kill() {Alive = false; number = 0;}

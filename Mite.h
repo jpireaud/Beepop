@@ -19,8 +19,10 @@ protected:
 public:
 	CMite();
 	CMite(int Res, int NonRes);
-	CMite(CMite& mite);	// Copy Constructor
+	CMite(const CMite& mite);	// Copy Constructor
 	virtual ~CMite();
+
+	CMite& operator=(const CMite& mite);
 
 	int GetResistant() {return int(m_Resistant + 0.5);}
 	int GetNonResistant() {return int(m_NonResistant + 0.5);}

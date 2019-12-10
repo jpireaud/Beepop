@@ -29,7 +29,7 @@ CMite::CMite(int Res, int NonRes)
 	m_NonResistant = NonRes;
 }
 
-CMite::CMite(CMite& mite)
+CMite::CMite(const CMite& mite)
 {
 	m_Resistant = mite.m_Resistant;
 	m_NonResistant = mite.m_NonResistant;
@@ -40,6 +40,15 @@ CMite::~CMite()
 
 }
 
+CMite& CMite::operator=(const CMite& mite)
+{
+	if (this != &mite)
+	{
+		m_Resistant = mite.m_Resistant;
+		m_NonResistant = mite.m_NonResistant;
+	}
+	return *this;
+}
 
 void CMite::SetPctResistant(double pct)
 {
