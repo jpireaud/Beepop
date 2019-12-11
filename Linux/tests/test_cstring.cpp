@@ -12,7 +12,7 @@ TEST_CASE("CString operations", "[port]") {
 	CString myString("ThisIsAString");
 	CHECK(myString == "ThisIsAString");
 	CHECK(myString == CString("ThisIsAString"));
-
+	
 	SECTION("append data") {
 
 		myString += " - SomeAdditional Data";
@@ -71,4 +71,112 @@ TEST_CASE("CString operations", "[port]") {
 		std::string fmtString = fmt::sprintf("This is an integer %d", 10);
 		CHECK(fmtString == "This is an integer 10");
 	}
+
+	SECTION("Access operator"){
+		
+		CHECK(myString == "ThisIsAString");
+		CHECK(myString[8] == 't');
+		myString[6] = ' ';
+		CHECK(myString == "ThisIs String");
+	}
+	
+	SECTION("Search") {\
+	
+		myString = "ThisIsAStringThisIsAString";
+
+		CHECK(myString.Find('z') == -1);
+		CHECK(myString.Find('\0') == -1);
+		CHECK(myString.Find('i') == 2);
+		
+		CHECK(myString.Find("toto") == -1);
+		CHECK(myString.Find("is") == 2);
+		CHECK(myString.Find("Is") == 4);
+
+		CHECK(myString.ReverseFind('z') == -1);
+		CHECK(myString.ReverseFind('\0') == -1);
+		CHECK(myString.ReverseFind('i') == 23);
+		
+		CHECK(myString.ReverseFind("toto") == -1);
+		CHECK(myString.ReverseFind("is") == 15);
+		CHECK(myString.ReverseFind("Is") == 17);
+	}
+
+	SECTION("Replace") {
+
+		myString.Replace("ThisIsAString", "My new string is actually a sentence");
+		CHECK(myString == "My new string is actually a sentence");
+
+		myString.Replace("Toto", "Not in string");
+		CHECK(myString == "My new string is actually a sentence");
+		
+		myString.Replace("", "Not");
+		CHECK(myString == "My new string is actually a sentence");
+		
+		myString.Replace(" ", "Not");
+		CHECK(myString == "MyNotnewNotstringNotisNotactuallyNotaNotsentence");
+		
+		myString = "This is a sentence with a several a thingy!";
+		myString.Replace("a", "Euh");
+		CHECK(myString == "This is Euh sentence with Euh severEuhl Euh thingy!");
+	}
+
+	SECTION("Substring") {
+
+		CString left = myString.Left(100);
+		CHECK(left == "ThisIsAString");
+		left = myString.Left(-100);
+		CHECK(left == "");
+
+		CString right = myString.Right(100);
+		CHECK(right == "");
+		right = myString.Right(-100);
+		CHECK(right == "ThisIsAString");
+
+		CString mid = myString.Mid(100);
+		CHECK(mid == "");
+		mid = myString.Mid(-100);
+		CHECK(mid == "ThisIsAString");
+
+		mid = myString.Mid(4, 4);
+		CHECK(mid == "IsAS");
+		mid = myString.Mid(7, 100);
+		CHECK(mid == "String");
+	}
+
+    SECTION("Tokenize") {
+
+        myString = "%First Second#Third";
+
+        CString resToken;
+        int curPos = 0;
+
+        resToken = myString.Tokenize("% #", curPos);
+        CHECK(resToken == "First");
+        CHECK(curPos == 6);
+        resToken = myString.Tokenize("% #", curPos);
+        CHECK(resToken == "Second");
+        CHECK(curPos == 13);
+        resToken = myString.Tokenize("% #", curPos);
+        CHECK(resToken == "Third");
+        CHECK(curPos == 19);
+        resToken = myString.Tokenize("% #", curPos);
+        CHECK(resToken == "");
+        CHECK(curPos == 19);
+    }
+
+    SECTION("Span Excluding") {
+
+        myString = "World Cup '98";
+
+        CString spaned = myString.SpanExcluding(";,.-'");
+        CHECK(spaned == "World Cup ");
+
+        CString str1 ("Hello World! Goodbye!");
+        CString str2 = str1.SpanExcluding(".!?");
+        CHECK(str2 == "Hello World");
+
+        CString str3 ("Hello World Goodbye");
+        CString str4 = str3.SpanExcluding(".!?");
+        CHECK(str4 == "Hello World Goodbye");
+    }
 }

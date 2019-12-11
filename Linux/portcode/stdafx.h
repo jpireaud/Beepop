@@ -18,6 +18,9 @@
 
 #define afx_msg 
 
+#define XSTR(x) STR(x)
+#define STR(x) #x
+
 #include <cassert>
 #define ASSERT assert
 
@@ -67,11 +70,11 @@ typedef size_t POSITION;
 template<>
 struct fmt::formatter<CString>
 {
-  template<typename ParseContext>
-  constexpr auto parse(ParseContext& ctx);
+    template<typename ParseContext>
+    constexpr auto parse(ParseContext& ctx);
 
-  template<typename FormatContext>
-  auto format(CString const& number, FormatContext& ctx);
+    template<typename FormatContext>
+    auto format(CString const& number, FormatContext& ctx);
 };
 #include "fmt/ostream.h"
 std::ostream &operator<<(std::ostream &stream, const CString& string);

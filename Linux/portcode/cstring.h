@@ -4,6 +4,7 @@
 
 #include <string>
 
+// This class mimic the needed bahavior of the ATL CString class for the VarroaPop project
 class CString
 {
 public:
@@ -14,6 +15,9 @@ public:
 
 	bool operator==(const CString& str) const;
 	bool operator==(const char* str) const;
+
+	char& operator[](const size_t& index);
+	const char& operator[](const size_t& index) const;
 
 	CString& operator+=(const CString& str);
 	CString& operator=(const CString& str);
@@ -30,31 +34,43 @@ public:
 	void Trim();
 	void TrimLeft();
 	void TrimRight();
-
-	// To be implemented...
 	
 	template<typename... Args>
 	void Format(const char* format, Args... args);
 
-	char& operator[](const size_t& index);
-	const char& operator[](const size_t& index) const;
-
+	// Find the first occurence of element 
+	// return -1 if not found and index otherwise
 	int Find(char element) const;
-	int Find(const char* element) const;
+
+	// Find the last occurence of element
+	// return -1 if not found and index otherwise
+	int ReverseFind(char element) const;
+	
+	// Find the first occurence of str 
+	// return -1 if not found and index otherwise
+	int Find(const char* str) const;
+
+	// Find the last occurence of str
+	// return -1 if not found and index otherwise
+	int ReverseFind(const char* str) const;
 
 	void Replace(const CString& toReplace, const CString& with);
 
-	int ReverseFind(char element) const;
-	int ReverseFind(const char* element) const;
+	// Return the substring consisting of the leftmost 'count' characters
+	CString Left(int count) const;
 
-	CString Left(int position) const;
-	CString Right(int position) const;
-	CString Mid(int position) const;
-	CString Mid(int start, int end) const;
+	// Return the substring consisting of the rightmost 'count' characters
+	CString Right(int count) const;
 
-	CString Tokenize(const char* delimiter, int startPosition) const;
+	// Return the substring starting at index 'first'
+	CString Mid(int first) const;
 
-	CString SpanExcluding(const char* str) const;
+	// Return the substring starting at index 'first', with length 'count'
+	CString Mid(int first, int count) const;
+
+	CString Tokenize(const char* delimiter, int& startPosition) const;
+
+	CString SpanExcluding(const char* delimiter) const;
 
 protected:
 
