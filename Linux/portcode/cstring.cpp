@@ -210,3 +210,19 @@ CString CString::SpanExcluding(const char* delimiter) const
     }
     return cResult;
 }
+
+CString operator+(const CString& str1, const CString& str2)
+{
+    return str1 + str2;
+}
+
+CString operator+(const CString& str1, const char* str2)
+{
+    return str1 + str2;
+}
+
+CString operator+(const char* str1, const CString& str2)
+{
+    CString cStr1(str1);
+    return cStr1 + str2;
+}

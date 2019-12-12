@@ -33,13 +33,15 @@ include_directories(BEFORE . portcode datamodel)
 
 ## sub directories
 
-add_subdirectory(portcode)
 add_subdirectory(datamodel)
+add_subdirectory(portcode)
 add_subdirectory(tests)
 
 ## build application
 
-set (SOURCES main.cpp)
+set (SOURCES main.cpp varroapopcmd.cpp)
+# set (SOURCES main.cpp)
 
 add_executable(VarroaPop ${SOURCES})
-add_dependencies(VarroaPop VarroaPopDataModel VarroaPopLinuxPort)
+target_link_libraries(VarroaPop PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
+target_precompile_headers(VarroaPop REUSE_FROM VarroaPopDataModel)

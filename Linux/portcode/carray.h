@@ -4,15 +4,15 @@
 
 #include "cobject.h"
 
-#include <cstddef>
+#include <vector>
 
 template<class TYPE, class ARG_TYPE = const TYPE&>
 class CArray : public CObject
 {
 public:
-	bool IsEmpty() const;
+	BOOL IsEmpty() const;
 
-	int GetCount() const;
+	INT_PTR GetCount() const;
 
 	void RemoveAll();
 
@@ -20,13 +20,18 @@ public:
 
 	void Add(const TYPE& element);
 
-	const TYPE& operator[](const size_t& index) const;
-	TYPE& operator[](const size_t& index);
+	const TYPE& operator[](INT_PTR index) const;
+	TYPE& operator[](INT_PTR index);
 
-	void RemoveAt(const size_t& index);
+	void RemoveAt(INT_PTR index);
 
-	void SetSize(size_t size);
-	void SetSize(size_t columnSize, size_t rowSize);
+	void SetSize(INT_PTR size, INT_PTR growBy = -1);
+
+protected:
+
+    std::vector<TYPE> m_data;
 };
+
+#include "carray.inline.h"
 
 #endif // CARRAY_CUSTOM_H

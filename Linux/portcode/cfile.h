@@ -46,4 +46,24 @@ public:
 	CString GetErrorMessage(char* buffer, uint32_t bufferSize) const;
 };
 
+class CStdioFile : public CFile
+{
+public:
+	CStdioFile();
+	CStdioFile(const char* lpszFileName, uint32_t nOpenFlags);
+
+	bool Open(const char* lpszFileName, uint32_t nOpenFlags, CFileException* pError);
+
+	bool ReadString(CString& str);
+	void WriteString(const CString& str);
+
+	CString GetFileName() const;
+	void Close();
+	void Rename(const CString& original, const CString& target);
+
+	void SeekToBegin();
+		
+	size_t GetPosition() const;
+};
+
 #endif // CFILE_CUSTOM_H

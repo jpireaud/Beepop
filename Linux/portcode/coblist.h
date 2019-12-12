@@ -5,34 +5,46 @@
 #include "cobject.h"
 #include "cstring.h"
 
+#include "stdafx.h"
+
 #include <cstddef>
+#include <list>
+
+namespace CObListNs { struct InnerPosition {
+    std::list<CObject*>::const_iterator m_it;
+}; }
 
 class CObList : public CObject
 {
 public:
 	CObList();
 
-	size_t GetCount() const;
-	bool IsEmpty() const;
+	INT_PTR GetCount() const;
+	BOOL IsEmpty() const;
 
 	// In the MFC framework we use the index to go through the linked list and return
 	// the actual node wrapped in the POSITION structure
-	size_t FindIndex(size_t index) const;
+	POSITION FindIndex(INT_PTR index) const;
 
-	CObject* GetAt(size_t position) const;
+	CObject* GetAt(POSITION position) const;
 	CObject* GetHead() const;
-	CObject* GetPrev(size_t position) const;
-	CObject* GetNext(size_t position) const;
+	CObject* GetPrev(POSITION& position) const;
+	CObject* GetNext(POSITION& position) const;
 
-	size_t GetHeadPosition() const;
-	size_t GetTailPosition() const;
+	POSITION GetHeadPosition() const;
+	POSITION GetTailPosition() const;
 
-	size_t AddHead (CObject* object);
-	size_t AddTail (CObject* object);
-	void RemoveAt(size_t position);
+	POSITION AddHead (CObject* object);
+	POSITION AddTail (CObject* object);
+	void RemoveAt(POSITION position);
 	CObject* RemoveHead();
-	CObject* RemoveTail ();
+	CObject* RemoveTail();
 	void RemoveAll();
+
+protected:
+
+    std::list<CObject*> m_data;
+    mutable std::unique_ptr<CObListNs::InnerPosition> m_iterator;
 };
 
 class CStringList : public CObList

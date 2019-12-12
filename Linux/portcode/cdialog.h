@@ -51,7 +51,6 @@ class CDialog : public CWnd
 public:
 	CDialog();
 	CDialog(int32_t id, CWnd* pParent);
-	virtual size_t DoModal();
 	virtual void Create(int32_t nIDTemplate);
 	virtual void Create(int32_t nIDTemplate, CWnd* pParentWnd);
 	bool SetWindowText(const CString& text);

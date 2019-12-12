@@ -15,8 +15,3 @@ void CString::Format(const char* format, Args... args)
 {
 	m_data = fmt::sprintf(format, std::forward< Args >(args)...);
 }
-
-std::ostream &operator<<(std::ostream &stream, const CString& string)
-{
-    return stream << string.ToString();
-}

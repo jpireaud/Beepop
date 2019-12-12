@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 
-bool gl_RunGUI;
+extern bool gl_RunGUI;
 
 #define MB_OK                       0x00000000L
 #define MB_YESNO                    0x00000004L

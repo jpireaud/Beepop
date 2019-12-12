@@ -5,6 +5,11 @@
 #include "cobject.h"
 
 #include <cstddef>
+#include <list>
+
+namespace CPtrListNs { template<class TYPE> struct InnerPosition {
+    typename std::list<TYPE>::const_iterator m_it;
+}; }
 
 class CPtrList : public CObject
 {
@@ -13,21 +18,29 @@ class CPtrList : public CObject
 };
 
 template<class BASE_CLASS, class TYPE>
-class CTypedPtrList : public BASE_CLASS
+class CTypedPtrList
 {
 public:
 
-	bool IsEmpty() const;
-	size_t GetCount() const;
-	TYPE GetAt(size_t position) const;
-	size_t AddTail(TYPE object);
-	void RemoveAt(size_t position);
-	size_t GetHeadPosition() const;
+	BOOL IsEmpty() const;
+	INT_PTR GetCount() const;
+	TYPE GetAt(POSITION position) const;
+	POSITION AddTail(TYPE object);
+	void RemoveAt(POSITION position);
+	POSITION GetHeadPosition() const;
+	POSITION GetTailPosition() const;
 	TYPE GetHead() const;
 	TYPE GetTail() const;
-	TYPE GetNext(size_t position) const;
-	TYPE RemoveHead() const;
-	void RemoveAll() const;
+	TYPE GetNext(POSITION position) const;
+	TYPE RemoveHead();
+	void RemoveAll();
+
+protected:
+
+    std::list<TYPE> m_data;
+    mutable std::unique_ptr<CPtrListNs::InnerPosition<TYPE>> m_iterator;
 };
+
+#include "cptrlist.inline.h"
 
 #endif // CPTRLIST_CUSTOM_H

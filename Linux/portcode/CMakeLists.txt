@@ -13,11 +13,13 @@ set(SOURCES carchive.cpp
             coblist.cpp
             coledatetime.cpp
             cptrlist.cpp
-            cstdiofile.cpp
             cstring.cpp
             cstringarray.cpp
             ctime.cpp
-            cuintarray.cpp )
+            cuintarray.cpp
+            stdafx.cpp
+            VarroaPop.cpp )
 
 add_library(VarroaPopLinuxPort ${SOURCES})
 target_link_libraries(VarroaPopLinuxPort fmt::fmt)
+target_precompile_headers(VarroaPopLinuxPort REUSE_FROM VarroaPopDataModel)

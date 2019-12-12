@@ -14,11 +14,11 @@ def get_project_root():
 
 
 def is_source_file(filename):
-    return os.path.splitext(filename)[1] in [".cpp", ".cxx", ".c"]
+    return os.path.splitext(filename)[1].lower() in [".cpp", ".cxx", ".c"]
 
 
 def is_header_file(filename):
-    return os.path.splitext(filename)[1] in [".h", ".hpp"]
+    return os.path.splitext(filename)[1].lower() in [".h", ".hpp"]
 
 
 def is_code_file(filename):

@@ -66,8 +66,8 @@ public:
 
 	bool GetAsSystemTime(SYSTEMTIME& time) const;
 
-	COleDateTimeSpan& operator+=(const COleDateTimeSpan& span);
-	COleDateTimeSpan& operator-=(const COleDateTimeSpan& span);
+	COleDateTimeSpan operator+=(const COleDateTimeSpan& span);
+	COleDateTimeSpan operator-=(const COleDateTimeSpan& span);
 
 	COleDateTime operator+(const COleDateTimeSpan& span);
 	COleDateTime operator-(const COleDateTimeSpan& span);

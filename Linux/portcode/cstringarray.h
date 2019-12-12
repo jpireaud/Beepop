@@ -6,24 +6,29 @@
 #include "cstring.h"
 
 #include <cstdint>
+#include <vector>
 
 class CStringArray : public CObject
 {
 public:
 
-	int32_t GetSize() const;
-	int32_t GetCount() const;
-	bool IsEmpty() const;
-	int32_t GetUpperBound() const;
-	void SetSize(int32_t nNewSize, int32_t nGrowBy = -1);
+	INT_PTR GetSize() const;
+	INT_PTR GetCount() const;
+	BOOL IsEmpty() const;
+	INT_PTR GetUpperBound() const;
+	void SetSize(INT_PTR nNewSize, INT_PTR nGrowBy = -1);
 
-	CString GetAt(int32_t position);
+	CString GetAt(INT_PTR position);
 	void Add(const CString& str);
 
-	const CString& operator[](const size_t& index) const;
-	CString& operator[](const size_t& index);
+	const CString& operator[](INT_PTR index) const;
+	CString& operator[](INT_PTR index);
 
 	void RemoveAll();
+
+protected:
+
+    std::vector<CString> m_data;
 }; 
 
 

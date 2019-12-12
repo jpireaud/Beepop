@@ -5,17 +5,22 @@
 #include "cobject.h"
 
 #include <cstdint>
+#include <vector>
 
 class CUIntArray : public CObject
 {
 public:
-    int GetSize() const;
-    uint32_t GetAt(uint32_t index) const;
+    INT_PTR GetSize() const;
+    UINT GetAt(INT_PTR index) const;
 
-    void Add(uint32_t eventId);
-    void RemoveAt(uint32_t index);
+    void Add(UINT eventId);
+    void RemoveAt(UINT index);
 
 	void RemoveAll();
+
+protected:
+
+    std::vector<UINT> m_data;
 };
 
 #endif // CUINTARRAY_CUSTOM_H

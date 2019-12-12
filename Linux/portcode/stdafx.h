@@ -2,7 +2,7 @@
 #ifndef STDAFX_CUSTOM_H
 #define STDAFX_CUSTOM_H
 
-#define DECLARE_DYNCREATE(Class) // void
+#define DECLARE_DYNCREATE(Class) public:
 #define IMPLEMENT_DYNCREATE(Class, BaseClass) // void
 
 #define DECLARE_SERIAL(Class) // void
@@ -38,7 +38,7 @@ typedef unsigned long DWORD;
 typedef uint32_t UINT;
 typedef const char* LPCTSTR;
 typedef char TCHAR;
-//typedef size_t INT_PTR;
+typedef size_t INT_PTR;
 typedef long LONG;
 
 #include <ctime>
@@ -48,7 +48,8 @@ typedef time_t SYSTEMTIME;
 #define FALSE false
 
 // Abstract iteration position check if we can change to a size_t
-typedef size_t POSITION;
+struct __POSITION {};
+typedef __POSITION* POSITION;
 
 #include "carchive.h"
 #include "carray.h"
@@ -62,7 +63,6 @@ typedef size_t POSITION;
 #include "cptrlist.h"
 #include "cstring.h"
 #include "cstringarray.h"
-#include "cstdiofile.h"
 #include "ctime.h"
 #include "cuintarray.h"
 
@@ -85,6 +85,8 @@ std::ostream &operator<<(std::ostream &stream, const CString& string);
 #define strcpy_s strcpy
 #define strtok_s(_In, _Delim, _SafeToken) strtok(_In, _Delim)
 #endif
+
+#define NOT_IMPLEMENTED() assert("Not implemented!")
 
 #endif // STDAFX_CUSTOM_H
 

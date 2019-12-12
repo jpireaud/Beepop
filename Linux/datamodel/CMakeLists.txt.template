@@ -6,5 +6,5 @@ find_package(fmt CONFIG REQUIRED)
 set(SOURCES $VarroaPopDataModelSourceFiles )
 
 add_library(VarroaPopDataModel $${SOURCES})
-target_precompile_headers(VarroaPopDataModel PRIVATE "$${VarroaPopPCH}")
 target_link_libraries(VarroaPopDataModel PRIVATE fmt::fmt)
+target_precompile_headers(VarroaPopDataModel PRIVATE "$${VarroaPopPCH}")
