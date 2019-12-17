@@ -8,7 +8,7 @@
 
 struct CFileStatus
 {
-	uint64_t m_size;
+	ULONGLONG m_size; // size in Bytes
 };
 
 class CFile
@@ -16,7 +16,8 @@ class CFile
 public:
 
 	// Flag values
-	enum OpenFlags {
+	enum OpenFlags 
+	{
 		modeRead = std::ios_base::in,
 		modeWrite = std::ios_base::out,
 		modeReadWrite = modeRead | modeWrite,
@@ -33,37 +34,57 @@ public:
 		shareDenyNone = 0
 	};
     
-    static size_t begin;
-
-    virtual size_t Seek(size_t lOff, size_t nFrom);
-
-	void GetStatus(CFileStatus& status) const;
+    enum SeekPosition 
+	{ 
+		begin = std::ios_base::beg, 
+		current = std::ios_base::cur, 
+		end = std::ios_base::end 
+	};
 };
 
 class CFileException
 {
 public:
-	CString GetErrorMessage(char* buffer, uint32_t bufferSize) const;
+	BOOL GetErrorMessage(LPTSTR buffer, UINT bufferSize) const;
+
+	void SetErrorMessage(const std::string& message);
+
+protected:
+	std::string m_message;
 };
 
 class CStdioFile : public CFile
 {
 public:
+	static void Rename(const CString& original, const CString& target);
+
 	CStdioFile();
-	CStdioFile(const char* lpszFileName, uint32_t nOpenFlags);
+	CStdioFile(LPCTSTR lpszFileName, UINT nOpenFlags);
 
-	bool Open(const char* lpszFileName, uint32_t nOpenFlags, CFileException* pError);
+	BOOL Open(LPCTSTR lpszFileName, UINT nOpenFlags, CFileException* pError);
 
-	bool ReadString(CString& str);
-	void WriteString(const CString& str);
+	void GetStatus(CFileStatus& status) const;
+
+	BOOL ReadString(CString& str);
+	
+	void WriteString(LPCTSTR str);
 
 	CString GetFileName() const;
+	
 	void Close();
-	void Rename(const CString& original, const CString& target);
 
 	void SeekToBegin();
+
+    ULONGLONG Seek(LONGLONG lOff, UINT nFrom);
 		
-	size_t GetPosition() const;
+	// Here we removed the constness of the method since in std c++ the rdstate of the stream
+	// will be change is tellg fails
+	ULONGLONG GetPosition();
+
+protected:
+
+	std::fstream m_fileStream;
+	std::string m_fileName;
 };
 
 #endif // CFILE_CUSTOM_H

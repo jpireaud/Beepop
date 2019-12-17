@@ -36,10 +36,13 @@ typedef unsigned char BYTE;
 typedef BYTE BOOLEAN;
 typedef unsigned long DWORD;
 typedef uint32_t UINT;
+typedef char* LPTSTR;
 typedef const char* LPCTSTR;
 typedef char TCHAR;
 typedef size_t INT_PTR;
 typedef long LONG;
+typedef int64_t LONGLONG;
+typedef uint64_t ULONGLONG;
 
 #include <ctime>
 typedef time_t SYSTEMTIME;

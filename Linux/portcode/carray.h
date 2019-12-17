@@ -21,6 +21,7 @@ public:
 	void Add(const TYPE& element);
 
 	const TYPE& operator[](INT_PTR index) const;
+	
 	TYPE& operator[](INT_PTR index);
 
 	void RemoveAt(INT_PTR index);

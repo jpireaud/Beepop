@@ -34,13 +34,13 @@ void CArray<TYPE, ARG_TYPE>::Add(const TYPE& element)
 template<class TYPE, class ARG_TYPE>
 const TYPE& CArray<TYPE, ARG_TYPE>::operator[](INT_PTR index) const
 {
-    return m_data[index];
+    return m_data.at(index);
 }
 
 template<class TYPE, class ARG_TYPE>
 TYPE& CArray<TYPE, ARG_TYPE>::operator[](INT_PTR index)
 {
-    return m_data[index];
+    return m_data.at(index);
 }
 
 template<class TYPE, class ARG_TYPE>

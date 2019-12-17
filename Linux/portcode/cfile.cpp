@@ -1,71 +1,104 @@
 #include "cfile.h"
 
-size_t CFile::begin = 0;
+#include <boost/filesystem.hpp>
+namespace bfs = boost::filesystem;
 
-size_t CFile::Seek(size_t lOff, size_t nFrom)
-{
-    NOT_IMPLEMENTED(); 
-    return 0;
-}
+#include <iostream>
 
-void CFile::GetStatus(CFileStatus& status) const
+void CStdioFile::Rename(const CString& original, const CString& target)
 {
-    NOT_IMPLEMENTED(); 
+    bfs::rename(original.ToString(), target.ToString());
 }
 
 CStdioFile::CStdioFile()
 {
-    NOT_IMPLEMENTED(); 
-}
-CStdioFile::CStdioFile(const char* lpszFileName, uint32_t nOpenFlags)
-{
-    NOT_IMPLEMENTED(); 
 }
 
-bool CStdioFile::Open(const char* lpszFileName, uint32_t nOpenFlags, CFileException* pError)
+CStdioFile::CStdioFile(LPCTSTR lpszFileName, UINT nOpenFlags)
+: m_fileStream(lpszFileName, static_cast<std::ios_base::openmode>(nOpenFlags))
+, m_fileName(lpszFileName)
 {
-    NOT_IMPLEMENTED(); 
-    return false;
 }
 
-bool CStdioFile::ReadString(CString& str)
+BOOL CStdioFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, CFileException* pError)
 {
-    NOT_IMPLEMENTED(); 
-    return false;
+    try 
+    {
+        m_fileStream.exceptions(std::ifstream::failbit);
+        m_fileStream.open(lpszFileName, static_cast<std::ios_base::openmode>(nOpenFlags));
+        m_fileName = lpszFileName;
+    }
+    catch(const std::ios_base::failure& exception)
+    {
+        pError->SetErrorMessage(exception.what());
+    }
+    return m_fileStream.is_open();
 }
-void CStdioFile::WriteString(const CString& str)
+
+BOOL CStdioFile::ReadString(CString& str)
 {
-    NOT_IMPLEMENTED(); 
+    std::string data;
+    std::getline(m_fileStream, data);
+    str = data;
+    return !data.empty();
+}
+
+void CStdioFile::WriteString(LPCTSTR str)
+{
+    std::string lStr (str);
+    m_fileStream.write(lStr.c_str(), lStr.length());
 }
 
 CString CStdioFile::GetFileName() const
 {
-    NOT_IMPLEMENTED(); 
-    return CString();
-}
-void CStdioFile::Close()
-{
-    NOT_IMPLEMENTED(); 
+    return CString(m_fileName);
 }
 
-void CStdioFile::Rename(const CString& original, const CString& target)
+void CStdioFile::Close()
 {
-    NOT_IMPLEMENTED(); 
+    if (m_fileStream.is_open())
+    {
+        m_fileStream.close();
+    }
+    m_fileStream.clear();
 }
 
 void CStdioFile::SeekToBegin()
 {
-    NOT_IMPLEMENTED(); 
+    m_fileStream.seekp(0);
 }
     
-size_t CStdioFile::GetPosition() const
+ULONGLONG CStdioFile::Seek(LONGLONG lOff, UINT nFrom)
 {
-    NOT_IMPLEMENTED();
-    return 0;
+    m_fileStream.seekp(lOff, static_cast<std::ios_base::seekdir>(nFrom));
+    return m_fileStream.tellp();
 }
 
-CString CFileException::GetErrorMessage(char* buffer, uint32_t bufferSize) const
+ULONGLONG CStdioFile::GetPosition()
 {
-    NOT_IMPLEMENTED(); 
-    return CString();
+    return m_fileStream.tellp();
 }
+
+void CStdioFile::GetStatus(CFileStatus& status) const
+{
+    // If we need more status information about the file than the size
+    // auto fileStatus = bfs::status(m_fileName);
+    
+    status.m_size = bfs::file_size(m_fileName);
+}
+
+BOOL CFileException::GetErrorMessage(LPTSTR buffer, UINT bufferSize) const
+{
+    bool hasErrorMessage = !m_message.empty();
+    if (hasErrorMessage)
+    {
+        snprintf(buffer, bufferSize, "%s", m_message.c_str());
+    }
+    return hasErrorMessage;
+}
+
+void CFileException::SetErrorMessage(const std::string& message)
+{
+    m_message = message;
+}
+

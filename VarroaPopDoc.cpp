@@ -913,6 +913,7 @@ void CVarroaPopDoc::Simulate()
 		if (gl_RunGUI) UpdateAllViews(NULL);
 		else
 		{
+			// This code generates an execption on Julien's computer we need to figure out what it does and why
 			POSITION pos = GetFirstViewPosition();
 			CVarroaPopView* pView = (CVarroaPopView*)GetNextView(pos);
 			pView->ChartData(this,gl_RunGUI);

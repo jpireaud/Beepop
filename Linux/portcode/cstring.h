@@ -78,6 +78,7 @@ protected:
 }; 
 
 CString operator+(const CString& str1, const CString& str2);
+CString operator+(const CString& str1, const char* str2);
 CString operator+(const char* str1, const CString& str2);
 
 #endif // CSTRING_CUSTOM_H
