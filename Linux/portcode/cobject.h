@@ -7,6 +7,7 @@ class CArchive;
 class CObject
 {
 public:
+	virtual ~CObject() {}
 	virtual void Serialize(CArchive& ar);
 };
 

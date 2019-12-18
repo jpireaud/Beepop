@@ -62,6 +62,11 @@ CString& CString::operator=(const CString& str)
 	return *this;
 }
 
+bool CString::operator<(const CString& str) const
+{
+	return m_data < str.m_data;
+}
+
 const std::string& CString::ToString() const
 {
 	return m_data;

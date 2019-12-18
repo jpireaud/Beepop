@@ -22,6 +22,8 @@ public:
 	CString& operator+=(const CString& str);
 	CString& operator=(const CString& str);
 
+	bool operator<(const CString& str) const;
+
 	const std::string& ToString() const;
 
 	operator const char* () const;

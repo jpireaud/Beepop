@@ -18,12 +18,13 @@ class CMapStringToOb : public CObject
 {
 public:
 
-	bool IsEmpty() const;
+	BOOL IsEmpty() const;
 	POSITION GetStartPosition() const;
-	void SetAt(CString& string, CObject* value);
+	void SetAt(LPCTSTR string, CObject* value);
 	void GetNextAssoc(POSITION& position, CString& string, CObject*& value) const;
-	bool Lookup(CString& string, CObject*& value) const;
-	void RemoveKey(CString& string);
+	BOOL Lookup(LPCTSTR string, CObject*& value) const;
+	BOOL RemoveKey(LPCTSTR string);
+	void RemoveAll();
 
 protected:
 
