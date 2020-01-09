@@ -87,7 +87,7 @@ def fix_include_directives(source, target):
     if len(result):
         with open(target, 'w') as code_file:
             for include in result:
-                if include in get_data_model_files():
+                if any(file.lower() == include.lower() for file in get_data_model_files()):
                     code_file_content = code_file_content.replace(include, include.lower())
             code_file.write(code_file_content)
     else:

@@ -6,7 +6,7 @@ CTime::CTime()
 
 }
 
-CTime::CTime(const time_t& time)
+CTime::CTime(const SYSTEMTIME& time)
 {
 
 }

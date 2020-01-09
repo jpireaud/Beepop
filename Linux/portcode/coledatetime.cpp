@@ -1,8 +1,11 @@
 #include "coledatetime.h"
 
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+
 COleDateTimeSpan::COleDateTimeSpan()
 {
-    NOT_IMPLEMENTED();
 }
 
 COleDateTimeSpan::COleDateTimeSpan(double dblSpanSrc)
@@ -38,8 +41,8 @@ bool COleDateTimeSpan::operator!=(const COleDateTimeSpan& other) const
 }
 
 COleDateTime::COleDateTime()
+: COleDateTime(1899, 12, 30, 0, 0, 0)
 {
-    NOT_IMPLEMENTED();
 }
 
 COleDateTime::COleDateTime(int32_t nYear,
@@ -49,48 +52,61 @@ COleDateTime::COleDateTime(int32_t nYear,
     int32_t nMin,
     int32_t nSec)
 {
-    NOT_IMPLEMENTED();
-}
-
-int32_t COleDateTime::GetMonth() const
-{
-    NOT_IMPLEMENTED();
-}
-
-int32_t COleDateTime::GetDay() const
-{
-    NOT_IMPLEMENTED();
-    return 0;
+    const char* dateTimeFormat = "%Y-%m-%d %H:%M:%S";
+    std::string dateTime = fmt::format("{}-{}-{} {}:{}:{}", nYear, nMonth, nDay, nHour, nMin, nSec);
+    std::istringstream stream (dateTime);
+    std::tm dt;
+    stream >> std::get_time(&dt, dateTimeFormat);
+    if (!stream.fail())
+    {
+        m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
+        m_status = valid;
+    }
+    else
+    {
+        m_status = error;
+    }
 }
 
 int32_t COleDateTime::GetYear() const
 {
-    NOT_IMPLEMENTED();
-    return 0;
+    SYSTEMTIME st = {0};
+    return GetAsSystemTime(st)? st.wYear : error;
+}
+
+int32_t COleDateTime::GetMonth() const
+{
+    SYSTEMTIME st = {0};
+    return GetAsSystemTime(st)? st.wMonth : error;
+}
+
+int32_t COleDateTime::GetDay() const
+{
+    SYSTEMTIME st = {0};
+    return GetAsSystemTime(st)? st.wDay : error;
 }
 
 int32_t COleDateTime::GetHour() const
 {
-    NOT_IMPLEMENTED();
-    return 0;
+    SYSTEMTIME st = {0};
+    return GetAsSystemTime(st)? st.wHour : error;
 }
 
 int32_t COleDateTime::GetMinute() const
 {
-    NOT_IMPLEMENTED();
-    return 0;
+    SYSTEMTIME st = {0};
+    return GetAsSystemTime(st)? st.wMinute : error;
 }
 
 int32_t COleDateTime::GetDayOfYear() const
 {
-    NOT_IMPLEMENTED();
-    return 0;
+    SYSTEMTIME st = {0};
+    return GetAsSystemTime(st)? st.wDayOfWeek : error;
 }
 
 COleDateTime::DateTimeStatus COleDateTime::GetStatus() const
 {
-    NOT_IMPLEMENTED();
-    return DateTimeStatus::error;
+    return m_status;
 }
 
 bool COleDateTime::operator < (const COleDateTime& other) const
@@ -126,12 +142,27 @@ bool COleDateTime::ParseDateTime(const CString& dateTimeStr)
 bool COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
 {
     NOT_IMPLEMENTED();
+	return false;
 }
 
 bool COleDateTime::GetAsSystemTime(SYSTEMTIME& time) const
 {
-    NOT_IMPLEMENTED();
-    return false;
+    std::time_t l_time = std::chrono::system_clock::to_time_t(m_time_point);
+    auto tm = std::localtime(&l_time);
+    bool success = tm != nullptr;
+    if(success)
+    {
+        time.wYear = tm->tm_year + 1900;
+        time.wMonth = tm->tm_mon + 1;
+        time.wDayOfWeek = tm->tm_wday;
+        time.wDay = tm->tm_mday;
+        time.wHour = tm->tm_hour;
+        time.wMinute = tm->tm_min;
+        time.wSecond = tm->tm_sec;
+        auto tp_no_milliseconds = std::chrono::system_clock::from_time_t(l_time);
+        time.wMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(m_time_point-tp_no_milliseconds).count();
+    }
+    return success;
 }
 
 COleDateTimeSpan COleDateTime::operator+=(const COleDateTimeSpan& span)

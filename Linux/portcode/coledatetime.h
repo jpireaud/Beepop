@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 
+#include <chrono>
+
 #define GetCurrentTime() GetTickCount()
 
 class COleDateTimeSpan
@@ -45,9 +47,9 @@ public:
 		int32_t nMin,
 		int32_t nSec);
 
+	int32_t GetYear() const;
 	int32_t GetMonth() const;
 	int32_t GetDay() const;
-	int32_t GetYear() const;
 	int32_t GetHour() const;
 	int32_t GetMinute() const;
 
@@ -74,6 +76,12 @@ public:
 
 	COleDateTimeSpan operator+(const COleDateTime& date) const;
 	COleDateTimeSpan operator-(const COleDateTime& date) const;
+
+protected:
+
+	// here we use a time point to get milliseconds precision
+	std::chrono::system_clock::time_point m_time_point;
+	DateTimeStatus m_status;
 };
 
 

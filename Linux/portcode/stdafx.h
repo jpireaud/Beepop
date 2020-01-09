@@ -30,22 +30,47 @@
 #include "fmt/printf.h"
 #define TRACE(...) fmt::printf(__VA_ARGS__)
 
+#ifndef WINDOWS
+#if _WIN32 || _WIN64
+#define WINDOWS
+#endif
+#endif
+
 #include <cstdint>
 typedef int32_t BOOL;
 typedef unsigned char BYTE;
 typedef BYTE BOOLEAN;
+typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef uint32_t UINT;
 typedef char* LPTSTR;
 typedef const char* LPCTSTR;
 typedef char TCHAR;
-typedef size_t INT_PTR;
+typedef intptr_t INT_PTR;
 typedef long LONG;
 typedef int64_t LONGLONG;
 typedef uint64_t ULONGLONG;
 
-#include <ctime>
-typedef time_t SYSTEMTIME;
+#ifndef WINDOWS
+#ifndef _SYSTEMTIME_
+#define _SYSTEMTIME_
+typedef struct _SYSTEMTIME
+{
+	WORD wYear;
+	WORD wMonth;
+	WORD wDayOfWeek;
+	WORD wDay;
+	WORD wHour;
+	WORD wMinute;
+	WORD wSecond;
+	WORD wMilliseconds;
+} SYSTEMTIME;
+typedef struct _SYSTEMTIME *PSYSTEMTIME;
+typedef struct _SYSTEMTIME *LPSYSTEMTIME;
+#endif
+#else
+#include <windows.h>
+#endif
 
 #define TRUE true
 #define FALSE false

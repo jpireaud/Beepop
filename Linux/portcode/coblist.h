@@ -18,6 +18,7 @@ class CObList : public CObject
 {
 public:
 	CObList();
+	~CObList();
 
 	INT_PTR GetCount() const;
 	BOOL IsEmpty() const;

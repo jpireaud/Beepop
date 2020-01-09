@@ -22,6 +22,9 @@ class CTypedPtrList
 {
 public:
 
+	CTypedPtrList();
+	~CTypedPtrList();
+
 	BOOL IsEmpty() const;
 	INT_PTR GetCount() const;
 	TYPE GetAt(POSITION position) const;
@@ -31,7 +34,7 @@ public:
 	POSITION GetTailPosition() const;
 	TYPE GetHead() const;
 	TYPE GetTail() const;
-	TYPE GetNext(POSITION position) const;
+	TYPE GetNext(POSITION& position) const;
 	TYPE RemoveHead();
 	void RemoveAll();
 

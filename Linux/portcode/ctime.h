@@ -10,7 +10,7 @@ class CTime
 {
 public:
 	CTime();
-	CTime(const time_t& time);
+	CTime(const SYSTEMTIME& time);
 
 	COleDateTime GetTime() const;
 

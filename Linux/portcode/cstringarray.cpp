@@ -2,7 +2,7 @@
 
 INT_PTR CStringArray::GetSize() const
 {
-    return m_data.capacity();
+    return m_data.size();
 }
 
 INT_PTR CStringArray::GetCount() const
