@@ -6,8 +6,33 @@
 
 #include "ctime.h"
 
+#include <ctime>
+
 TEST_CASE("CTime operations", "[port]") {
     
-    CTime time;
-    CHECK(false);
+    SECTION("construct") {
+
+        COleDateTime dateTime(2020, 1, 11, 0, 0, 0);
+
+        SYSTEMTIME systemTime;
+        dateTime.GetAsSystemTime(systemTime);
+
+        CTime time(systemTime);
+
+        CHECK(time.GetTime() >= dateTime);
+    }
+    
+    SECTION("now") {
+
+        CTime time;
+        auto now = std::time(nullptr);
+        auto tm = std::localtime(&now);
+
+        auto oleTime = time.GetTime();
+        CHECK(oleTime.GetYear() == tm->tm_year);
+        CHECK(oleTime.GetMonth() == tm->tm_mon);
+        CHECK(oleTime.GetDay() == tm->tm_mday);
+        CHECK(oleTime.GetHour() == tm->tm_min);
+        CHECK(oleTime.GetMinute() == tm->tm_sec);
+    }
 }

@@ -8,22 +8,7 @@
 
 #define GetCurrentTime() GetTickCount()
 
-class COleDateTimeSpan
-{
-public:
-	COleDateTimeSpan();
-
-	COleDateTimeSpan(double dblSpanSrc);
-
-	COleDateTimeSpan(size_t lDays,
-		int32_t nHours,
-		int32_t nMins,
-		int32_t nSecs);
-
-	int32_t GetDays();
-
-	bool operator!=(const COleDateTimeSpan& other) const;
-};
+class COleDateTimeSpan;
 
 class COleDateTime
 {
@@ -38,6 +23,8 @@ public:
 
 	static COleDateTime GetTickCount();
 
+	friend class CTime;
+
 	COleDateTime();
 
 	COleDateTime(int32_t nYear,
@@ -46,6 +33,12 @@ public:
 		int32_t nHour,
 		int32_t nMin,
 		int32_t nSec);
+
+protected:
+
+	COleDateTime(const std::chrono::system_clock::time_point& timePoint);
+
+public:
 
 	int32_t GetYear() const;
 	int32_t GetMonth() const;
@@ -67,14 +60,11 @@ public:
 	bool SetDate(int32_t year, int32_t month, int32_t day);
 
 	bool GetAsSystemTime(SYSTEMTIME& time) const;
-
-	COleDateTimeSpan operator+=(const COleDateTimeSpan& span);
-	COleDateTimeSpan operator-=(const COleDateTimeSpan& span);
+	bool GetAsUDATE(UDATE& date) const;
 
 	COleDateTime operator+(const COleDateTimeSpan& span);
 	COleDateTime operator-(const COleDateTimeSpan& span);
 
-	COleDateTimeSpan operator+(const COleDateTime& date) const;
 	COleDateTimeSpan operator-(const COleDateTime& date) const;
 
 protected:
@@ -84,5 +74,33 @@ protected:
 	DateTimeStatus m_status;
 };
 
+class COleDateTimeSpan
+{
+public:
+	friend class COleDateTime;
+
+	COleDateTimeSpan();
+
+	COleDateTimeSpan(double dblSpanSrc);
+
+	COleDateTimeSpan(size_t lDays,
+		int32_t nHours,
+		int32_t nMins,
+		int32_t nSecs);
+
+protected:
+
+	COleDateTimeSpan(const std::chrono::seconds& span);
+
+public:
+
+	int32_t GetDays();
+
+	bool operator!=(const COleDateTimeSpan& other) const;
+
+protected:
+
+	std::chrono::seconds m_span;
+};
 
 #endif // COLEDATETIME_CUSTOM_H

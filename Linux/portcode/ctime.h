@@ -4,7 +4,7 @@
 
 #include "coledatetime.h"
 
-#include <ctime>
+#include <chrono>
 
 class CTime
 {
@@ -14,7 +14,10 @@ public:
 
 	COleDateTime GetTime() const;
 
-	bool GetAsSystemTime(time_t& time) const;
+protected:
+
+	// here we use a time point to get milliseconds precision
+	std::chrono::system_clock::time_point m_time_point;
 };
 
 #endif // CTIME_CUSTOM_H

@@ -67,6 +67,10 @@ typedef struct _SYSTEMTIME
 } SYSTEMTIME;
 typedef struct _SYSTEMTIME *PSYSTEMTIME;
 typedef struct _SYSTEMTIME *LPSYSTEMTIME;
+typedef struct {
+    SYSTEMTIME st;
+    WORD  wDayOfYear;
+} UDATE;
 #endif
 #else
 #include <windows.h>
