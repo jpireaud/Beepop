@@ -29,10 +29,10 @@ TEST_CASE("CTime operations", "[port]") {
         auto tm = std::localtime(&now);
 
         auto oleTime = time.GetTime();
-        CHECK(oleTime.GetYear() == tm->tm_year);
-        CHECK(oleTime.GetMonth() == tm->tm_mon);
+        CHECK(oleTime.GetYear() == tm->tm_year + 1900);
+        CHECK(oleTime.GetMonth() == tm->tm_mon + 1);
         CHECK(oleTime.GetDay() == tm->tm_mday);
-        CHECK(oleTime.GetHour() == tm->tm_min);
-        CHECK(oleTime.GetMinute() == tm->tm_sec);
+        CHECK(oleTime.GetHour() == tm->tm_hour);
+        CHECK(oleTime.GetMinute() == tm->tm_min);
     }
 }
