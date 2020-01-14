@@ -58,6 +58,8 @@ def get_data_model_files():
         "EGG.CPP",
         "EPAData.h",
         "EPAData.cpp",
+        "IEDItem.h",
+        "IEDItem.cpp",
         "LARVA.H",
         "LARVA.CPP",
         "Matrix.h",

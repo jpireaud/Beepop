@@ -53,6 +53,7 @@ public:
 	bool operator < (const COleDateTime& other) const;
 	bool operator > (const COleDateTime& other) const;
 	bool operator >= (const COleDateTime& other) const;
+	bool operator <= (const COleDateTime& other) const;
 
 	CString Format(const char* format) const;
 	bool ParseDateTime(const CString& dateTimeStr);

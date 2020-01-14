@@ -18,7 +18,7 @@ class CObList : public CObject
 {
 public:
 	CObList();
-	~CObList();
+	virtual ~CObList();
 
 	INT_PTR GetCount() const;
 	BOOL IsEmpty() const;
@@ -48,12 +48,31 @@ protected:
     mutable std::unique_ptr<CObListNs::InnerPosition> m_iterator;
 };
 
-class CStringList : public CObList
+namespace CStringListNs { struct InnerPosition {
+    std::list<CString>::const_iterator m_it;
+}; }
+
+class CStringList : public CObject
 {
 public:
 	CStringList();
+	~CStringList();
 
+	INT_PTR GetCount() const;
+	BOOL IsEmpty() const;
+
+	const CString& GetNext(POSITION& position) const;
+
+	POSITION GetHeadPosition() const;
+	
 	void AddTail(const CString& string);
+	
+	void RemoveAll();
+
+protected:
+
+    std::list<CString> m_data;
+    mutable std::unique_ptr<CStringListNs::InnerPosition> m_iterator;
 };
 
 #endif // COBLIST_CUSTOM_H

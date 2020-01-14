@@ -82,6 +82,58 @@ TEST_CASE("COleDateTime operations", "[port]") {
         CHECK((seventh - fifth).GetDays() == 2);
     }
 
+    SECTION("ParseDate") {
+
+        COleDateTime dt;
+        dt.ParseDateTime("toto");
+        CHECK(dt.GetStatus() == COleDateTime::error);
+        
+        dt.ParseDateTime("1/1/2001");
+        CHECK(dt.GetStatus() == COleDateTime::error);
+        
+        dt.ParseDateTime("01/01/2001");
+        CHECK(dt.GetStatus() == COleDateTime::valid);
+        
+        CHECK(dt.GetYear() == 2001);
+        CHECK(dt.GetMonth() == 1);
+        CHECK(dt.GetDay() == 1);
+        CHECK(dt.GetHour() == 0);
+        CHECK(dt.GetMinute() == 0);
+        
+        dt.ParseDateTime("12/31/2020 16:34:05");
+        CHECK(dt.GetStatus() == COleDateTime::valid);
+        
+        CHECK(dt.GetYear() == 2020);
+        CHECK(dt.GetMonth() == 12);
+        CHECK(dt.GetDay() == 31);
+        CHECK(dt.GetHour() == 16);
+        CHECK(dt.GetMinute() == 34);
+    }
+
+    SECTION("Format") {
+
+        COleDateTime dt;
+        dt.ParseDateTime("12/31/2020 16:34:05");
+        CHECK(dt.GetStatus() == COleDateTime::valid);
+        
+        CHECK(dt.Format("%Y") == "2020");
+        CHECK(dt.Format("%Y-%m-%d") == "2020-12-31");
+        CHECK(dt.Format("%m/%d/%Y") == "12/31/2020");
+    }
+
+    SECTION("SetDate") {
+
+        COleDateTime dt;
+        dt.SetDate(2020, 12, 1);
+        CHECK(dt.GetStatus() == COleDateTime::valid);
+        
+        CHECK(dt.GetYear() == 2020);
+        CHECK(dt.GetMonth() == 12);
+        CHECK(dt.GetDay() == 1);
+        CHECK(dt.GetHour() == 0);
+        CHECK(dt.GetMinute() == 0);
+    }
+
     SECTION("COleDateTimeSpan") {
 
         SECTION("COleDateTimeSpan()") {

@@ -134,10 +134,54 @@ void CObList::RemoveAll()
 
 
 CStringList::CStringList()
+: m_iterator(new CStringListNs::InnerPosition)
 {
 }
 
+CStringList::~CStringList()
+{
+}
+
+INT_PTR CStringList::GetCount() const
+{
+    return m_data.size();   
+}
+
+BOOL CStringList::IsEmpty() const
+{
+    return m_data.empty();
+}
+
+const CString& CStringList::GetNext(POSITION& position) const 
+{
+    auto it = reinterpret_cast<CStringListNs::InnerPosition*>(position);
+    auto next = std::ref(*it->m_it);
+    it->m_it++;
+    if (it->m_it == m_data.end())
+    {
+        position = nullptr;
+    }
+    return next.get();
+}
+
+POSITION CStringList::GetHeadPosition() const
+{
+    POSITION position = nullptr;
+    if (GetCount() > 0)
+    {
+        m_iterator->m_it = m_data.begin();
+        position = reinterpret_cast<POSITION>(m_iterator.get());
+    }
+    return position;
+}	
+
 void CStringList::AddTail(const CString& string)
 {
-    // need to figure out memory ownership
+    m_data.push_back(string);
 }
+	
+void CStringList::RemoveAll()
+{
+    m_data.clear();
+}
+

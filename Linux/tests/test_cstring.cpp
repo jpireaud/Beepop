@@ -179,4 +179,12 @@ TEST_CASE("CString operations", "[port]") {
         CString str4 = str3.SpanExcluding(".!?");
         CHECK(str4 == "Hello World Goodbye");
     }
+
+    SECTION("Operations") {
+
+        myString = "World Cup '98";
+
+        CString added = myString + " toto";
+        CHECK(added == "World Cup '98 toto");
+    }
 }

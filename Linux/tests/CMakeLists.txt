@@ -13,6 +13,7 @@ set(SOURCES main.cpp
             test_cptrlist.cpp
             test_cstring.cpp
             test_cstringarray.cpp 
+            test_cstringlist.cpp 
             test_ctime.cpp 
             test_cuintarray.cpp )
 

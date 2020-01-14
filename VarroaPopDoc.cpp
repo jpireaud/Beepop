@@ -260,7 +260,6 @@ bool CVarroaPopDoc::ReadyToSimulate()
 	return(theColony.IsInitialized()&&m_pWeather->IsInitialized());
 }
 
-
 int CVarroaPopDoc::GetSimDays()
 {
 	COleDateTimeSpan ts = GetSimEnd() - GetSimStart();

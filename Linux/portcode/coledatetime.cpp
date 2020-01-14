@@ -106,22 +106,69 @@ bool COleDateTime::operator >= (const COleDateTime& other) const
     return m_time_point >= other.m_time_point;
 }
 
+bool COleDateTime::operator <= (const COleDateTime& other) const
+{
+    return m_time_point <= other.m_time_point;
+}
+
 CString COleDateTime::Format(const char* format) const
 {
-    NOT_IMPLEMENTED();
-    return CString();
+    std::time_t l_time = std::chrono::system_clock::to_time_t(m_time_point);
+    auto tm = std::localtime(&l_time);
+    std::stringstream ss;
+    ss << std::put_time(tm, format);
+    return CString(ss.str());
 }
 
 bool COleDateTime::ParseDateTime(const CString& dateTimeStr)
 {
-    NOT_IMPLEMENTED();
-    return false;
+    std::istringstream stream(dateTimeStr.ToString());
+    std::tm dt = {0};
+
+    const char *dateTimeFormat = "%m/%d/%Y %H:%M:%S";
+    dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
+    stream >> std::get_time(&dt, dateTimeFormat);
+    if (!stream.fail())
+    {
+        m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
+        m_status = valid;
+    }
+    else
+    {
+        // let's try to parse only a date
+        const char *dateFormat = "%m/%d/%Y";
+        stream >> std::get_time(&dt, dateFormat);
+        if (!stream.fail())
+        {
+            m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
+            m_status = valid;
+        }
+        else
+        {
+            m_status = error;
+        }
+    }
+    return m_status == valid;
 }
 
 bool COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
 {
-    NOT_IMPLEMENTED();
-	return false;
+    const char* dateFormat = "%Y-%m-%d";
+    std::string dateStr = fmt::format("{:0>4}-{:0>2}-{:0>2}", year, month, day);
+    std::istringstream stream (dateStr);
+    std::tm dt = {};
+    dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
+    stream >> std::get_time(&dt, dateFormat);
+    if (!stream.fail())
+    {
+        m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
+        m_status = valid;
+    }
+    else
+    {
+        m_status = error;
+    }
+    return m_status == valid;
 }
 
 bool COleDateTime::GetAsSystemTime(SYSTEMTIME& time) const
