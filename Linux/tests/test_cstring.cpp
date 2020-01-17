@@ -124,13 +124,17 @@ TEST_CASE("CString operations", "[port]") {
 
 		CString left = myString.Left(100);
 		CHECK(left == "ThisIsAString");
+		left = myString.Left(3);
+		CHECK(left == "Thi");
 		left = myString.Left(-100);
 		CHECK(left == "");
 
 		CString right = myString.Right(100);
-		CHECK(right == "");
-		right = myString.Right(-100);
 		CHECK(right == "ThisIsAString");
+		right = myString.Right(4);
+		CHECK(right == "ring");
+		right = myString.Right(-100);
+		CHECK(right == "");
 
 		CString mid = myString.Mid(100);
 		CHECK(mid == "");

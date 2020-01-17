@@ -30,7 +30,7 @@ COleDateTime::COleDateTime(int32_t nYear,
     const char* dateTimeFormat = "%Y-%m-%d %H:%M:%S";
     std::string dateTime = fmt::format("{:0>4}-{:0>2}-{:0>2} {:0>2}:{:0>2}:{:0>2}", nYear, nMonth, nDay, nHour, nMin, nSec);
     std::istringstream stream (dateTime);
-    std::tm dt;
+	std::tm dt = {0};
     dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
     stream >> std::get_time(&dt, dateTimeFormat);
     if (!stream.fail())
@@ -117,7 +117,8 @@ CString COleDateTime::Format(const char* format) const
     auto tm = std::localtime(&l_time);
     std::stringstream ss;
     ss << std::put_time(tm, format);
-    return CString(ss.str());
+	CString string(ss.str());
+    return string;
 }
 
 bool COleDateTime::ParseDateTime(const CString& dateTimeStr)
@@ -156,7 +157,7 @@ bool COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
     const char* dateFormat = "%Y-%m-%d";
     std::string dateStr = fmt::format("{:0>4}-{:0>2}-{:0>2}", year, month, day);
     std::istringstream stream (dateStr);
-    std::tm dt = {};
+    std::tm dt = {0};
     dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
     stream >> std::get_time(&dt, dateFormat);
     if (!stream.fail())

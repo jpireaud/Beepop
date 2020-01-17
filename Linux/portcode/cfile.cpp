@@ -37,10 +37,14 @@ BOOL CStdioFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, CFileException* pEr
 
 BOOL CStdioFile::ReadString(CString& str)
 {
+    // JULIEN find a way to detect end of file
     std::string data;
-    std::getline(m_fileStream, data);
+    if (!m_fileStream.eof())
+    {
+        std::getline(m_fileStream, data);
+    }
     str = data;
-    return !data.empty();
+    return !m_fileStream.eof();
 }
 
 void CStdioFile::WriteString(LPCTSTR str)

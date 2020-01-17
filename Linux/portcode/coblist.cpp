@@ -40,6 +40,11 @@ CObject* CObList::GetHead() const
     return m_data.front();
 }
 
+CObject* CObList::GetTail() const
+{
+    return m_data.back();
+}
+
 CObject* CObList::GetPrev(POSITION& position) const
 {
     auto it = reinterpret_cast<CObListNs::InnerPosition*>(position);
@@ -122,7 +127,7 @@ CObject* CObList::RemoveHead()
 
 CObject* CObList::RemoveTail ()
 {
-    CObject* tail = GetHead();
+    CObject* tail = GetTail();
     m_data.pop_back();
     return tail;
 }
@@ -131,7 +136,6 @@ void CObList::RemoveAll()
 {
     m_data.clear();
 }
-
 
 CStringList::CStringList()
 : m_iterator(new CStringListNs::InnerPosition)

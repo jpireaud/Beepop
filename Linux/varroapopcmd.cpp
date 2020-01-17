@@ -1252,7 +1252,8 @@ void VarroaPopCmd::Simulate()
 		}
 		else	// Otherwise space delimited
 		{
-			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %.2f %.2f %.2f %04.2f %.2f %.2f %05.2f %6d %6d %6d %6.2f %6.2f %6.2f %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3ff %6.3f";
+			// original m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %.2f %.2f %.2f %04.2f %.2f %.2f %05.2f %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3f";
+			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %.2f %.2f %.2f %04.2f %.2f %.2f %05.2f %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3ff";
 		}
         
 		CEvent* pEvent = m_pWeather->GetDayEvent(GetSimStart());
@@ -1294,15 +1295,15 @@ void VarroaPopCmd::Simulate()
 				theColony.CapWkr.GetMiteCount(),
 				theColony.CapDrn.GetMitesPerCell(),
 				theColony.CapWkr.GetMitesPerCell(),
+				0, // Changed from double to int
 				0.0,
 				0.0,
 				0.0,
 				0.0,
 				0.0,
-				0.0,
-				0,0,0,0,0,
+				0,0,0,0,0, // Added 1 0 at the end
 				theColony.queen.GetQueenStrength(),
-				0.0,0.0,0.0);
+				0.0,0.0); // removed 1 0.0 from the end
 		m_ResultsText.AddTail(CurSize);
     
 		// *************************************************

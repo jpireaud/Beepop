@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 find_package(fmt CONFIG REQUIRED)
-# find_package(Boost CONFIG REQUIRED)
+find_package(Boost CONFIG REQUIRED system filesystem)
 
 set(SOURCES carchive.cpp
             carray.cpp
@@ -21,5 +21,6 @@ set(SOURCES carchive.cpp
             VarroaPop.cpp )
 
 add_library(VarroaPopLinuxPort ${SOURCES})
-target_link_libraries(VarroaPopLinuxPort fmt::fmt)
+target_link_libraries(VarroaPopLinuxPort PRIVATE fmt::fmt)
+target_link_libraries(VarroaPopLinuxPort PRIVATE Boost::system Boost::filesystem)
 target_precompile_headers(VarroaPopLinuxPort REUSE_FROM VarroaPopDataModel)

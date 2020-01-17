@@ -73,6 +73,7 @@ typedef struct {
 } UDATE;
 #endif
 #else
+#define NOMINMAX
 #include <windows.h>
 #endif
 

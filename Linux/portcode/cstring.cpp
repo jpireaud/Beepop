@@ -9,6 +9,7 @@
 #include <boost/tokenizer.hpp>
 
 #include <cassert>
+#include <limits>
 
 namespace ba = boost::algorithm;
 
@@ -82,18 +83,16 @@ int CString::GetLength() const
 	return static_cast<int>(m_data.length());
 }
 
-CString CString::MakeLower() const
+CString& CString::MakeLower()
 {
-	std::string lower(m_data);
-	ba::to_lower(lower);
-	return CString(lower);
+	ba::to_lower(m_data);
+	return *this;
 }
 
-CString CString::MakeUpper() const
+CString& CString::MakeUpper()
 {
-	std::string upper(m_data);
-	ba::to_upper(upper);
-	return CString(upper);
+	ba::to_upper(m_data);
+	return *this;
 }
 
 void CString::Trim()
@@ -145,7 +144,7 @@ void CString::Replace(const CString& toReplace, const CString& with)
 CString CString::Left(int count) const
 {
     // make sure that during size_t to int conversion we don't loose data
-    assert(std::numeric_limits<int>::max() > m_data.length());
+	assert(std::numeric_limits<int>::max() > m_data.length());
     auto length = static_cast<int>(m_data.length());
 
 	count = std::clamp(count, 0, length);
@@ -159,7 +158,7 @@ CString CString::Right(int count) const
     auto length = static_cast<int>(m_data.length());
 
 	count = std::clamp(count, 0, length);
-	return m_data.substr(count);
+	return m_data.substr(length - count);
 }
 
 CString CString::Mid(int first) const

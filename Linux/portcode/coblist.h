@@ -29,6 +29,7 @@ public:
 
 	CObject* GetAt(POSITION position) const;
 	CObject* GetHead() const;
+	CObject* GetTail() const;
 	CObject* GetPrev(POSITION& position) const;
 	CObject* GetNext(POSITION& position) const;
 

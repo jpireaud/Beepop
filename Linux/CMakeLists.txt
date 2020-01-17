@@ -31,6 +31,8 @@ set(VarroaPopPCH "${CMAKE_SOURCE_DIR}/portcode/stdafx.h")
 
 include_directories(BEFORE . portcode datamodel)
 
+## specific definitions
+
 ## sub directories
 
 add_subdirectory(datamodel)
@@ -42,9 +44,9 @@ add_subdirectory(tests)
 find_package(Boost CONFIG REQUIRED system filesystem)
 
 set (SOURCES main.cpp varroapopcmd.cpp)
-# set (SOURCES main.cpp)
 
 add_executable(VarroaPop ${SOURCES})
+
 target_link_libraries(VarroaPop PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
 target_link_libraries(VarroaPop PRIVATE Boost::system Boost::filesystem)
 target_precompile_headers(VarroaPop REUSE_FROM VarroaPopDataModel)

@@ -30,8 +30,8 @@ public:
 
 	int GetLength() const;
 
-	CString MakeLower() const;
-	CString MakeUpper() const;
+	CString& MakeLower();
+	CString& MakeUpper();
 
 	void Trim();
 	void TrimLeft();
