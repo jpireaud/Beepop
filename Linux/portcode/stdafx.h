@@ -80,9 +80,8 @@ typedef struct {
 #define TRUE true
 #define FALSE false
 
-// Abstract iteration position check if we can change to a size_t
-struct __POSITION {};
-typedef __POSITION* POSITION;
+// Replacement of the POSITION struct in the MFC framework
+#include "position.h"
 
 #include "carchive.h"
 #include "carray.h"

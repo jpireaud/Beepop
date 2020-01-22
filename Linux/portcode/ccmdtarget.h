@@ -6,8 +6,8 @@
 
 class CCmdTarget : public CObject
 {
-    public:
-    
+public:
+	virtual ~CCmdTarget() {}
 };
 
 #endif // CCMDTARGET_CUSTOM_H

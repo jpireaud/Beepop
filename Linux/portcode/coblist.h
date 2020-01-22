@@ -10,7 +10,9 @@
 #include <cstddef>
 #include <list>
 
-namespace CObListNs { struct InnerPosition {
+namespace CObListNs { struct InnerPosition : public __POSITION {
+	InnerPosition(const std::list<CObject*>::const_iterator& it) : m_it(it) {}
+	InnerPosition* copy() { return new InnerPosition(m_it); }
     std::list<CObject*>::const_iterator m_it;
 }; }
 
@@ -46,10 +48,11 @@ public:
 protected:
 
     std::list<CObject*> m_data;
-    mutable std::unique_ptr<CObListNs::InnerPosition> m_iterator;
 };
 
-namespace CStringListNs { struct InnerPosition {
+namespace CStringListNs { struct InnerPosition : public __POSITION {
+	InnerPosition(const std::list<CString>::const_iterator& it) : m_it(it) {}
+	InnerPosition* copy() { return new InnerPosition(m_it); }
     std::list<CString>::const_iterator m_it;
 }; }
 
@@ -73,7 +76,6 @@ public:
 protected:
 
     std::list<CString> m_data;
-    mutable std::unique_ptr<CStringListNs::InnerPosition> m_iterator;
 };
 
 #endif // COBLIST_CUSTOM_H

@@ -10,8 +10,7 @@
 
 /*static*/ COleDateTime COleDateTime::GetTickCount()
 {
-    COleDateTime time;
-    NOT_IMPLEMENTED();
+    COleDateTime time (std::chrono::system_clock::now());
     return time;
 }
 

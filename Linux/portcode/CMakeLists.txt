@@ -17,6 +17,7 @@ set(SOURCES carchive.cpp
             cstringarray.cpp
             ctime.cpp
             cuintarray.cpp
+            position.cpp
             stdafx.cpp
             VarroaPop.cpp )
 

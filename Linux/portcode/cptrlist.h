@@ -5,9 +5,12 @@
 #include "cobject.h"
 
 #include <cstddef>
+#include <memory>
 #include <list>
 
-namespace CPtrListNs { template<class TYPE> struct InnerPosition {
+namespace CPtrListNs { template<class TYPE> struct InnerPosition : public __POSITION {
+	InnerPosition(const typename std::list<TYPE>::const_iterator& it) : m_it(it) {}
+	InnerPosition* copy() { return new InnerPosition(m_it); }
     typename std::list<TYPE>::const_iterator m_it;
 }; }
 
@@ -41,7 +44,6 @@ public:
 protected:
 
     std::list<TYPE> m_data;
-    mutable std::unique_ptr<CPtrListNs::InnerPosition<TYPE>> m_iterator;
 };
 
 #include "cptrlist.inline.h"

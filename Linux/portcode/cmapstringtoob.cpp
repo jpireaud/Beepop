@@ -8,12 +8,11 @@ BOOL CMapStringToOb::IsEmpty() const
 POSITION CMapStringToOb::GetStartPosition() const
 {
     // initialize iterator 
-    m_iterator.reset(new CMapStringToObNs::InnerPosition);
-    m_iterator->m_it = m_map.begin();
+    auto it = m_map.begin();
     POSITION position = nullptr;
-    if (m_iterator->m_it != m_map.end())
+    if (it != m_map.end())
     {
-        position = reinterpret_cast<POSITION>(m_iterator.get());
+        position = std::make_unique<CMapStringToObNs::InnerPosition>(it);
     }
     return position;
 }
@@ -25,7 +24,7 @@ void CMapStringToOb::SetAt(LPCTSTR string, CObject* value)
 
 void CMapStringToOb::GetNextAssoc(POSITION& position, CString& string, CObject*& value) const
 {
-    auto iterator = reinterpret_cast<CMapStringToObNs::InnerPosition*>(position);
+    auto iterator = ext::dynamic_unique_cast<CMapStringToObNs::InnerPosition>(position.get());
     string = iterator->m_it->first;
     value = iterator->m_it->second;
     iterator->m_it++;

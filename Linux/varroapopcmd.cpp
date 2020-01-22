@@ -1253,7 +1253,7 @@ void VarroaPopCmd::Simulate()
 		else	// Otherwise space delimited
 		{
 			// original m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %.2f %.2f %.2f %04.2f %.2f %.2f %05.2f %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3f";
-			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %.2f %.2f %.2f %04.2f %.2f %.2f %05.2f %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3ff";
+			m_ResultsFileFormatStg = "%s %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %.2f %.2f %.2f %04.2f %.2f %.2f %05.2f %6d %6d %6d %6.2f %6.2f %6d %6.2f %6.1f %6.3f %6.1f %6.3f %6d %6d %6d %6d %6d     %6.3f   %6.3f %6.3f";
 		}
         
 		CEvent* pEvent = m_pWeather->GetDayEvent(GetSimStart());

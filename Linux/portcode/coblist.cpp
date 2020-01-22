@@ -1,7 +1,6 @@
 #include "coblist.h"
 
 CObList::CObList()
-: m_iterator(new CObListNs::InnerPosition)
 {
 }
 
@@ -23,15 +22,15 @@ POSITION CObList::FindIndex(INT_PTR index) const
 {
     auto it = m_data.begin();
     std::advance(it, index);
-    m_iterator->m_it = it;
-
-    auto position = reinterpret_cast<POSITION>(m_iterator.get());
+    
+    POSITION position; 
+    position = std::make_unique<CObListNs::InnerPosition>(it);
     return position;
 }
 
 CObject* CObList::GetAt(POSITION position) const
 {
-    auto it = reinterpret_cast<CObListNs::InnerPosition*>(position);
+    auto it = ext::dynamic_unique_cast<CObListNs::InnerPosition>(position.get());
     return *it->m_it;
 }
 
@@ -47,7 +46,7 @@ CObject* CObList::GetTail() const
 
 CObject* CObList::GetPrev(POSITION& position) const
 {
-    auto it = reinterpret_cast<CObListNs::InnerPosition*>(position);
+    auto it = ext::dynamic_unique_cast<CObListNs::InnerPosition>(position.get());
     CObject* prev = *it->m_it;
     if (it->m_it == m_data.begin())
     {
@@ -56,23 +55,18 @@ CObject* CObList::GetPrev(POSITION& position) const
     else 
     {
         it->m_it--;
-        prev = *it->m_it;
     }
     return prev;
 }
 
 CObject* CObList::GetNext(POSITION& position) const
 {
-    auto it = reinterpret_cast<CObListNs::InnerPosition*>(position);
+    auto it = ext::dynamic_unique_cast<CObListNs::InnerPosition>(position.get());
     CObject* next = *it->m_it;
     it->m_it++;
     if (it->m_it == m_data.end())
     {
         position = nullptr;
-    }
-    else 
-    {
-        next = *it->m_it;
     }
     return next;
 }
@@ -82,8 +76,7 @@ POSITION CObList::GetHeadPosition() const
     POSITION position = nullptr;
     if (GetCount() > 0)
     {
-        m_iterator->m_it = m_data.begin();
-        position = reinterpret_cast<POSITION>(m_iterator.get());
+        position = std::make_unique<CObListNs::InnerPosition>(m_data.begin());
     }
     return position;
 }
@@ -93,9 +86,9 @@ POSITION CObList::GetTailPosition() const
     POSITION position = nullptr;
     if (GetCount() > 0)
     {
-        m_iterator->m_it = m_data.begin();
-        std::advance(m_iterator->m_it, m_data.size() - 1);
-        position = reinterpret_cast<POSITION>(m_iterator.get());
+        auto it = m_data.begin();
+        std::advance(it, m_data.size() - 1);
+        position = std::make_unique<CObListNs::InnerPosition>(it);
     }
     return position;
 }
@@ -114,7 +107,7 @@ POSITION CObList::AddTail (CObject* object)
 
 void CObList::RemoveAt(POSITION position)
 {
-    auto it = reinterpret_cast<CObListNs::InnerPosition*>(position);
+    auto it = ext::dynamic_unique_cast<CObListNs::InnerPosition>(position.get());
     it->m_it = m_data.erase(it->m_it);
 }
 
@@ -138,7 +131,6 @@ void CObList::RemoveAll()
 }
 
 CStringList::CStringList()
-: m_iterator(new CStringListNs::InnerPosition)
 {
 }
 
@@ -158,7 +150,7 @@ BOOL CStringList::IsEmpty() const
 
 const CString& CStringList::GetNext(POSITION& position) const 
 {
-    auto it = reinterpret_cast<CStringListNs::InnerPosition*>(position);
+    auto it = ext::dynamic_unique_cast<CStringListNs::InnerPosition>(position.get());
     auto next = std::ref(*it->m_it);
     it->m_it++;
     if (it->m_it == m_data.end())
@@ -173,8 +165,7 @@ POSITION CStringList::GetHeadPosition() const
     POSITION position = nullptr;
     if (GetCount() > 0)
     {
-        m_iterator->m_it = m_data.begin();
-        position = reinterpret_cast<POSITION>(m_iterator.get());
+        position = std::make_unique<CStringListNs::InnerPosition>(m_data.begin());
     }
     return position;
 }	

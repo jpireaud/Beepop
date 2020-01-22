@@ -1,6 +1,5 @@
 template<class BASE_CLASS, class TYPE>
 CTypedPtrList<BASE_CLASS, TYPE>::CTypedPtrList()
-: m_iterator(new CPtrListNs::InnerPosition<TYPE>)
 {
 }
 
@@ -24,7 +23,7 @@ INT_PTR CTypedPtrList<BASE_CLASS, TYPE>::GetCount() const
 template<class BASE_CLASS, class TYPE>
 TYPE CTypedPtrList<BASE_CLASS, TYPE>::GetAt(POSITION position) const
 {
-    auto it = reinterpret_cast<CPtrListNs::InnerPosition<TYPE>*>(position);
+    auto it = ext::dynamic_unique_cast<CPtrListNs::InnerPosition<TYPE>>(position.get());
     return *it->m_it;
 }
 
@@ -38,7 +37,7 @@ POSITION CTypedPtrList<BASE_CLASS, TYPE>::AddTail(TYPE object)
 template<class BASE_CLASS, class TYPE>
 void CTypedPtrList<BASE_CLASS, TYPE>::RemoveAt(POSITION position)
 {
-    auto it = reinterpret_cast<CPtrListNs::InnerPosition<TYPE>*>(position);
+    auto it = ext::dynamic_unique_cast<CPtrListNs::InnerPosition<TYPE>>(position.get());
     it->m_it = m_data.erase(it->m_it);
 }
 
@@ -48,8 +47,7 @@ POSITION CTypedPtrList<BASE_CLASS, TYPE>::GetHeadPosition() const
     POSITION position = nullptr;
     if (GetCount() > 0)
     {
-        m_iterator->m_it = m_data.begin();
-        position = reinterpret_cast<POSITION>(m_iterator.get());
+        position = std::make_unique<CPtrListNs::InnerPosition<TYPE>>(m_data.begin());
     }
     return position;
 }
@@ -60,9 +58,9 @@ POSITION CTypedPtrList<BASE_CLASS, TYPE>::GetTailPosition() const
     POSITION position = nullptr;
     if (GetCount() > 0)
     {
-        m_iterator->m_it = m_data.begin();
-        std::advance(m_iterator->m_it, m_data.size() - 1);
-        position = reinterpret_cast<POSITION>(m_iterator.get());
+        auto it = m_data.begin();
+        std::advance(it, m_data.size() - 1);
+        position = std::make_unique<CPtrListNs::InnerPosition<TYPE>>(it);
     }
     return position;
 }
@@ -82,16 +80,12 @@ TYPE CTypedPtrList<BASE_CLASS, TYPE>::GetTail() const
 template<class BASE_CLASS, class TYPE>
 TYPE CTypedPtrList<BASE_CLASS, TYPE>::GetNext(POSITION& position) const
 {
-    auto it = reinterpret_cast<CPtrListNs::InnerPosition<TYPE>*>(position);
+    auto it = ext::dynamic_unique_cast<CPtrListNs::InnerPosition<TYPE>>(position.get());
     TYPE next = *it->m_it;
     it->m_it++;
     if (it->m_it == m_data.end())
     {
         position = nullptr;
-    }
-    else 
-    {
-        next = *it->m_it;
     }
     return next;
 }

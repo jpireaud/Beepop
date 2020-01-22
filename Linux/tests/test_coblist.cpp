@@ -66,7 +66,7 @@ TEST_CASE("CObList operations", "[port]") {
         CHECK(cObj == headObject.get());
 
         cObj = list.GetNext(it);
-        CHECK(cObj == tailObject.get());
+        CHECK(cObj == headObject.get());
         CHECK_FALSE(it == nullptr);
 
         cObj = list.GetNext(it);
@@ -78,7 +78,7 @@ TEST_CASE("CObList operations", "[port]") {
         CHECK(cObj == tailObject.get());
 
         cObj = list.GetPrev(it);
-        CHECK(cObj == headObject.get());
+        CHECK(cObj == tailObject.get());
         CHECK_FALSE(it == nullptr);
 
         cObj = list.GetPrev(it);
@@ -140,6 +140,10 @@ TEST_CASE("CObList operations", "[port]") {
 
         cObj = dynamic_cast<MyObject*>(list.GetPrev(it));
         REQUIRE(it != nullptr);
+        CHECK(cObj->GetData() == "element 9");
+        
+        cObj = dynamic_cast<MyObject*>(list.GetPrev(it));
+        REQUIRE(it != nullptr);
         CHECK(cObj->GetData() == "element 8");
         
         cObj = dynamic_cast<MyObject*>(list.GetPrev(it));
@@ -148,11 +152,15 @@ TEST_CASE("CObList operations", "[port]") {
 
         cObj = dynamic_cast<MyObject*>(list.GetNext(it));
         REQUIRE(it != nullptr);
-        CHECK(cObj->GetData() == "element 8");
-        
+        CHECK(cObj->GetData() == "element 6");
+
         cObj = dynamic_cast<MyObject*>(list.GetNext(it));
         REQUIRE(it != nullptr);
-        CHECK(cObj->GetData() == "element 9");
+        CHECK(cObj->GetData() == "element 7");
+
+        cObj = dynamic_cast<MyObject*>(list.GetNext(it));
+        REQUIRE(it != nullptr);
+        CHECK(cObj->GetData() == "element 8");
         
         cObj = dynamic_cast<MyObject*>(list.GetNext(it));
         REQUIRE(it == nullptr);
@@ -163,6 +171,6 @@ TEST_CASE("CObList operations", "[port]") {
         list.GetPrev(it);
         list.RemoveAt(it);
         cObj = dynamic_cast<MyObject*>(list.GetAt(it));
-        CHECK(cObj->GetData() == "element 8");
+        CHECK(cObj->GetData() == "element 7");
     }
 }

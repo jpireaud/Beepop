@@ -10,7 +10,9 @@
 #include <cstddef>
 #include <map>
 
-namespace CMapStringToObNs { struct InnerPosition {
+namespace CMapStringToObNs { struct InnerPosition : public __POSITION {
+	InnerPosition(const typename std::map<CString, CObject*>::const_iterator& it) : m_it(it) {}
+	InnerPosition* copy() { return new InnerPosition(m_it); }
     std::map<CString, CObject*>::const_iterator m_it;
 }; }
 
@@ -29,7 +31,6 @@ public:
 protected:
 
     std::map<CString, CObject*> m_map;
-    mutable std::unique_ptr<CMapStringToObNs::InnerPosition> m_iterator;
 };
 
 #endif // CMAPSTRINGTOOB_CUSTOM_H
