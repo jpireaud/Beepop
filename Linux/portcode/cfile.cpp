@@ -15,9 +15,9 @@ CStdioFile::CStdioFile()
 }
 
 CStdioFile::CStdioFile(LPCTSTR lpszFileName, UINT nOpenFlags)
-: m_fileStream(lpszFileName, static_cast<std::ios_base::openmode>(nOpenFlags))
-, m_fileName(lpszFileName)
 {
+    m_fileStream.open(lpszFileName, static_cast<std::ios_base::openmode>(nOpenFlags));
+    m_fileName = lpszFileName;
 }
 
 BOOL CStdioFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, CFileException* pError)

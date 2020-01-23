@@ -17,11 +17,17 @@ int main(int argc, char** argv)
 
 	const std::string inputFile = (bfs::path(rootFolder) / "input" / "vp_linux_input.txt").string();
 	const std::string resultsFile = (bfs::path(rootFolder) / "output" / "vp_linux_results.txt").string();
+	const std::string vrpFile = (bfs::path(rootFolder) / "exe" / "default.vrp").string();
 
 	const bool inputFileOk = bfs::exists(inputFile); 
 
 	if (inputFileOk)
 	{
+
+        // CStdioFile file(vrpFile.c_str(), CFile::modeRead | CFile::typeBinary);
+        // CArchive archive(&file, CArchive::load);
+		// app.Serialize(archive);        
+
 		// Read input file
 		app.ProcessInputFile(inputFile);
 

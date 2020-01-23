@@ -1984,3 +1984,387 @@ void VarroaPopCmd::StoreResultsFile(CString PathName)
 	}
 
 }
+
+void VarroaPopCmd::Serialize(CArchive& ar)
+{
+	//  Prior to version 2.1.4, no accommodation was made to read prior file versions.
+	//  If the first string read in is 10 asterisks, then we use versioning, otherwise
+	//  assume prior to 2.1.4 and first string is the filename.
+	//
+	//  Valid data file format Versions:
+	//
+	//		VarroaPop Versions prior to 2.1.4 are data file Version 0
+	//		VarroaPop Version 2.1.4 created data file Version 1
+	//		VarroaPop Version 2.2.1 created file Version 3.  Adds
+	//			data for Fungus control
+	//      VarroaPop Version 2.2.2 created file Version 4.  Adds multiple 
+	//          mite treatment dates.
+	//      VarroaPop Version 2.3.1 created file Version 5.  This causes weather file path + filename
+	//          to be stored
+	//      VarroaPop Version 3.0.1 created file Version 6.  This added the DateRangeValues for life stage transitions
+	//
+	//      VarroaPop Version 3.1.2 created file Version 7.  This added a single IEDItem to identify EPA IED Method of pesticide impact
+	//
+	//		VarroaPop Version 3.1.2 also created file version 8.  This adds EPA user data.
+	//      
+	//		VarroaPop Version 3.2.2 added created file version 9.  This continues to add the EPA user data.
+	//
+	//		VarroaPop Version 3.2.3 added version 10. More EPA user data.
+	//
+	//		VarroaPop Version 3.2.5.3 added version 11.  Added Graphing capability for bees killed by pesticide
+	//		
+	//		VarroaPop Version 3.2.6.2 added version 13.  Added parameters to track manual scaling for graphs
+	//		
+	//		VarroaPop Version 3.2.6.2 also added version 14.  Added nectar/pollen direct contamination table
+	//
+	//		VarroaPop Version 3.2.6.8 added version 15.  This changed Queen Strength from integer to double
+	//
+	//		VarroaPop Version 3.2.6.9 added version 16.  Added supplemental feeding data
+	//
+	//		VarroaPop Version 3.2.7.2 added version 17.  Added some overwintering and foraging data.  Also added some spare variables
+	//													 to make it easier to add variables in the future without changing file format
+	//		VarroaPop Version 3.2.8.0 added version 18.  Allows user to select whether to have notifications or not - selected from view menu.
+	//
+	//		VarroaPop Version 3.2.8.2 added version 19.  Serializes user selection of whether lack of resources causes colony to die.  Serialized in CColony
+
+
+#define VERSIONING_VALID "**********"
+#define THIS_VERSION 19
+
+	//TRACE("Entering VarroaPopDoc::Serialize\n");
+	int bval;
+	int FileFormatVersion = THIS_VERSION;
+	CString vv = VERSIONING_VALID;
+	if (ar.IsStoring())
+	{
+		ar << vv;				 // Version addition
+		ar << THIS_VERSION;		 // Version addition
+		// Modified for Version 2
+		CString weathername = m_pWeather->GetFileName();
+		//ar << SplitPath(m_pWeather->GetFileName(),FNAME) + 
+		//	SplitPath(m_pWeather->GetFileName(),EXT);
+		ar << m_pWeather->GetFileName();
+		ar << m_SimStartTime;
+		ar << m_SimEndTime;
+		ar << m_ImmigrationType;
+		ar << m_TotImmigratingMites.GetTotal();
+		ar << int(m_ImmMitePctResistant);
+		ar << m_ImmigrationStartDate;
+		ar << m_ImmigrationEndDate;
+		ar << m_RQEggLayingDelay;
+		ar << m_RQWkrDrnRatio;
+		ar << m_RQReQueenDate;
+		bval = (m_RQEnableReQueen) ? 0 : 1;
+		ar << bval;
+		ar << m_RQScheduled;
+		if (FileFormatVersion >= 15)
+		{
+			ar << m_RQQueenStrength;
+		}
+		else
+		{
+			int iRQQS = (int)m_RQQueenStrength;
+			ar << iRQQS;
+		}
+		ar << m_RQOnce;
+		ar << m_VTTreatmentDuration;
+		ar << m_VTMortality;
+		ar << m_VTEnable;
+		ar << m_VTTreatmentStart;
+		ar << int(m_InitMitePctResistant);
+
+		ar << m_SPEnable;
+		ar << m_SPTreatmentStart;
+		ar << m_SPInitial;
+		ar << m_Mort10;
+		ar << m_Mort25;
+		ar << m_Mort50;
+		ar << m_Mort75;
+		ar << m_Mort90;
+
+		// EPA IED
+		ar << m_IEDItem.m_IEDDate;
+		ar << m_IEDItem.m_MortEggs;
+		ar << m_IEDItem.m_MortLarvae;
+		ar << m_IEDItem.m_MortBrood;
+		ar << m_IEDItem.m_MortAdults;
+		ar << m_IEDItem.m_MortForagers;
+
+
+		bval = (m_ImmigrationEnabled) ? 0 : 1;
+		ar << bval;
+		ar << (m_TM ? 1 : 0);
+		ar << (m_AD ? 1 : 0);
+		ar << (m_AW ? 1 : 0);
+		ar << (m_CS ? 1 : 0);
+		ar << (m_DB ? 1 : 0);
+		ar << (m_DE ? 1 : 0);
+		ar << (m_DL ? 1 : 0);
+		ar << (m_F ? 1 : 0);
+		ar << (m_MDB ? 1 : 0);
+		ar << (m_MWB ? 1 : 0);
+		ar << (m_PDB ? 1 : 0);
+		ar << (m_PWB ? 1 : 0);
+		ar << (m_PRM ? 1 : 0);
+		ar << (m_RM ? 1 : 0);
+		ar << (m_WB ? 1 : 0);
+		ar << (m_WE ? 1 : 0);
+		ar << (m_WL ? 1 : 0);
+		ar << (m_IM ? 1 : 0);
+		//  Added with Version 1
+		ar << (m_MD ? 1 : 0);
+		ar << (m_PMD ? 1 : 0);
+		// Added with Version 9
+		ar << (m_NS ? 1 : 0);
+		ar << (m_PS ? 1 : 0);
+		ar << (m_NPC ? 1 : 0);
+		ar << (m_PPC ? 1 : 0);
+		// Added with Version 11
+		ar << (m_DDL ? 1 : 0);
+		ar << (m_DWL ? 1 : 0);
+		ar << (m_DDA ? 1 : 0);
+		ar << (m_DWA ? 1 : 0);
+		ar << (m_DFG ? 1 : 0);
+
+		// Added with Version 13
+		ar << m_AutoScaleChart;
+		ar << m_YAxisMax;
+		ar << m_YAxisMin;
+
+		// Added with Version 18
+		// bval = IsShowWarnings() ? 1 : 0; // Julien: ignore for now
+		bval = 0;
+		ar << bval;
+
+	}
+	else
+	{
+		m_pWeather->ClearAllEvents();
+		CString temp;
+		int InitMitePctRes;
+		int ImmMiteQty;
+		ar >> temp;
+		// Version 1 addition
+		if (temp == VERSIONING_VALID)
+		{
+			ar >> FileFormatVersion;
+			ar >> temp;  // now put the weather file name into "temp"
+		}
+		ar >> m_SimStartTime;
+		SetSimStart(m_SimStartTime);
+		ar >> m_SimEndTime;
+		SetSimEnd(m_SimEndTime);
+		ar >> m_ImmigrationType;
+		ar >> ImmMiteQty;   //m_TotImmigratingMites;
+		ar >> InitMitePctRes;
+		m_TotImmigratingMites = ImmMiteQty;
+		m_ImmMitePctResistant = double(InitMitePctRes);
+		m_TotImmigratingMites.SetPctResistant(m_ImmMitePctResistant);
+		ar >> m_ImmigrationStartDate;
+		ar >> m_ImmigrationEndDate;
+		ar >> m_RQEggLayingDelay;
+		ar >> m_RQWkrDrnRatio;
+		ar >> m_RQReQueenDate;
+		ar >> bval;
+		m_RQEnableReQueen = (bval == 0);
+		ar >> m_RQScheduled;
+		if (FileFormatVersion >= 15)
+		{
+			ar >> m_RQQueenStrength;
+		}
+		else
+		{
+			int iRQQS;
+			ar >> iRQQS;
+			m_RQQueenStrength = iRQQS;
+		}
+		ar >> m_RQOnce;
+		ar >> m_VTTreatmentDuration;
+		ar >> m_VTMortality;
+		ar >> m_VTEnable;
+		ar >> m_VTTreatmentStart;
+		ar >> InitMitePctRes;
+		m_InitMitePctResistant = double(InitMitePctRes);
+		if (FileFormatVersion >= 3)
+		{
+			ar >> m_SPEnable;
+			ar >> m_SPTreatmentStart;
+			ar >> m_SPInitial;
+			ar >> m_Mort10;
+			ar >> m_Mort25;
+			ar >> m_Mort50;
+			ar >> m_Mort75;
+			ar >> m_Mort90;
+		}
+		if (FileFormatVersion >= 7) // EPA IED
+		{
+			ar >> m_IEDItem.m_IEDDate;
+			ar >> m_IEDItem.m_MortEggs;
+			ar >> m_IEDItem.m_MortLarvae;
+			ar >> m_IEDItem.m_MortBrood;
+			ar >> m_IEDItem.m_MortAdults;
+			ar >> m_IEDItem.m_MortForagers;
+		}
+
+
+		ar >> bval;
+		m_ImmigrationEnabled = (bval == 0);
+		ar >> bval;
+		m_TM = (bval == 1);
+		ar >> bval;
+		m_AD = (bval == 1);
+		ar >> bval;
+		m_AW = (bval == 1);
+		ar >> bval;
+		m_CS = (bval == 1);
+		ar >> bval;
+		m_DB = (bval == 1);
+		ar >> bval;
+		m_DE = (bval == 1);
+		ar >> bval;
+		m_DL = (bval == 1);
+		ar >> bval;
+		m_F = (bval == 1);
+		ar >> bval;
+		m_MDB = (bval == 1);
+		ar >> bval;
+		m_MWB = (bval == 1);
+		ar >> bval;
+		m_PDB = (bval == 1);
+		ar >> bval;
+		m_PWB = (bval == 1);
+		ar >> bval;
+		m_PRM = (bval == 1);
+		ar >> bval;
+		m_RM = (bval == 1);
+		ar >> bval;
+		m_WB = (bval == 1);
+		ar >> bval;
+		m_WE = (bval == 1);
+		ar >> bval;
+		m_WL = (bval == 1);
+		ar >> bval;
+		m_IM = (bval == 1);
+		if (FileFormatVersion >= 1)
+		{
+			ar >> bval;
+			m_MD = (bval == 1);
+			ar >> bval;
+			m_PMD = (bval == 1);
+		}
+		if (FileFormatVersion >= 9)
+		{
+			ar >> bval;
+			m_NS = (bval == 1);
+			ar >> bval;
+			m_PS = (bval == 1);
+			ar >> bval;
+			m_NPC = (bval == 1);
+			ar >> bval;
+			m_PPC = (bval == 1);
+		}
+		if (FileFormatVersion >= 11)
+		{
+			ar >> bval;
+			m_DDL = (bval == 1);
+			ar >> bval;
+			m_DWL = (bval == 1);
+			ar >> bval;
+			m_DDA = (bval == 1);
+			ar >> bval;
+			m_DWA = (bval == 1);
+			ar >> bval;
+			m_DFG = (bval == 1);
+		}
+		if (FileFormatVersion >= 13)
+		{
+			ar >> m_AutoScaleChart;
+			ar >> m_YAxisMax;
+			ar >> m_YAxisMin;
+
+		}
+
+		if (FileFormatVersion >= 18)
+		{
+			ar >> bval;
+			// SetShowWarnings(bval == 1); // Julien ignored for now
+		}
+
+
+		// Set Default Path name = SessionFile Path
+		// CString pathname = ar.GetFile()->GetFilePath();
+		// SetDefaultPathName(SplitPath(pathname, DRV) + SplitPath(pathname, DIR));
+
+
+		// if ((m_ImmigrationEnabled) && (gl_RunGUI))
+		// 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->SetImmigration(true);
+		// else if (gl_RunGUI)
+		// 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->SetImmigration(false);
+
+		// Load the weather file associated with the session
+		if (temp.GetLength() == 0) // no weather file name
+		{
+			// CString msg = "  This Session has no associated Weather File\n";
+			// msg += "You will have to specify one before you run a simulation";
+			// MyMessageBox(msg);
+			// ((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_WeatherFileName = "";
+		}
+		else
+		{
+			// Early versions store weather filename only
+			// If this is the case, add path name and extension info
+			// if (FileFormatVersion == 0) temp = GetDefaultPathName() + temp + ".wth";
+
+			// Version 1 and 5+ stores entire path of weather file so temp contains path
+			if ((FileFormatVersion == 1) || (FileFormatVersion >= 5));  // do nothing
+
+			// Version 2 thru 4 stores filename and extension only so must add Default Path
+			// if ((FileFormatVersion >= 2) && (FileFormatVersion <= 4))
+			// 	temp = GetDefaultPathName() + temp;
+
+			// Version 2.3.1 of VarroaPop changed back to store the entire path+filename.
+			// Session Files that were created with version 2 - 4 will have the default path name 
+			// appended to the file name.  Session files version 5 and up have the entire path name stored
+
+
+			m_WeatherFileName = temp;
+			// m_WeatherLoaded = LoadWeatherFile(m_WeatherFileName); // Try to load using
+			if (m_WeatherLoaded)
+			{
+				// if (gl_RunGUI)
+				// 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->InitializeDateCtrls();
+			}
+			else
+			{
+				// CString msg = "  Reading Session File: The Specified Weather file  ";
+				// msg += temp + " was not found\n";
+				// msg += "You will have to specify one before you run a simulation";
+				// MyMessageBox(msg);
+			}
+
+		}
+
+	}
+
+	theColony.Serialize(ar, FileFormatVersion);  // Added colony check for FileFormatVersion
+
+	if (FileFormatVersion >= 4)  // Version with multiple mite-treatment dates
+	{
+		m_MiteTreatments.Serialize(ar);
+		//theColony.m_MiteTreatmentInfo.Serialize(ar);
+	}
+
+	// After reading .vrp file, update any variables which were changed
+	// by the command line input file
+	// CString InputFileName = ((CVarroaPopApp*)AfxGetApp())->m_InputFileName;
+	// if ((!ar.IsStoring()) & (InputFileName.GetLength() > 0))
+	// {
+	// 	ProcessInputFile(InputFileName);
+	// }
+
+	// if (gl_RunGUI)
+	// 	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->EnableDialogBar(ReadyToSimulate());
+
+	m_SessionLoaded = true;
+	//TRACE("***Leaving VarroaPopDoc::Serialize\n");
+}

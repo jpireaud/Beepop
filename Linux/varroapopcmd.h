@@ -38,6 +38,8 @@ public:
 	CString GetWeatherFileName() {return m_pWeather->GetFileName();}
 	CString GetColonyFileName() {return theColony.GetName();}
 
+	void Serialize(CArchive& ar);
+
 protected:
 
 	// Simulation Operations

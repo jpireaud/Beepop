@@ -14,6 +14,9 @@ public:
 
 	COleDateTime GetTime() const;
 
+	void FromTimeT(const time_t& time);
+	time_t GetAsTimeT() const;
+
 protected:
 
 	// here we use a time point to get milliseconds precision

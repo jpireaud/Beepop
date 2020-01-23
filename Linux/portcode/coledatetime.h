@@ -26,6 +26,8 @@ public:
 	friend class CTime;
 
 	COleDateTime();
+	
+	COleDateTime(DATE dateSrc);
 
 	COleDateTime(int32_t nYear,
 		int32_t nMonth,
@@ -62,6 +64,7 @@ public:
 
 	bool GetAsSystemTime(SYSTEMTIME& time) const;
 	bool GetAsUDATE(UDATE& date) const;
+	bool GetAsDATE(DATE& date) const;
 
 	COleDateTime operator+(const COleDateTimeSpan& span);
 	COleDateTime operator-(const COleDateTimeSpan& span);

@@ -40,6 +40,18 @@ public:
 		current = std::ios_base::cur, 
 		end = std::ios_base::end 
 	};
+
+	friend class CArchive;
+
+protected:
+
+	const std::fstream& GetStream() const {return m_fileStream;}
+	std::fstream& GetStream() {return m_fileStream;}
+
+protected:
+
+	std::fstream m_fileStream;
+	std::string m_fileName;
 };
 
 class CFileException
@@ -80,11 +92,6 @@ public:
 	// Here we removed the constness of the method since in std c++ the rdstate of the stream
 	// will be change is tellg fails
 	ULONGLONG GetPosition();
-
-protected:
-
-	std::fstream m_fileStream;
-	std::string m_fileName;
 };
 
 #endif // CFILE_CUSTOM_H

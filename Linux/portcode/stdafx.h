@@ -41,15 +41,18 @@ typedef int32_t BOOL;
 typedef unsigned char BYTE;
 typedef BYTE BOOLEAN;
 typedef unsigned short WORD;
-typedef unsigned long DWORD;
+typedef unsigned int DWORD;
+typedef unsigned int DWORD_PTR;
 typedef uint32_t UINT;
 typedef char* LPTSTR;
 typedef const char* LPCTSTR;
 typedef char TCHAR;
 typedef intptr_t INT_PTR;
-typedef long LONG;
+typedef uintptr_t UINT_PTR;
+typedef int LONG;
 typedef int64_t LONGLONG;
 typedef uint64_t ULONGLONG;
+typedef double DATE;
 
 #ifndef WINDOWS
 #ifndef _SYSTEMTIME_

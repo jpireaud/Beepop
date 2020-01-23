@@ -14,6 +14,25 @@
     return time;
 }
 
+COleDateTime::COleDateTime(DATE dateSrc)
+{
+    double daysShift;
+    double dayShift = std::modf(dateSrc, &daysShift);
+    std::chrono::duration<double, std::ratio<24*3600>> spanInDays (daysShift);
+    std::chrono::duration<double, std::ratio<24*3600>> spanInDay (std::abs(dayShift));
+    COleDateTimeSpan delta (std::chrono::duration_cast<std::chrono::seconds>(spanInDays+spanInDay));
+    COleDateTime origin(1899, 12, 30, 0, 0, 0);
+    COleDateTime date = origin + delta;
+    if (date.GetStatus() == valid)
+    {
+        *this = date;
+    }
+    else
+    {
+        m_status = error;
+    }
+}
+
 COleDateTime::COleDateTime()
 : COleDateTime(1899, 12, 30, 0, 0, 0)
 {
@@ -210,6 +229,20 @@ bool COleDateTime::GetAsUDATE(UDATE& date) const
         date.st.wMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(m_time_point-tp_no_milliseconds).count();
     }
     return success;
+}
+
+bool COleDateTime::GetAsDATE(DATE& date) const
+{
+    COleDateTime origin(1899, 12, 30, 0, 0, 0);
+    COleDateTimeSpan timeSpan = *this - origin;
+    date = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<24*3600>>>(timeSpan.m_span).count();
+    if (date < 0.0)
+    {
+        double daysShift;
+        double dayShift = std::modf(date, &daysShift);
+        date = (daysShift<0.0)? daysShift:-1.0 - (1.0 + dayShift);
+    }
+    return true;
 }
 
 COleDateTime COleDateTime::operator+(const COleDateTimeSpan& span)

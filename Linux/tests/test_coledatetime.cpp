@@ -166,4 +166,179 @@ TEST_CASE("COleDateTime operations", "[port]") {
             }
         }
     }
+
+    SECTION("date MFC like") {
+        {
+            COleDateTime dateTime(0.0);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1899);
+            CHECK(dateTime.GetMonth() == 12);
+            CHECK(dateTime.GetDay() == 30);
+            
+            CHECK(dateTime.GetHour() == 0);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(1.0);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1899);
+            CHECK(dateTime.GetMonth() == 12);
+            CHECK(dateTime.GetDay() == 31);
+            
+            CHECK(dateTime.GetHour() == 0);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(2.0);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1900);
+            CHECK(dateTime.GetMonth() == 1);
+            CHECK(dateTime.GetDay() == 1);
+            
+            CHECK(dateTime.GetHour() == 0);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(5.25);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1900);
+            CHECK(dateTime.GetMonth() == 1);
+            CHECK(dateTime.GetDay() == 4);
+            
+            CHECK(dateTime.GetHour() == 6);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(5.50);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1900);
+            CHECK(dateTime.GetMonth() == 1);
+            CHECK(dateTime.GetDay() == 4);
+            
+            CHECK(dateTime.GetHour() == 12);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(5.875);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1900);
+            CHECK(dateTime.GetMonth() == 1);
+            CHECK(dateTime.GetDay() == 4);
+            
+            CHECK(dateTime.GetHour() == 21);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(-0.75);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1899);
+            CHECK(dateTime.GetMonth() == 12);
+            CHECK(dateTime.GetDay() == 30);
+            
+            CHECK(dateTime.GetHour() == 18);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(-1.75);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1899);
+            CHECK(dateTime.GetMonth() == 12);
+            CHECK(dateTime.GetDay() == 29);
+            
+            CHECK(dateTime.GetHour() == 18);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+    }
+
+    SECTION("To MFC Date") {
+        
+        {
+            COleDateTime dateTime (1899, 12, 30, 0, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == 0.0);
+        }
+        {
+            COleDateTime dateTime (1899, 12, 31, 0, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == 1.0);
+        }
+        {
+            COleDateTime dateTime (1900, 1, 1, 0, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == 2.0);
+        }
+        {
+            COleDateTime dateTime (1900, 1, 4, 6, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == 5.25);
+        }
+        {
+            COleDateTime dateTime (1900, 1, 4, 12, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == 5.5);
+        }
+        {
+            COleDateTime dateTime (1900, 1, 4, 21, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == 5.875);
+        }
+        {
+            COleDateTime dateTime (1899, 12, 30, 18, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == 0.75);
+        }
+        {
+            COleDateTime dateTime (1899, 12, 29, 18, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == -1.75);
+        }
+        {
+            COleDateTime dateTime (1899, 12, 27, 0, 0, 0);
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            DATE dt;
+            dateTime.GetAsDATE(dt);
+            CHECK(dt == -3.00);
+        }
+    }
 }

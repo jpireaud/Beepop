@@ -5,6 +5,7 @@ find_package(Boost CONFIG REQUIRED system filesystem)
 
 set(SOURCES main.cpp
             helpers/myobject.cpp
+            test_carchive.cpp
             test_carray.cpp
             test_cfile.cpp
             test_cmapstringtoob.cpp

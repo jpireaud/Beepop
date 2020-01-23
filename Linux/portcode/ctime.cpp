@@ -27,3 +27,14 @@ COleDateTime CTime::GetTime() const
     COleDateTime time (m_time_point);
     return time;
 }
+
+void CTime::FromTimeT(const time_t& time)
+{
+    m_time_point = std::chrono::system_clock::from_time_t(time);   
+}
+
+time_t CTime::GetAsTimeT() const
+{
+    time_t time = std::chrono::system_clock::to_time_t(m_time_point);
+    return time;
+}
