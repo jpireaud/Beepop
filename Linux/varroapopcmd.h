@@ -40,6 +40,10 @@ public:
 
 	void Serialize(CArchive& ar);
 
+	// Added for the CMD app
+	void LoadVRPFile(const CString& filename);
+	void LoadWeatherFile(const CString& filename);
+
 protected:
 
 	// Simulation Operations

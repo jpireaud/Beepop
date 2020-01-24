@@ -2368,3 +2368,26 @@ void VarroaPopCmd::Serialize(CArchive& ar)
 	m_SessionLoaded = true;
 	//TRACE("***Leaving VarroaPopDoc::Serialize\n");
 }
+
+void VarroaPopCmd::LoadVRPFile(const CString& filename)
+{
+	CStdioFile file(filename, CFile::modeRead | CFile::typeBinary);
+	CArchive archive(&file, CArchive::load);
+	Serialize(archive);        
+}
+
+void VarroaPopCmd::LoadWeatherFile(const CString& filename)
+{
+	m_WeatherLoaded = m_pWeather->LoadWeatherFile(filename);
+	if (m_WeatherLoaded)
+	{
+		m_WeatherFileName = filename;
+	}
+	else
+	{
+		CString msg = "  Processing Input File: The Specified Weather file  ";
+		msg += filename+" was not found\n";
+		msg += "You will have to specify one before you run a simulation";
+		std::cerr << msg << std::endl;
+	}      
+}

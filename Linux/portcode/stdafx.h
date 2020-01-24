@@ -28,7 +28,11 @@
 #define DEBUG_NEW new
 
 #include "fmt/printf.h"
+#ifdef TRACE
 #define TRACE(...) fmt::printf(__VA_ARGS__)
+#else 
+#define TRACE(...)
+#endif // DEBUG
 
 #ifndef WINDOWS
 #if _WIN32 || _WIN64

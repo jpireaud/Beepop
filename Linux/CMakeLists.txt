@@ -23,6 +23,9 @@ hunter_add_package(Catch)
 # Boost framework
 hunter_add_package(Boost COMPONENTS system filesystem)
 
+# Add CXXOPTS for command line options
+hunter_add_package(cxxopts)
+
 ## precompiled header
 
 set(VarroaPopPCH "${CMAKE_SOURCE_DIR}/portcode/stdafx.h")
@@ -42,6 +45,7 @@ add_subdirectory(tests)
 ## build application
 
 find_package(Boost CONFIG REQUIRED system filesystem)
+find_package(cxxopts CONFIG REQUIRED)
 
 set (SOURCES main.cpp varroapopcmd.cpp)
 
@@ -49,4 +53,5 @@ add_executable(VarroaPop ${SOURCES})
 
 target_link_libraries(VarroaPop PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
 target_link_libraries(VarroaPop PRIVATE Boost::system Boost::filesystem)
+target_link_libraries(VarroaPop PRIVATE cxxopts::cxxopts)
 target_precompile_headers(VarroaPop REUSE_FROM VarroaPopDataModel)
