@@ -21,6 +21,7 @@ int main(int argc, char** argv)
 	("v,vrp_file", "[optional] VRP File: If specified the VRP file will be parsed to initialize default simulation values", cxxopts::value<std::string>())
 	("w,weather_file", "[optional] Weather File: Simulation will use this weather file instead of the one in the input file", cxxopts::value<std::string>())
 	("d,working_directory", "[optional] Working Directory: If specified all path provided are relative this path", cxxopts::value<std::string>())
+	("f,force", "Force overwrite of output file if it exists")
 	;
 
 	options.add_options("help")
@@ -107,7 +108,7 @@ int main(int argc, char** argv)
 					}
 				}
 			}
-			else
+			else if (arguments.count("f") == 0)
 			{
 				std::cerr << "output file " << outputFile.string() << " already exists. Do you want to overwrite it? [y/n]: ";
 				char answer = 0;
