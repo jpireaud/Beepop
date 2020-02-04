@@ -514,6 +514,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="VarroaPopSession.cpp" />
     <ClCompile Include="VarroaPopView.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
@@ -696,6 +697,7 @@ makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "hlp\
     <ClInclude Include="valuelabelcollection.h" />
     <ClInclude Include="VarroaPop.h" />
     <ClInclude Include="VarroaPopDoc.h" />
+    <ClInclude Include="VarroaPopSession.h" />
     <ClInclude Include="VarroaPopView.h" />
     <ClInclude Include="view3d.h" />
     <ClInclude Include="VPCommandLineInfo.h" />
