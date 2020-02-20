@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "VarroaPop.h"
 #include "VarroaPopSession.h"
 
 CVarroaPopSession::CVarroaPopSession()
