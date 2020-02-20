@@ -2,6 +2,7 @@
 
 #include <boost/filesystem.hpp>
 namespace bfs = boost::filesystem;
+namespace bs = boost::system;
 
 #include <iostream>
 
@@ -87,8 +88,8 @@ void CStdioFile::GetStatus(CFileStatus& status) const
 {
     // If we need more status information about the file than the size
     // auto fileStatus = bfs::status(m_fileName);
-    
-    status.m_size = bfs::file_size(m_fileName);
+    bs::error_code ec;
+    status.m_size = bfs::file_size(m_fileName, ec);
 }
 
 BOOL CFileException::GetErrorMessage(LPTSTR buffer, UINT bufferSize) const

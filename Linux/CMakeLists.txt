@@ -47,7 +47,7 @@ add_subdirectory(tests)
 find_package(Boost CONFIG REQUIRED system filesystem)
 find_package(cxxopts CONFIG REQUIRED)
 
-set (SOURCES main.cpp varroapopcmd.cpp)
+set (SOURCES main.cpp varroapopcmdbridge.cpp)
 
 add_executable(VarroaPop ${SOURCES})
 

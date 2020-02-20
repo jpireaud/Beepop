@@ -63,6 +63,12 @@ CString& CString::operator=(const CString& str)
 	return *this;
 }
 
+CString& CString::operator+=(const char& c)
+{
+	m_data += c;
+	return *this;
+}
+
 bool CString::operator<(const CString& str) const
 {
 	return m_data < str.m_data;

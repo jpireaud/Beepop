@@ -139,8 +139,10 @@ CString COleDateTime::Format(const char* format) const
     return string;
 }
 
-bool COleDateTime::ParseDateTime(const CString& dateTimeStr)
+bool COleDateTime::ParseDateTime(const CString& dateTimeStr, DWORD /*dwFlags*/)
 {
+    // TODO: optimize method using dwFlag VAR_DATEVALUEONLY and VAR_TIMEVALUEONLY
+
     std::istringstream stream(dateTimeStr.ToString());
     std::tm dt = {0};
 

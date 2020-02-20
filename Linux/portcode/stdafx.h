@@ -58,6 +58,9 @@ typedef int64_t LONGLONG;
 typedef uint64_t ULONGLONG;
 typedef double DATE;
 
+#define VAR_TIMEVALUEONLY ((DWORD)0x00000001) /* return time value */
+#define VAR_DATEVALUEONLY ((DWORD)0x00000002) /* return date value */
+
 #ifndef WINDOWS
 #ifndef _SYSTEMTIME_
 #define _SYSTEMTIME_
