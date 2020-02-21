@@ -5,6 +5,11 @@ namespace bfs = boost::filesystem;
 
 #include <iostream>
 
+bool CFile::IsValid() const
+{
+    return m_fileStream.good();
+}
+
 void CStdioFile::Rename(const CString& original, const CString& target)
 {
     bfs::rename(original.ToString(), target.ToString());
@@ -22,29 +27,30 @@ CStdioFile::CStdioFile(LPCTSTR lpszFileName, UINT nOpenFlags)
 
 BOOL CStdioFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, CFileException* pError)
 {
-    try 
+    m_fileStream.open(lpszFileName, static_cast<std::ios_base::openmode>(nOpenFlags));
+    
+    if (!m_fileStream.fail())
     {
-        m_fileStream.exceptions(std::ifstream::failbit);
-        m_fileStream.open(lpszFileName, static_cast<std::ios_base::openmode>(nOpenFlags));
         m_fileName = lpszFileName;
     }
-    catch(const std::ios_base::failure& exception)
+    else
     {
-        pError->SetErrorMessage(exception.what());
+        CString message;
+        message.Format("Cannot open file %s", lpszFileName);
+        pError->SetErrorMessage(message.ToString());
     }
     return m_fileStream.is_open();
 }
 
 BOOL CStdioFile::ReadString(CString& str)
 {
-    // JULIEN find a way to detect end of file
     std::string data;
-    if (!m_fileStream.eof())
+    if (IsValid())
     {
         std::getline(m_fileStream, data);
     }
     str = data;
-    return !m_fileStream.eof();
+    return IsValid();
 }
 
 void CStdioFile::WriteString(LPCTSTR str)

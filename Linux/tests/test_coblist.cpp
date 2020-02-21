@@ -169,8 +169,10 @@ TEST_CASE("CObList operations", "[port]") {
         it = list.GetTailPosition();
         list.GetPrev(it);
         list.GetPrev(it);
+        // save valid Posision
+        POSITION valid = it; list.GetPrev(valid);
         list.RemoveAt(it);
-        cObj = dynamic_cast<MyObject*>(list.GetAt(it));
-        CHECK(cObj->GetData() == "element 7");
+        cObj = dynamic_cast<MyObject*>(list.GetAt(valid));
+        CHECK(cObj->GetData() == "element 6");
     }
 }

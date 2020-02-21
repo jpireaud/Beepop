@@ -191,4 +191,11 @@ TEST_CASE("CString operations", "[port]") {
         CString added = myString + " toto";
         CHECK(added == "World Cup '98 toto");
     }
+
+    SECTION("Format") {
+
+        CString added;
+		added.Format("%7.2f", 6.432432);
+        CHECK(added == "   6.43");
+    }
 }

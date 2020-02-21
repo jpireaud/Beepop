@@ -187,7 +187,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "simstart")
 			{
 				COleDateTime theDate;
-				theDate.ParseDateTime(Value);
+				theDate.ParseDateTime(Value, VAR_DATEVALUEONLY);
 				COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 				m_SimStartTime = tempDate;
 				SetSimStart(m_SimStartTime);
@@ -196,7 +196,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "simend")
 			{
 				COleDateTime theDate;
-				theDate.ParseDateTime(Value);
+				theDate.ParseDateTime(Value, VAR_DATEVALUEONLY);
 				COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 				m_SimEndTime = tempDate;
 				SetSimEnd(m_SimEndTime);
@@ -461,14 +461,14 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "immstart")
 			{
 				COleDateTime theDate;
-				theDate.ParseDateTime(Value);
+				theDate.ParseDateTime(Value, VAR_DATEVALUEONLY);
 				m_ImmigrationStartDate = theDate;
 				continue;
 			}
 			if (Name == "immend")
 			{
 				COleDateTime theDate;
-				theDate.ParseDateTime(Value);
+				theDate.ParseDateTime(Value, VAR_DATEVALUEONLY);
 				m_ImmigrationEndDate = theDate;
 				continue;
 			}
@@ -490,7 +490,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "rqrequeendate")
 			{
 				COleDateTime theDate;
-				theDate.ParseDateTime(Value);
+				theDate.ParseDateTime(Value, VAR_DATEVALUEONLY);
 				COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 				m_RQReQueenDate = tempDate;
 				continue;
@@ -537,7 +537,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "vttreatmentstart")
 			{
 				COleDateTime theDate;
-				if(theDate.ParseDateTime(Value)) // Verifies this is a valid date
+				if(theDate.ParseDateTime(Value, VAR_DATEVALUEONLY)) // Verifies this is a valid date
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					m_VTTreatmentStart = tempDate;
@@ -761,7 +761,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "foliarappdate")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_EPAData.m_FoliarAppDate = tempDate;
@@ -771,7 +771,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "foliarforagebegin")
 			{
 				COleDateTime theDate;
-				theDate.ParseDateTime(Value);
+				theDate.ParseDateTime(Value, VAR_DATEVALUEONLY);
 				COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 				theColony.m_EPAData.m_FoliarForageBegin = tempDate;
 				continue;
@@ -779,7 +779,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "foliarforageend")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_EPAData.m_FoliarForageEnd = tempDate;
@@ -789,7 +789,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "soilforagebegin")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_EPAData.m_SoilForageBegin = tempDate;
@@ -799,7 +799,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "soilforageend")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_EPAData.m_SoilForageEnd = tempDate;
@@ -809,7 +809,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "seedforagebegin")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_EPAData.m_SeedForageBegin = tempDate;
@@ -819,7 +819,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "seedforageend")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_EPAData.m_SeedForageEnd = tempDate;
@@ -869,7 +869,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "suppollenbegin")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_SuppPollen.m_BeginDate = tempDate;
@@ -879,7 +879,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "suppollenend")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_SuppPollen.m_EndDate = tempDate;
@@ -899,7 +899,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			if (Name == "supnectarbegin")
 			{
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_SuppNectar.m_BeginDate = tempDate;
@@ -910,7 +910,7 @@ void VarroaPopCmd::ProcessInputFile(CString FileName)
 			{
 
 				COleDateTime theDate;
-				if( theDate.ParseDateTime(Value) ) // Verify this Value is a valid date expression
+				if( theDate.ParseDateTime(Value, VAR_DATEVALUEONLY) ) // Verify this Value is a valid date expression
 				{
 					COleDateTime tempDate(theDate.GetYear(),theDate.GetMonth(),theDate.GetDay(),0,0,0);
 					theColony.m_SuppNectar.m_EndDate = tempDate;

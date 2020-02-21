@@ -7,16 +7,41 @@
 #include "cfile.h"
 
 #include <boost/filesystem.hpp>
+namespace bfs = boost::filesystem;
+
+CString GetFileInTempDirectory(const CString& filename) {
+    bfs::path file_path = bfs::temp_directory_path();
+    file_path = file_path / filename.ToString();
+    return file_path.string();
+}
+
+// On Windows the newline character is still written \n -> \r\n
+// to handle this difference we are going to explicitely add 1 character for each \n
+int AdjustedStrlen(const char* str) {
+    int count = std::strlen(str);
+#ifdef WINDOWS    
+    std::for_each(str, str+count, [&count](const char& c)
+        {
+            if (c == '\n') count++;
+        }
+    );
+#endif
+    return count;
+}
 
 TEST_CASE("CFile operations", "[port]") {
     
-    CStdioFile file ("/tmp/dummy.txt", CFile::modeWrite);
-    file.WriteString("This is a single line file\n");
+    CStdioFile file (GetFileInTempDirectory("dummy.txt"), CFile::modeWrite);
+    
+    const char* fileContent = "This is a single line file\n";
+    int fileContentSize = AdjustedStrlen(fileContent);
+
+    file.WriteString(fileContent);
     file.Close();
 
     SECTION("Read dummy file") {
         
-        CStdioFile file ("/tmp/dummy.txt", CFile::modeRead);
+        CStdioFile file (GetFileInTempDirectory("dummy.txt"), CFile::modeRead);
 
         CString content;
         file.ReadString(content);
@@ -27,15 +52,15 @@ TEST_CASE("CFile operations", "[port]") {
 
     SECTION("Tell and Seek in read mode") {
 
-        CStdioFile file ("/tmp/dummy.txt", CFile::modeRead);
+        CStdioFile file (GetFileInTempDirectory("dummy.txt"), CFile::modeRead);
 
         CHECK(file.GetPosition() == 0);
 
         file.SeekToBegin();        
         CHECK(file.GetPosition() == 0);
         
-        CHECK(file.Seek(0, CFile::end) == 27);
-        CHECK(file.GetPosition() == 27);
+        CHECK(file.Seek(0, CFile::end) == fileContentSize);
+        CHECK(file.GetPosition() == fileContentSize);
         
         CHECK(file.Seek(10, CFile::begin) == 10);
         CHECK(file.GetPosition() == 10);
@@ -49,38 +74,43 @@ TEST_CASE("CFile operations", "[port]") {
 
     SECTION("Tell and Seek in write mode") {
 
-        CStdioFile file ("/tmp/dummy.txt", CFile::modeWrite);
+        CStdioFile file (GetFileInTempDirectory("dummy.txt"), CFile::modeWrite);
 
         CHECK(file.GetPosition() == 0);
         CHECK(file.Seek(10, CFile::begin) == 10);
         CHECK(file.GetPosition() == 10);
 
-        file.WriteString("double single line file");
-        CHECK(file.GetPosition() == 33);
+        const char* additionalContent = "double single line file";
+
+        file.WriteString(additionalContent);
+        CHECK(file.GetPosition() == 10 + AdjustedStrlen(additionalContent));
         
         file.Close();
     }
 
     SECTION("Tell and Seek in read/write mode") {
 
-        CStdioFile file ("/tmp/dummy.txt", CFile::modeReadWrite);
+        CStdioFile file (GetFileInTempDirectory("dummy.txt"), CFile::modeReadWrite);
 
         CString content;
         file.ReadString(content);
         CHECK(content == "This is a single line file"); 
 
-        CHECK(file.GetPosition() == 27);
-        CHECK(file.Seek(0, CFile::end) == 27);
-        CHECK(file.GetPosition() == 27);
+        CHECK(file.GetPosition() == fileContentSize);
+        CHECK(file.Seek(0, CFile::end) == fileContentSize);
+        CHECK(file.GetPosition() == fileContentSize);
 
-        file.WriteString("This is a second line in the file\n");
-        CHECK(file.GetPosition() == 61);
+        const char* additionalContent = "This is a second line in the file\n";
+        int additionalContentSize = AdjustedStrlen(additionalContent);
+
+        file.WriteString(additionalContent);
+        CHECK(file.GetPosition() == fileContentSize + additionalContentSize);
 
         file.Close();
 
         SECTION("Iterate on the file content") {
             
-            CStdioFile file ("/tmp/dummy.txt", CFile::modeRead);
+            CStdioFile file (GetFileInTempDirectory("dummy.txt"), CFile::modeRead);
 
             std::vector<std::string> fileContent = {
                 "This is a single line file",
@@ -106,12 +136,12 @@ TEST_CASE("CFile operations", "[port]") {
             CStdioFile file;
             CFileException error;
 
-            CHECK(file.Open("/tmp/dummy.txt", CFile::modeRead, &error));
-            CHECK(file.GetFileName() == "/tmp/dummy.txt");
+            CHECK(file.Open(GetFileInTempDirectory("dummy.txt"), CFile::modeRead, &error));
+            CHECK(file.GetFileName() == GetFileInTempDirectory("dummy.txt"));
 
             CFileStatus status;
             file.GetStatus(status);
-            CHECK(status.m_size == 61);
+            CHECK(status.m_size == fileContentSize + additionalContentSize);
             
             file.Close();
         }
@@ -121,7 +151,7 @@ TEST_CASE("CFile operations", "[port]") {
             CStdioFile file;
             CFileException error;
 
-            CHECK_FALSE(file.Open("/tmp/dummy-not-exists.txt", CFile::modeRead, &error));
+            CHECK_FALSE(file.Open(GetFileInTempDirectory("dummy-not-exists.txt"), CFile::modeRead, &error));
             CHECK(file.GetFileName() == "");
 
             char buffer[12];
@@ -132,18 +162,18 @@ TEST_CASE("CFile operations", "[port]") {
 
         SECTION("Rename") {
 
-            CStdioFile::Rename("/tmp/dummy.txt", "/tmp/dummy-rename.txt");
+            CStdioFile::Rename(GetFileInTempDirectory("dummy.txt"), GetFileInTempDirectory("dummy-rename.txt"));
 
             CStdioFile file;
             CFileException error;
 
-            CHECK_FALSE(file.Open("/tmp/dummy.txt", CFile::modeRead, &error));
+            CHECK_FALSE(file.Open(GetFileInTempDirectory("dummy.txt"), CFile::modeRead, &error));
             CHECK(file.GetFileName() == "");
 
             file.Close();
 
-            CHECK(file.Open("/tmp/dummy-rename.txt", CFile::modeRead, &error));
-            CHECK(file.GetFileName() == "/tmp/dummy-rename.txt");
+            CHECK(file.Open(GetFileInTempDirectory("dummy-rename.txt"), CFile::modeRead, &error));
+            CHECK(file.GetFileName() == GetFileInTempDirectory("dummy-rename.txt"));
             
             file.Close();
         }

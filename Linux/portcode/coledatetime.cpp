@@ -139,14 +139,42 @@ CString COleDateTime::Format(const char* format) const
     return string;
 }
 
-bool COleDateTime::ParseDateTime(const CString& dateTimeStr)
+bool COleDateTime::ParseDateTime(const CString& dateTimeStr, DWORD dwFlags)
 {
     std::istringstream stream(dateTimeStr.ToString());
     std::tm dt = {0};
 
-    const char *dateTimeFormat = "%m/%d/%Y %H:%M:%S";
     dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
-    stream >> std::get_time(&dt, dateTimeFormat);
+
+    if (dwFlags == VAR_DATEVALUEONLY)
+    {
+        // let's try to parse only a date
+        const char* dateFormat = "%m/%d/%Y";
+        stream >> std::get_time(&dt, dateFormat);
+    }
+    else if (dwFlags == VAR_TIMEVALUEONLY)
+    {
+        // let's try to parse only a time
+        const char* timeFormat = "%H:%M:%S";
+        stream >> std::get_time(&dt, timeFormat);
+    }
+    else 
+    {
+        const char* dateTimeFormat = "%m/%d/%Y %H:%M:%S";
+        stream >> std::get_time(&dt, dateTimeFormat);
+        if (stream.fail())
+        {
+            // let's try to parse only a date
+            const char* dateFormat = "%m/%d/%Y";
+            stream >> std::get_time(&dt, dateFormat);
+            if (stream.fail())
+            {
+                // let's try to parse only a time
+                const char* timeFormat = "%H:%M:%S";
+                stream >> std::get_time(&dt, timeFormat);
+            }
+        }
+    }
     if (!stream.fail())
     {
         m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
@@ -154,18 +182,7 @@ bool COleDateTime::ParseDateTime(const CString& dateTimeStr)
     }
     else
     {
-        // let's try to parse only a date
-        const char *dateFormat = "%m/%d/%Y";
-        stream >> std::get_time(&dt, dateFormat);
-        if (!stream.fail())
-        {
-            m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
-            m_status = valid;
-        }
-        else
-        {
-            m_status = error;
-        }
+        m_status = error;
     }
     return m_status == valid;
 }

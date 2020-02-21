@@ -45,18 +45,22 @@ typedef int32_t BOOL;
 typedef unsigned char BYTE;
 typedef BYTE BOOLEAN;
 typedef unsigned short WORD;
-typedef unsigned int DWORD;
-typedef unsigned int DWORD_PTR;
+typedef unsigned long DWORD;
+typedef uint64_t ULONG_PTR;
+typedef ULONG_PTR DWORD_PTR;
 typedef uint32_t UINT;
 typedef char* LPTSTR;
 typedef const char* LPCTSTR;
 typedef char TCHAR;
 typedef intptr_t INT_PTR;
 typedef uintptr_t UINT_PTR;
-typedef int LONG;
+typedef long LONG;
 typedef int64_t LONGLONG;
 typedef uint64_t ULONGLONG;
 typedef double DATE;
+
+#define VAR_TIMEVALUEONLY ((DWORD)0x00000001) /* return time value */
+#define VAR_DATEVALUEONLY ((DWORD)0x00000002) /* return date value */
 
 #ifndef WINDOWS
 #ifndef _SYSTEMTIME_

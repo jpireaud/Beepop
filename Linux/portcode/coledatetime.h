@@ -58,7 +58,7 @@ public:
 	bool operator <= (const COleDateTime& other) const;
 
 	CString Format(const char* format) const;
-	bool ParseDateTime(const CString& dateTimeStr);
+	bool ParseDateTime(const CString& dateTimeStr, DWORD dwFlags = 0);
 
 	bool SetDate(int32_t year, int32_t month, int32_t day);
 

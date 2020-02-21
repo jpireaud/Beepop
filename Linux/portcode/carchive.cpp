@@ -162,7 +162,7 @@ DWORD_PTR CArchive::ReadCount()
 #else  // _WIN64
 	if (dwCount != 0xFFFFFFFF)
 		return dwCount;
-z
+
 	DWORD_PTR qwCount;
 	*this >> qwCount;
 	return qwCount;

@@ -159,8 +159,10 @@ TEST_CASE("CPtrList operations", "[port]") {
         it = list.GetHeadPosition();
         list.GetNext(it);
         list.GetNext(it);
+        // save valid Posision
+        POSITION valid = it; list.GetNext(valid);
         list.RemoveAt(it);
-        cObj = dynamic_cast<MyObject*>(list.GetAt(it));
-        CHECK(cObj->GetData() == "element 4");
+        cObj = dynamic_cast<MyObject*>(list.GetAt(valid));
+        CHECK(cObj->GetData() == "element 5");
     }
 }
