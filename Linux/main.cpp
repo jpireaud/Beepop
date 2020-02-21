@@ -141,8 +141,9 @@ int main(int argc, char** argv)
 						// try to execute replace regex
 						const std::regex digitRegex("(\\(\\d+\\))");
 						const std::regex digitReplaceRegex("\\(\\d+\\)");
+						const std::string filename = outputFilename.string();
 						std::smatch digitMatch;
-						if (std::regex_search(outputFilename.string(), digitMatch, digitRegex))
+						if (std::regex_search(filename, digitMatch, digitRegex))
 						{
 							increment = std::atoi(digitMatch[digitMatch.size()-1].str().c_str()+1);
 							replaceString << "(" << ++increment << ")";

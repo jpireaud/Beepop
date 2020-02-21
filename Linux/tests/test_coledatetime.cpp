@@ -88,10 +88,10 @@ TEST_CASE("COleDateTime operations", "[port]") {
         dt.ParseDateTime("toto");
         CHECK(dt.GetStatus() == COleDateTime::error);
         
-        dt.ParseDateTime("1/1/2001");
+        dt.ParseDateTime("1/1/2001", VAR_DATEVALUEONLY);
         CHECK(dt.GetStatus() == COleDateTime::error);
         
-        dt.ParseDateTime("01/01/2001");
+        dt.ParseDateTime("01/01/2001", VAR_DATEVALUEONLY);
         CHECK(dt.GetStatus() == COleDateTime::valid);
         
         CHECK(dt.GetYear() == 2001);

@@ -48,6 +48,9 @@ protected:
 	const std::fstream& GetStream() const {return m_fileStream;}
 	std::fstream& GetStream() {return m_fileStream;}
 
+	// Returns true if the stream is valid
+	bool IsValid() const;
+
 protected:
 
 	std::fstream m_fileStream;
