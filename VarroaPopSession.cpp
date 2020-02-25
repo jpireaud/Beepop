@@ -688,15 +688,15 @@ void CVarroaPopSession::Simulate()
 				theColony.CapWkr.GetMiteCount(),
 				theColony.CapDrn.GetMitesPerCell(),
 				theColony.CapWkr.GetMitesPerCell(),
+				0,
 				0.0,
 				0.0,
 				0.0,
 				0.0,
 				0.0,
-				0.0,
-				0,0,0,0,
+				0,0,0,0,0,
 				theColony.queen.GetQueenStrength(),
-				0.0,0.0,0.0);
+				0.0,0.0);
 		m_ResultsText.AddTail(CurSize);
 
 
