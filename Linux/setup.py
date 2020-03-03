@@ -76,6 +76,8 @@ def get_data_model_files():
         "Queen.cpp",
         "Spores.h",
         "Spores.cpp",
+        "VarroaPopSession.h",
+        "VarroaPopSession.cpp",
         "WeatherEvents.h",
         "WeatherEvents.cpp"
     ]

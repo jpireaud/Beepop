@@ -21,6 +21,8 @@ public:
 
 	CString& operator+=(const CString& str);
 	CString& operator=(const CString& str);
+	
+	CString& operator+=(const char& c);
 
 	bool operator<(const CString& str) const;
 

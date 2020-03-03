@@ -1,4 +1,4 @@
-#include "varroapopcmd.h"
+#include "varroapopcmdbridge.h"
 
 #include "stdafx.h"
 
@@ -8,6 +8,8 @@ namespace bfs = boost::filesystem;
 #include <cxxopts.hpp>
 
 #include <set>
+
+void LoadVRPFile(CVarroaPopSession& session, const CString& filename);
 
 int main(int argc, char** argv)
 {
@@ -180,26 +182,37 @@ int main(int argc, char** argv)
 
 	// now that we processed input arguments let's proceed with the simulation
 
-    VarroaPopCmd app;
+    CVarroaPopSession session;
+
+	// setup bridge
+
+	VarroaPopCmdBridge bridge (session);
+	bridge.SetResultsFileName(outputFile.string().c_str());
+
+	session.SetBridge(&bridge);
 
 	if (!vrpFile.empty())
 	{
-		app.LoadVRPFile(vrpFile.string().c_str());     
+		LoadVRPFile(session, vrpFile.string().c_str());     
 	}
 
 	// Read input file
-	app.ProcessInputFile(inputFile.string().c_str());
+	session.ProcessInputFile(inputFile.string().c_str());
 
 	if (!weatherFile.empty())
 	{
-		app.LoadWeatherFile(weatherFile.string().c_str());      
+		session.LoadWeatherFile(weatherFile.string().c_str());      
 	}
 
-	// Set results filename
-	app.SetResultsFileName(outputFile.string().c_str());
-
 	// Run simulation
-	app.Simulate();
+	session.Simulate();
 
     return 0;
+}
+
+void LoadVRPFile(CVarroaPopSession& session, const CString& filename)
+{
+	CStdioFile file(filename, CFile::modeRead | CFile::typeBinary);
+	CArchive archive(&file, CArchive::load);
+	session.Serialize(archive);        
 }
