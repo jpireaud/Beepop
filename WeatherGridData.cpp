@@ -189,6 +189,25 @@ namespace WeatherGridDataNs
         return daylightHours;
     }
 
+    class malformated_latitude_exception : public std::exception
+    {
+    public:
+        malformated_latitude_exception(const std::string& filename) 
+            : m_filename(filename) 
+        {
+        }
+        virtual ~malformated_latitude_exception()
+        {
+        }
+        virtual const char* what() const noexcept 
+        { 
+            std::string message = "can't find latitude in file named: " + m_filename; 
+            return message.c_str(); 
+        }
+    private:
+        std::string m_filename;
+    };
+
     double GetLatitudeFromFilename(const std::string& filename)
     {
         const size_t firstUnderscore = filename.find_first_of('_');
@@ -202,14 +221,12 @@ namespace WeatherGridDataNs
             }
             else
             {
-                std::string message = "can't find latitude in file named: " + filename;
-                throw std::exception(message.c_str());
+                throw malformated_latitude_exception(filename);
             }
         }
         else
         {
-            std::string message = "can't find latitude in file named: " + filename;
-            throw std::exception(message.c_str());
+            throw malformated_latitude_exception(filename);
         }
     }
     
