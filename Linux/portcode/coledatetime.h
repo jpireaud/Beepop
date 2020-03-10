@@ -66,8 +66,11 @@ public:
 	bool GetAsUDATE(UDATE& date) const;
 	bool GetAsDATE(DATE& date) const;
 
-	COleDateTime operator+(const COleDateTimeSpan& span);
-	COleDateTime operator-(const COleDateTimeSpan& span);
+	COleDateTime operator+(const COleDateTimeSpan& span) const;
+	COleDateTime operator-(const COleDateTimeSpan& span) const;
+
+	COleDateTime& operator+=(const COleDateTimeSpan& span);
+	COleDateTime& operator-=(const COleDateTimeSpan& span);
 
 	COleDateTimeSpan operator-(const COleDateTime& date) const;
 

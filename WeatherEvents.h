@@ -9,6 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <vector>
 
 class CEvent : public CObject
 {
@@ -44,6 +45,7 @@ public:
 	void SetMinTemp(double minTemp) {m_MinTemp = minTemp;}
 	void SetRainfall(double rainfall) {m_Rainfall = rainfall;}
 	void SetForage(bool Forage) {m_ForageDay = Forage;}
+	void SetForageInc(double forageInc) {m_ForageInc = forageInc;};
 	void SetForageInc(double TThresh, double TMax, double TAve);
 	double GetForageInc() {return m_ForageInc;}
 	void SetLineNum(int line) {m_LineNum = line;}
@@ -142,6 +144,13 @@ public:
 	bool LoadWeatherFile(CString FileName);
 	bool LoadEPAWeatherFileDVF(CString FileName);
 	bool LoadEPAWeatherFileWEA(CString FileName);
+
+	//! Enable to load grid binary files directly check WeatherGridData.h to see supported formats
+	template<typename GridDataType>
+	bool LoadWeatherGridDataBinaryFile(CString FileName);
+
+	void ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::vector<CEvent*>& events);
+
 	void Serialize(CArchive& ar);
 	bool IsInitialized() {return HasBeenInitialized;}
 	//  Access

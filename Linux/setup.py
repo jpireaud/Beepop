@@ -58,6 +58,8 @@ def get_data_model_files():
         "EGG.CPP",
         "EPAData.h",
         "EPAData.cpp",
+        "GlobalOptions.h",
+        "GlobalOptions.cpp",
         "IEDItem.h",
         "IEDItem.cpp",
         "LARVA.H",
@@ -79,7 +81,9 @@ def get_data_model_files():
         "VarroaPopSession.h",
         "VarroaPopSession.cpp",
         "WeatherEvents.h",
-        "WeatherEvents.cpp"
+        "WeatherEvents.cpp",
+        "WeatherGridData.h",
+        "WeatherGridData.cpp"
     ]
 
 

@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "VarroaPop.h"
 #include "Colony.h"
+#include "GlobalOptions.h"
 #include <math.h>
 
 #ifdef _DEBUG
@@ -516,9 +517,38 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 	ForagerCount++;
 	theAdult->SetLifespan(GetColony()->m_CurrentForagerLifespan);
 
+	const bool pendingForagersFirst = GlobalOptions::Get().ShouldAddForagersToPendingForagersFirst();
+	if (pendingForagersFirst)
+	{
+		// Add the Adult to the Pending Foragers list
+		if (PendingForagers.GetCount() == 0)
+		{
+			PendingForagers.AddHead(theAdult);
+		}
+		else
+		{
+			// check if the latest pending adult is still 0 day old if yes add the numbers
+			POSITION pos = PendingForagers.GetHeadPosition();
+			CAdult* pendingAdult = (CAdult*)PendingForagers.GetNext(pos);
+			if (pendingAdult->GetForageInc() == 0.0)
+			{
+				pendingAdult->SetNumber(pendingAdult->GetNumber() + theAdult->GetNumber());
+				delete theAdult;
+				ForagerCount--;
+			}
+			else
+			{
+				PendingForagers.AddHead(theAdult);
+			}
+		}
+	}
+
 	if (theDay->IsForageDay())
 	{
-		PendingForagers.AddHead(theAdult);
+		if (!pendingForagersFirst)
+		{
+			PendingForagers.AddHead(theAdult);
+		}
 
 		POSITION pos = PendingForagers.GetHeadPosition();
 		CAdult* pendingAdult;
@@ -549,7 +579,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 			}
 		}
 	}
-	else
+	else if(!pendingForagersFirst)
 	{
 		if (IsEmpty())
 		{

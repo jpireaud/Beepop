@@ -4,6 +4,7 @@ find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost CONFIG REQUIRED system filesystem)
 
 set(SOURCES main.cpp
+            helpers/common.cpp
             helpers/myobject.cpp
             test_carchive.cpp
             test_carray.cpp
@@ -16,7 +17,8 @@ set(SOURCES main.cpp
             test_cstringarray.cpp 
             test_cstringlist.cpp 
             test_ctime.cpp 
-            test_cuintarray.cpp )
+            test_cuintarray.cpp
+            test_temperaturedata.cpp )
 
 add_executable(VarroaPopTests ${SOURCES})
 target_link_libraries(VarroaPopTests PRIVATE VarroaPopDataModel VarroaPopLinuxPort)

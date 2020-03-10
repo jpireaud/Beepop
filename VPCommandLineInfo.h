@@ -26,6 +26,7 @@ public:
 					FLOutputResults, 
 					FLOutputLog, 
 					FLBackground,
+					FLBinaryWeatherFileFormat,
 					FLInvalid};
 	FlagType m_CurFlag;
 
