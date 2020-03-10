@@ -637,6 +637,7 @@ void CVarroaPopSession::Simulate()
 
 		const char* formatData[] = {
 			"%s", // "Initial or Date"
+			"%.f", // Day Light Hours
 			"%6d", // Colony size
 			"%6d", // Adult Drones
 			"%6d", // Adult Workers
@@ -712,6 +713,7 @@ void CVarroaPopSession::Simulate()
 		CurSize.Format(m_ResultsFileFormatStg,
 			//pEvent->GetDateStg("%m/%d/%Y"), 
 			"Initial   ", // "Initial or Date"
+			pEvent->GetDaylightHours(),
 			theColony.GetColonySize(), // Colony size
 			theColony.Dadl.GetQuantity(), // Adult Drones
 			theColony.Wadl.GetQuantity(), // Adult Workers
@@ -816,6 +818,7 @@ void CVarroaPopSession::Simulate()
 
 				CurSize.Format(m_ResultsFileFormatStg,
 					pEvent->GetDateStg("%m/%d/%Y"),
+					pEvent->GetDaylightHours(),
 					theColony.GetColonySize(),
 					theColony.Dadl.GetQuantity(),
 					theColony.Wadl.GetQuantity(),

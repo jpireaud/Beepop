@@ -1507,7 +1507,6 @@ bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
 			if (!computeHourlyTemperaturesEstimation)
 			{
 				event->SetDaylightHours(WeatherGridDataNs::DayLength(latitude, WeatherGridDataNs::ComputeJDay(date)).daylength);
-				// event->SetDaylightHours(WeatherGridDataNs::DayLightHours(latitude, WeatherGridDataNs::ComputeJDay(date)));
 			}
 			event->SetTemp((accessor.TMAX() + accessor.TMIN()) * 0.5);
 			event->SetMaxTemp(accessor.TMAX());
@@ -1692,8 +1691,6 @@ void CWeatherEvents::ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::v
 
 			prevEvent = event;
 			event = nextEvent;
-			eventIndex++;
-
 		}
 	}
 	catch (std::exception & e)
