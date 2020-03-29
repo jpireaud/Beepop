@@ -253,7 +253,7 @@ namespace WeatherGridDataNs
                     hourly_temperatures[h] = tmin;
                 }
             }
-            else if (h > sunrise&& h <= sunset)
+            else if (h > sunrise && h <= sunset)
             {
                 hourly_temperatures[h] = tmin + (((tmax)-tmin) * std::sin(M_PI * ((h)-sunrise) / ((daylength)+4)));
             }

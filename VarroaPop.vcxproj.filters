@@ -364,6 +364,15 @@
     <ClCompile Include="IEDItem.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="VarroaPopSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeatherGridData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VarroaPop.rc">
@@ -735,6 +744,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="2DCONST.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VarroaPopSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherGridData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
