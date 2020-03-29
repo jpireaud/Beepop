@@ -511,14 +511,16 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 {
 	// 10% of foragers die over the winter 11/1 - 4/1
 #define WINTER_MORTALITY_PER_DAY 0.10/152 // Reduce 10% over the 152 days of winter
-	ASSERT(theAdult);
-	// Change lifespan from that of Worker to that of forager
-	WorkerCount--;
-	ForagerCount++;
-	theAdult->SetLifespan(GetColony()->m_CurrentForagerLifespan);
+	if (theAdult)
+	{
+		// Change lifespan from that of Worker to that of forager
+		WorkerCount--;
+		ForagerCount++;
+		theAdult->SetLifespan(GetColony()->m_CurrentForagerLifespan);
+	}
 
 	const bool pendingForagersFirst = GlobalOptions::Get().ShouldAddForagersToPendingForagersFirst();
-	if (pendingForagersFirst)
+	if (theAdult && pendingForagersFirst)
 	{
 		// Add the Adult to the Pending Foragers list
 		if (PendingForagers.GetCount() == 0)
@@ -545,7 +547,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 
 	if (theDay->IsForageDay())
 	{
-		if (!pendingForagersFirst)
+		if (theAdult && !pendingForagersFirst)
 		{
 			PendingForagers.AddHead(theAdult);
 		}
@@ -555,7 +557,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 		while (pos != NULL) // Increment the forageIncrement for Pending List
 		{
 			pendingAdult = (CAdult*)PendingForagers.GetNext(pos);
-			pendingAdult->SetForageInc(theAdult->GetForageInc() + theDay->GetForageInc());
+			pendingAdult->SetForageInc(pendingAdult->GetForageInc() + theDay->GetForageInc());
 		}
 		pos = PendingForagers.GetTailPosition();
 		POSITION oldpos;
@@ -579,7 +581,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 			}
 		}
 	}
-	else if(!pendingForagersFirst)
+	else if(theAdult && !pendingForagersFirst)
 	{
 		if (IsEmpty())
 		{
@@ -836,6 +838,103 @@ void CAdultlist::Serialize(CArchive &ar)
 			pos = AddTail(temp);
 		}
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CAdultlistA - Overloaded implementation of the CAdultList that changes the way
+// Adult bees are aging. The aging process is now depending on the daylight hours and the 
+// estimated daily temperatures to match Foragers aging.
+//
+void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder)
+{
+	// Here we create an Adult only for thepurpose of aging using the ForageInc
+	CAdult* theAdult = new CAdult(theBrood->GetNumber());
+	theAdult->SetMites(theBrood->m_Mites);
+	theAdult->SetPropVirgins(theBrood->m_PropVirgins);
+	theAdult->SetLifespan(WADLLIFE);
+
+	// Add the Adult to the Pending Foragers list
+	if (PendingAdults.GetCount() == 0)
+	{
+		PendingAdults.AddHead(theAdult);
+	}
+	else
+	{
+		// check if the latest pending adult is still 0 day old if yes add the numbers
+		POSITION pos = PendingAdults.GetHeadPosition();
+		CAdult* pendingAdult = (CAdult*)PendingAdults.GetNext(pos);
+		if (pendingAdult->GetForageInc() == 0.0)
+		{
+			pendingAdult->SetNumber(pendingAdult->GetNumber() + theAdult->GetNumber());
+			delete theAdult;
+		}
+		else
+		{
+			PendingAdults.AddHead(theAdult);
+		}
+	}
+
+	if (theEvent->IsForageDay())
+	{
+		CAdult* lCaboose = new CAdult();
+
+		POSITION pos = PendingAdults.GetHeadPosition();
+		CAdult* pendingAdult;
+		while (pos != NULL) // Increment the forageIncrement for Pending List
+		{
+			pendingAdult = (CAdult*)PendingAdults.GetNext(pos);
+			pendingAdult->SetForageInc(theAdult->GetForageInc() + theEvent->GetForageInc());
+		}
+		pos = PendingAdults.GetTailPosition();
+		POSITION oldpos;
+		while (pos != NULL)
+		{
+			oldpos = pos;  // Save old position for possible deletion
+			pendingAdult = (CAdult*)PendingAdults.GetPrev(pos);
+			if (pendingAdult->GetForageInc() >= 1.0)
+			{
+				pendingAdult->SetForageInc(0.0);
+
+				// Here we give back control to the Adult list default implementation
+				CBrood* brood = new CBrood(pendingAdult->GetNumber());
+				brood->m_Mites = pendingAdult->GetMites();
+				brood->m_PropVirgins = pendingAdult->GetPropVirgins();
+				CAdultlist::Update(brood, theColony, theEvent, bWorkder);
+
+				if (Caboose)
+				{
+					lCaboose->SetNumber(lCaboose->GetNumber() + Caboose->GetNumber());
+
+					delete Caboose;
+					Caboose = NULL;
+				}
+
+				PendingAdults.RemoveAt(oldpos);
+				delete pendingAdult;
+			}
+		}
+
+		if (lCaboose->GetNumber() > 0)
+		{
+			Caboose = lCaboose;
+		}
+		else
+		{
+			delete lCaboose;
+			Caboose = NULL;
+		}
+	}
+	else
+	{
+		Caboose = NULL;
+	}
+}
+
+void CAdultlistA::KillAll()
+{
+	CAdultlist::KillAll();
+	PendingAdults.KillAll();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1136,6 +1235,10 @@ CColony::~CColony()
 	}
 }
 
+// TODO: Julien: Assignment and Copy Constructor implementations seem weird.
+// Unless there is something under the hood that I don't understand, when we are assigning or copying
+// a Colony we and creating the new ones by adding the same objects to the new Colony and not copy of objects.
+// I don't know if it is intended thus the assignment and copy are Shallow copies instead of Deep copies.
 
 CColony CColony::operator = (CColony col)
 {

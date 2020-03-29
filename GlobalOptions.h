@@ -51,6 +51,12 @@ public:
 	// Foragers will always be added to the PendingForagers list first so they'll age regarding the Forager increment.
 	Option<bool> ShouldAddForagersToPendingForagersFirst = false;
 
+	// Adult aging options
+
+	// This option changes the way adult are aged. Basically, their aging will be the same as the Foragers.
+	// Adults will new be added to the PendingAdults list first so they'll age regarding the Forager increment.
+	Option<bool> ShouldAdultsAgeBasedOnForageDayElection = false;
+
 	// Weather file options
 
 	// If the weather file to be loaded is in bynary format, this specify which format to use

@@ -23,7 +23,7 @@
 #include "EPAData.h"
 #include "NutrientContaminationTable.h"
 
-
+#include <functional>
 
 class CColony;  // Forward declaration
 
@@ -48,15 +48,15 @@ protected:
 public:
 	CBeelist(){}
 	~CBeelist();
-	void SetLength(int len) {m_ListLength = len;}
-	int GetLength() {return m_ListLength;}
-	int GetQuantity();
-	int GetQuantityAt(int index);
-	int GetQuantityAt(int from, int to);
-	void SetQuantityAt(int index, int Quan);
-	void SetQuantityAt(int from, int to, int Quan);
-	void SetQuantityAtProportional(int from, int to, double Proportion);
-	void KillAll();
+	virtual void SetLength(int len) {m_ListLength = len;}
+	virtual int GetLength() {return m_ListLength;}
+	virtual int GetQuantity();
+	virtual int GetQuantityAt(int index);
+	virtual int GetQuantityAt(int from, int to);
+	virtual void SetQuantityAt(int index, int Quan);
+	virtual void SetQuantityAt(int from, int to, int Quan);
+	virtual void SetQuantityAtProportional(int from, int to, double Proportion);
+	virtual void KillAll();
 	void SetColony(CColony* pCol) {m_pColony = pCol;}
 	CColony* GetColony() {return m_pColony;}
 	void AddMember(CBee* element);
@@ -64,8 +64,8 @@ public:
 	CString Status();
 	void FactorQuantity(double factor);
 	//void SetQuantityAt(int Quan);
-	void SetPropTransition(double Prop) {m_PropTransition = Prop;}
-	double GetPropTransition() {return m_PropTransition;}
+	virtual void SetPropTransition(double Prop) {m_PropTransition = Prop;}
+	virtual double GetPropTransition() {return m_PropTransition;}
 
 	static int DroneCount;
 	static int ForagerCount;
@@ -84,14 +84,31 @@ protected:
 	CAdult* Caboose;
 public:
 
-	CAdultlist() {Caboose = NULL;}	
-	CAdult* GetCaboose() {return Caboose;}
-	void ClearCaboose() {Caboose = NULL;}
-	void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
-	void Serialize(CArchive &ar);
-	void KillAll();
+	CAdultlist() { Caboose = NULL; }
+	CAdult* GetCaboose() { return Caboose; }
+	void ClearCaboose() { Caboose = NULL; }
+	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void Serialize(CArchive& ar);
+	virtual void KillAll();
 	void UpdateLength(int len, bool bWorker = true);
 	int MoveToEnd(int QuantityToMove, int MinAge);
+};
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CAdultlistA - Overloaded implementation of the CAdultList that changes the way
+// Adult bees are aging. The aging process is now depending on the daylight hours and the 
+// estimated daily temperatures to match Foragers aging.
+//
+class CAdultlistA : public CAdultlist
+{
+protected:
+	CAdultlist PendingAdults;
+public:
+
+	CAdultlistA() {}
+	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void KillAll();
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -316,7 +333,7 @@ public:
 	//CForagerlist foragers;
 	CForagerlistA foragers;
 	CAdultlist Dadl;
-	CAdultlist Wadl;
+	CAdultlistA Wadl;
 	CBroodlist CapWkr;
 	CBroodlist CapDrn;
 	CLarvalist Wlarv;
