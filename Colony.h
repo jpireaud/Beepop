@@ -85,6 +85,7 @@ protected:
 public:
 
 	CAdultlist() { Caboose = NULL; }
+	virtual ~CAdultlist() {}
 	CAdult* GetCaboose() { return Caboose; }
 	void ClearCaboose() { Caboose = NULL; }
 	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
@@ -107,7 +108,9 @@ protected:
 public:
 
 	CAdultlistA() {}
+	~CAdultlistA() { KillAll(); }
 	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual int GetQuantity();
 	virtual void KillAll();
 };
 
@@ -333,6 +336,7 @@ public:
 	//CForagerlist foragers;
 	CForagerlistA foragers;
 	CAdultlist Dadl;
+	// To change Adult Workers aging use CAdultlist for day aging or CAdultlistA for Hourly Temperature based aging
 	CAdultlistA Wadl;
 	CBroodlist CapWkr;
 	CBroodlist CapDrn;

@@ -854,7 +854,7 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 	theAdult->SetPropVirgins(theBrood->m_PropVirgins);
 	theAdult->SetLifespan(WADLLIFE);
 
-	// Add the Adult to the Pending Foragers list
+	// Add the Adult to the Pending Adults list
 	if (PendingAdults.GetCount() == 0)
 	{
 		PendingAdults.AddHead(theAdult);
@@ -875,10 +875,18 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 		}
 	}
 
+	// Make sure the Caboose pointer is reset since the object
+	// may have been delete by the foragers list implementation
+	Caboose = NULL;
+
 	if (theEvent->IsForageDay())
 	{
-		CAdult* lCaboose = new CAdult();
+		// Here we keep a local Caboose object to aggregate all bees that are going to become
+		// foragers after successful calls to CAdultlist::Update
+		CAdult lCaboose;
+		CAdult* lastValidCaboose = NULL;
 
+		// Here we age adults given the ForageInc of the current day
 		POSITION pos = PendingAdults.GetHeadPosition();
 		CAdult* pendingAdult;
 		while (pos != NULL) // Increment the forageIncrement for Pending List
@@ -886,6 +894,8 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 			pendingAdult = (CAdult*)PendingAdults.GetNext(pos);
 			pendingAdult->SetForageInc(theAdult->GetForageInc() + theEvent->GetForageInc());
 		}
+
+		// All adults with a ForageInc >= 1.0 will enter the Adult boxcar
 		pos = PendingAdults.GetTailPosition();
 		POSITION oldpos;
 		while (pos != NULL)
@@ -900,14 +910,19 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 				CBrood* brood = new CBrood(pendingAdult->GetNumber());
 				brood->m_Mites = pendingAdult->GetMites();
 				brood->m_PropVirgins = pendingAdult->GetPropVirgins();
+
+				// Add adults (brood) appropriately aged using ForageInc to the Adultlist.
 				CAdultlist::Update(brood, theColony, theEvent, bWorkder);
 
 				if (Caboose)
 				{
-					lCaboose->SetNumber(lCaboose->GetNumber() + Caboose->GetNumber());
-
-					delete Caboose;
-					Caboose = NULL;
+					// We need to delete the lastValidCaboose since it will not be processed afterwards
+					if (lastValidCaboose)
+					{
+						delete lastValidCaboose;
+					}
+					lastValidCaboose = Caboose;
+					lCaboose.SetNumber(lCaboose.GetNumber() + Caboose->GetNumber());
 				}
 
 				PendingAdults.RemoveAt(oldpos);
@@ -915,20 +930,26 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 			}
 		}
 
-		if (lCaboose->GetNumber() > 0)
+		if (lastValidCaboose)
 		{
-			Caboose = lCaboose;
-		}
-		else
-		{
-			delete lCaboose;
-			Caboose = NULL;
+			// Overwrite the Caboose number with the aggregated one from all CAdultlist::Update calls
+			Caboose = lastValidCaboose;
+			Caboose->SetNumber(lCaboose.GetNumber());
 		}
 	}
-	else
+}
+
+int CAdultlistA::GetQuantity()
+{
+	int quan = CAdultlist::GetQuantity();
+	POSITION pos = PendingAdults.GetHeadPosition();
+	CAdult* temp;
+	while (pos != NULL)
 	{
-		Caboose = NULL;
+		temp = (CAdult*)PendingAdults.GetNext(pos);
+		quan += temp->GetNumber();
 	}
+	return quan;
 }
 
 void CAdultlistA::KillAll()
