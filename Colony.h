@@ -24,6 +24,7 @@
 #include "NutrientContaminationTable.h"
 
 #include <functional>
+#include <memory>
 
 class CColony;  // Forward declaration
 
@@ -336,8 +337,11 @@ public:
 	//CForagerlist foragers;
 	CForagerlistA foragers;
 	CAdultlist Dadl;
+protected:
 	// To change Adult Workers aging use CAdultlist for day aging or CAdultlistA for Hourly Temperature based aging
-	CAdultlistA Wadl;
+	std::unique_ptr<CAdultlist> WadlPrt;
+public:
+	CAdultlist& Wadl();
 	CBroodlist CapWkr;
 	CBroodlist CapDrn;
 	CLarvalist Wlarv;

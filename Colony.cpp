@@ -1234,6 +1234,8 @@ CColony::CColony()
 
 	m_NoResourceKillsColony = false;
 
+	// Default CAdultList behavior will age WADLLIFE days 
+	WadlPrt.reset(new CAdultlist());
 }
 
 
@@ -1281,8 +1283,8 @@ CColony CColony::operator = (CColony col)
 	pos = col.Dlarv.GetHeadPosition();
 	while (pos!=NULL) temp.Dlarv.AddTail(col.Dlarv.GetNext(pos));
 
-	pos = col.Wadl.GetHeadPosition();
-	while (pos!=NULL) temp.Wadl.AddTail(col.Wadl.GetNext(pos));
+	pos = col.Wadl().GetHeadPosition();
+	while (pos!=NULL) temp.Wadl().AddTail(col.Wadl().GetNext(pos));
 
 	return temp;
 }
@@ -1294,8 +1296,8 @@ CColony:: CColony(CColony& col)  // Copy Constructor
 	name = col.name;
 	queen=col.queen;
 
-	POSITION pos = col.Wadl.GetHeadPosition();
-	while (pos!=NULL) Wadl.AddTail(col.Wadl.GetNext(pos));
+	POSITION pos = col.Wadl().GetHeadPosition();
+	while (pos!=NULL) Wadl().AddTail(col.Wadl().GetNext(pos));
 
 	pos = col.Dadl.GetHeadPosition();
 	while (pos!=NULL) Dadl.AddTail(col.Dadl.GetNext(pos));
@@ -1334,6 +1336,12 @@ END_MESSAGE_MAP()
 
 void CColony::InitializeColony()
 {
+	// If the user ask to age adult bees using forage day let's do it here
+	if (GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection())
+	{
+		WadlPrt.reset(new CAdultlistA());
+	}
+
 	InitializeBees();
 	InitializeMites();
 
@@ -1558,7 +1566,7 @@ void CColony::AddEventNotification(CString DateStg, CString Msg)
 //
 //	// Now serialize the lists
 //
-//	Wadl.Serialize(ar);
+//	Wadl().Serialize(ar);
 //	Dadl.Serialize(ar);
 //	foragers.Serialize(ar);
 //	Wlarv.Serialize(ar);
@@ -1764,7 +1772,7 @@ void CColony::Serialize(CArchive& ar, int FileFormatVersion)
 
 	// Now serialize the lists
 
-	Wadl.Serialize(ar);
+	Wadl().Serialize(ar);
 	Dadl.Serialize(ar);
 	foragers.Serialize(ar);
 	Wlarv.Serialize(ar);
@@ -1831,7 +1839,7 @@ void CColony::KillColony()
 	CapDrn.KillAll();
 	CapWkr.KillAll();
 	Dadl.KillAll();
-	Wadl.KillAll();
+	Wadl().KillAll();
 	foragers.KillAll();
 	foragers.ClearPendingForagers();
 }
@@ -1839,13 +1847,13 @@ void CColony::KillColony()
 void CColony::Clear()
 {
 
-	//  Empty Wadl list
-	while (!Wadl.IsEmpty())
+	//  Empty Wadl() list
+	while (!Wadl().IsEmpty())
 	{
-		CAdult* temp = (CAdult*)Wadl.RemoveHead();
+		CAdult* temp = (CAdult*)Wadl().RemoveHead();
 		ASSERT(temp);
 		delete temp;
-		Wadl.ClearCaboose();
+		Wadl().ClearCaboose();
 	}
 
 	//  Empty Dadl list
@@ -1953,9 +1961,9 @@ void CColony::InitializeBees()
 	CapWkr.SetPropTransition(1.0);
 	Dadl.SetLength(DADLLIFE);
 	Dadl.SetPropTransition(1.0);
-	Wadl.SetLength(WADLLIFE);
-	Wadl.SetPropTransition(1.0);
-	Wadl.SetColony(this);
+	Wadl().SetLength(WADLLIFE);
+	Wadl().SetPropTransition(1.0);
+	Wadl().SetColony(this);
 	foragers.SetLength(m_CurrentForagerLifespan);
 	foragers.SetColony(this);
 	//foragers.SetUnemployedForagerQuantity(0);
@@ -2042,15 +2050,15 @@ void CColony::InitializeBees()
 
 	// Distribute Worker Adults over Workers and Foragers
 	e = m_InitCond.m_workerAdultsField/
-	(Wadl.GetLength() + foragers.GetLength());
+	(Wadl().GetLength() + foragers.GetLength());
 	del  = m_InitCond.m_workerAdultsField - 
-		e*(Wadl.GetLength()+foragers.GetLength());
-	for (i=0;i<Wadl.GetLength();i++)  // Distribute into Worker Boxcars
+		e*(Wadl().GetLength()+foragers.GetLength());
+	for (i=0;i<Wadl().GetLength();i++)  // Distribute into Worker Boxcars
 	{
 		CAdult* theWorker;
 		theWorker = new CAdult(e);
 		theWorker->SetLifespan(WADLLIFE);
-		Wadl.AddHead(theWorker);
+		Wadl().AddHead(theWorker);
 	}
 	for (i=0;i<foragers.GetLength();i++) // Distribute remaining into Foragers
 	{
@@ -2069,7 +2077,7 @@ void CColony::InitializeBees()
 
 int CColony::GetColonySize()
 {
-	return(Dadl.GetQuantity() + Wadl.GetQuantity() + foragers.GetQuantity());
+	return(Dadl.GetQuantity() + Wadl().GetQuantity() + foragers.GetQuantity());
 }
 
 
@@ -2077,7 +2085,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 {
 
 	float LarvPerBee = float(Wlarv.GetQuantity() + Dlarv.GetQuantity())/
-					(Wadl.GetQuantity() + Dadl.GetQuantity() + foragers.GetQuantity());
+					(Wadl().GetQuantity() + Dadl.GetQuantity() + foragers.GetQuantity());
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Apply Date Range values
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2124,12 +2132,12 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		if ((m_InitCond.m_AdultTransitionDRV.GetActiveValue(theDate,PropTransition)) && (m_InitCond.m_AdultTransitionDRV.IsEnabled()))
 		{
 			Dadl.SetPropTransition(PropTransition/100);
-			Wadl.SetPropTransition(PropTransition/100);
+			Wadl().SetPropTransition(PropTransition/100);
 		}
 		else
 		{
 			Dadl.SetPropTransition(1.0);
-			Wadl.SetPropTransition(1.0);
+			Wadl().SetPropTransition(1.0);
 		}
 		// Adults Lifespan Change
 		// A reduction moves Adults to caboose in boxcars > new max limit
@@ -2137,16 +2145,16 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		double AdultAgeLimit;
 		if ((m_InitCond.m_AdultLifespanDRV.GetActiveValue(theDate,AdultAgeLimit)) && (m_InitCond.m_AdultLifespanDRV.IsEnabled()))
 		{
-			if (Wadl.GetLength() != (int)AdultAgeLimit) // Update if new AdultAgeLimit
+			if (Wadl().GetLength() != (int)AdultAgeLimit) // Update if new AdultAgeLimit
 			{
-				Wadl.UpdateLength((int)AdultAgeLimit);
+				Wadl().UpdateLength((int)AdultAgeLimit);
 			}
 		}
 		else
 		{
-			if (Wadl.GetLength() != WADLLIFE) // Update if return to default
+			if (Wadl().GetLength() != WADLLIFE) // Update if return to default
 			{
-				Wadl.UpdateLength(WADLLIFE);
+				Wadl().UpdateLength(WADLLIFE);
 			}
 		}
 
@@ -2177,7 +2185,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		CapDrn.SetPropTransition(1.0);
 		CapWkr.SetPropTransition(1.0);
 		Dadl.SetPropTransition(1.0);
-		Wadl.SetPropTransition(1.0);
+		Wadl().SetPropTransition(1.0);
    }
 	
 	queen.LayEggs(DayNum,pEvent->GetTemp(),pEvent->GetDaylightHours(),
@@ -2192,13 +2200,13 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	if ((NumberOfNonAdults > 0) || (pEvent->IsForageDay()))
 	{
 		// Foragers killed due to pesticide.  Recruit precocious Adult Workers to be foragers - Add them to the last Adult Boxcar
-		// The last boxcar will be moved to the Caboose when Wadl.Update is called a little later.  The Wadl Caboose will be moved to the 
+		// The last boxcar will be moved to the Caboose when Wadl().Update is called a little later.  The Wadl() Caboose will be moved to the 
 		// forager list when forager.Update is called.
 		//
 		int ForagersToBeKilled = QuantityPesticideToKill(&foragers,m_EPAData.m_D_C_Foragers,0,m_EPAData.m_AI_AdultLD50_Contact,m_EPAData.m_AI_AdultSlope_Contact); //Contact Mortality
 		ForagersToBeKilled +=    QuantityPesticideToKill(&foragers, m_EPAData.m_D_D_Foragers, 0, m_EPAData.m_AI_AdultLD50, m_EPAData.m_AI_AdultSlope); //Diet Mortality
 		int MinAgeToForager = 14;
-		Wadl.MoveToEnd(ForagersToBeKilled, MinAgeToForager);
+		Wadl().MoveToEnd(ForagersToBeKilled, MinAgeToForager);
 		if (ForagersToBeKilled > 0)
 		{
 			CString notification;
@@ -2209,11 +2217,11 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 
 		//TRACE("Date: %s\n",pEvent->GetDateStg());
 		Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, pEvent, false);
-		//TRACE("HB Before Update:%s\n",Wadl.Status());
-		Wadl.Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
-		//TRACE(" HB After Update:%s\n",Wadl.Status());
-		//TRACE("    Worker Caboose Quan: %d\n", Wadl.GetCaboose()->number);
-		foragers.Update((CAdult*)Wadl.GetCaboose(), pEvent);
+		//TRACE("HB Before Update:%s\n",Wadl().Status());
+		Wadl().Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
+		//TRACE(" HB After Update:%s\n",Wadl().Status());
+		//TRACE("    Worker Caboose Quan: %d\n", Wadl().GetCaboose()->number);
+		foragers.Update((CAdult*)Wadl().GetCaboose(), pEvent);
 		//TRACE("Updated Foragers:%s\n",foragers.Status());
 	}
 
@@ -2292,7 +2300,7 @@ void CColony::InitializeMites()
 	CapDrn.DistributeMites(DMites);
 
 	// Initial condition mites on adult bees i.e. Running Mites
-	RunMiteW = CMite(0,int((Wadl.GetQuantity()*m_InitCond.m_workerAdultInfestField+
+	RunMiteW = CMite(0,int((Wadl().GetQuantity()*m_InitCond.m_workerAdultInfestField+
 							foragers.GetQuantity()*m_InitCond.m_workerAdultInfestField)/float(100)));
 	RunMiteD = CMite(0,int((Dadl.GetQuantity()*m_InitCond.m_droneAdultInfestField)/float(100)));
 	
@@ -2408,9 +2416,9 @@ void CColony::UpdateMites(CEvent* pEvent, int DayNum)
 	// emerging this time
 	CBrood WkrEmerge;
 	CBrood DrnEmerge;
-	WkrEmerge.number = ((CAdult*)Wadl.GetHead())->GetNumber();
-	WkrEmerge.m_Mites = ((CAdult*)Wadl.GetHead())->GetMites();
-	WkrEmerge.m_PropVirgins = ((CAdult*)Wadl.GetHead())->GetPropVirgins();
+	WkrEmerge.number = ((CAdult*)Wadl().GetHead())->GetNumber();
+	WkrEmerge.m_Mites = ((CAdult*)Wadl().GetHead())->GetMites();
+	WkrEmerge.m_PropVirgins = ((CAdult*)Wadl().GetHead())->GetPropVirgins();
 	DrnEmerge.number = ((CAdult*)Dadl.GetHead())->GetNumber();
 	DrnEmerge.m_Mites = ((CAdult*)Dadl.GetHead())->GetMites();
 	DrnEmerge.m_PropVirgins = ((CAdult*)Dadl.GetHead())->GetPropVirgins();
@@ -2729,7 +2737,7 @@ void CColony::DoPendingEvents(CEvent* pWeatherEvent, int CurrentSimDay)
 			MyMessageBox("Detected SWARM Discrete Event\n");
 			AddEventNotification(pWeatherEvent->GetDateStg("%m/%d/%Y"), "Detected SWARM Discrete Event");
 			foragers.FactorQuantity(0.75);
-			Wadl.FactorQuantity(0.75);
+			Wadl().FactorQuantity(0.75);
 			Dadl.FactorQuantity(0.75);
 			break;
 
@@ -2842,10 +2850,10 @@ void CColony::ApplyPesticideMortality()
 
 
 	// Worker Adults 1-3
-	m_DeadWorkerAdultsPesticide = ApplyPesticideToBees(&Wadl,0,0,m_EPAData.m_D_A13,0,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope); // New adults
+	m_DeadWorkerAdultsPesticide = ApplyPesticideToBees(&Wadl(),0,0,m_EPAData.m_D_A13,0,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope); // New adults
 	if (m_EPAData.m_D_A13 > m_EPAData.m_D_A13_Max) 
 	{
-		m_DeadWorkerAdultsPesticide += ApplyPesticideToBees(&Wadl,1,2,m_EPAData.m_D_A13,m_EPAData.m_D_A13_Max,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope);
+		m_DeadWorkerAdultsPesticide += ApplyPesticideToBees(&Wadl(),1,2,m_EPAData.m_D_A13,m_EPAData.m_D_A13_Max,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope);
 		m_EPAData.m_D_A13_Max = m_EPAData.m_D_A13;
 	}
 
@@ -2853,14 +2861,14 @@ void CColony::ApplyPesticideMortality()
 	// Worker Adults 4-10
 	if (m_EPAData.m_D_A410 > m_EPAData.m_D_A410_Max) 
 	{
-		m_DeadWorkerAdultsPesticide += ApplyPesticideToBees(&Wadl,3,9,m_EPAData.m_D_A410,m_EPAData.m_D_A410_Max,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope);
+		m_DeadWorkerAdultsPesticide += ApplyPesticideToBees(&Wadl(),3,9,m_EPAData.m_D_A410,m_EPAData.m_D_A410_Max,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope);
 		m_EPAData.m_D_A410_Max = m_EPAData.m_D_A410;
 	}
 
 	// Worker Adults 11-20
 	if (m_EPAData.m_D_A1120 > m_EPAData.m_D_A1120_Max) 
 	{
-		m_DeadWorkerAdultsPesticide += ApplyPesticideToBees(&Wadl,10,WADLLIFE-1,m_EPAData.m_D_A1120,m_EPAData.m_D_A1120_Max,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope);
+		m_DeadWorkerAdultsPesticide += ApplyPesticideToBees(&Wadl(),10,WADLLIFE-1,m_EPAData.m_D_A1120,m_EPAData.m_D_A1120_Max,m_EPAData.m_AI_AdultLD50,m_EPAData.m_AI_AdultSlope);
 		m_EPAData.m_D_A1120_Max = m_EPAData.m_D_A1120;
 	}
 
@@ -3261,9 +3269,9 @@ double CColony::GetPollenNeeds(CEvent* pEvent)
 		// Nurse bees are the youngest of the age groups so determine how many of the youngest bees are nurse bees and
 		// compute need based on that
 		int WadlAG[3];  // Worker Adult Age Groups for consumption rates
-		WadlAG[0]= Wadl.GetQuantityAt(0, 2);
-		WadlAG[1] = Wadl.GetQuantityAt(3, 9);
-		WadlAG[2] = Wadl.GetQuantityAt(10, 19);
+		WadlAG[0]= Wadl().GetQuantityAt(0, 2);
+		WadlAG[1] = Wadl().GetQuantityAt(3, 9);
+		WadlAG[2] = Wadl().GetQuantityAt(10, 19);
 		double Consumption[3];  // Consumption rates for each of the Adult Age Groups in grams
 		Consumption[0] = m_EPAData.m_C_A13_Pollen/1000.0;
 		Consumption[1] = m_EPAData.m_C_A410_Pollen/1000.0;
@@ -3315,15 +3323,15 @@ double CColony::GetPollenNeeds(CEvent* pEvent)
 		double ANeeds;
 		if (pEvent->IsForageDay())
 		{
-			ANeeds = Wadl.GetQuantityAt(0,2)*m_EPAData.m_C_A13_Pollen + Wadl.GetQuantityAt(3,9)*m_EPAData.m_C_A410_Pollen +
-				Wadl.GetQuantityAt(10,19)*m_EPAData.m_C_A1120_Pollen + Dadl.GetQuantity()*m_EPAData.m_C_AD_Pollen + 
+			ANeeds = Wadl().GetQuantityAt(0,2)*m_EPAData.m_C_A13_Pollen + Wadl().GetQuantityAt(3,9)*m_EPAData.m_C_A410_Pollen +
+				Wadl().GetQuantityAt(10,19)*m_EPAData.m_C_A1120_Pollen + Dadl.GetQuantity()*m_EPAData.m_C_AD_Pollen + 
 				foragers.GetActiveQuantity()*m_EPAData.m_C_Forager_Pollen + foragers.GetUnemployedQuantity()*m_EPAData.m_C_A1120_Pollen;
 				// Unemployed foragers consume like most mature adult house bees
 		}
 		else // All foragers consume the same quantity as the most mature adult house bees on non-forage days
 		{
-			ANeeds = Wadl.GetQuantityAt(0,2)*m_EPAData.m_C_A13_Pollen + Wadl.GetQuantityAt(3,9)*m_EPAData.m_C_A410_Pollen +
-				(Wadl.GetQuantityAt(10,19) + foragers.GetQuantity())*m_EPAData.m_C_A1120_Pollen + Dadl.GetQuantity()*m_EPAData.m_C_AD_Pollen;
+			ANeeds = Wadl().GetQuantityAt(0,2)*m_EPAData.m_C_A13_Pollen + Wadl().GetQuantityAt(3,9)*m_EPAData.m_C_A410_Pollen +
+				(Wadl().GetQuantityAt(10,19) + foragers.GetQuantity())*m_EPAData.m_C_A1120_Pollen + Dadl.GetQuantity()*m_EPAData.m_C_AD_Pollen;
 		}
 
 		Need = (LNeeds + ANeeds)/1000.0;  // Convert to grams
@@ -3376,14 +3384,14 @@ double CColony::GetNectarNeeds(CEvent* pEvent)
 		double ANeeds;
 		if (pEvent->IsForageDay())
 		{
-			ANeeds = Wadl.GetQuantityAt(0,2)*m_EPAData.m_C_A13_Nectar + Wadl.GetQuantityAt(3,9)*m_EPAData.m_C_A410_Nectar +
-				Wadl.GetQuantityAt(10,19)*m_EPAData.m_C_A1120_Nectar + foragers.GetUnemployedQuantity()*m_EPAData.m_C_A1120_Nectar + 
+			ANeeds = Wadl().GetQuantityAt(0,2)*m_EPAData.m_C_A13_Nectar + Wadl().GetQuantityAt(3,9)*m_EPAData.m_C_A410_Nectar +
+				Wadl().GetQuantityAt(10,19)*m_EPAData.m_C_A1120_Nectar + foragers.GetUnemployedQuantity()*m_EPAData.m_C_A1120_Nectar + 
 				foragers.GetActiveQuantity()*m_EPAData.m_C_Forager_Nectar + Dadl.GetQuantity()*m_EPAData.m_C_AD_Nectar;
 		}
 		else // Foragers consume the same quantity as the most mature adult house bees
 		{
-			ANeeds = Wadl.GetQuantityAt(0,2)*m_EPAData.m_C_A13_Nectar + Wadl.GetQuantityAt(3,9)*m_EPAData.m_C_A410_Nectar +
-				(Wadl.GetQuantityAt(10,19) + foragers.GetQuantity())*m_EPAData.m_C_A1120_Nectar + Dadl.GetQuantity()*m_EPAData.m_C_AD_Nectar;
+			ANeeds = Wadl().GetQuantityAt(0,2)*m_EPAData.m_C_A13_Nectar + Wadl().GetQuantityAt(3,9)*m_EPAData.m_C_A410_Nectar +
+				(Wadl().GetQuantityAt(10,19) + foragers.GetQuantity())*m_EPAData.m_C_A1120_Nectar + Dadl.GetQuantity()*m_EPAData.m_C_AD_Nectar;
 		}
 
 		Need = (LNeeds + ANeeds)/1000.0;  //Convert to grams
@@ -3546,6 +3554,10 @@ double CColony::GetIncomingPollenPesticideConcentration(int DayNum)
 	return IncomingConcentration; // Grams AI/Gram
 }
 
-
+CAdultlist& CColony::Wadl()
+{
+	ASSERT(WadlPrt != nullptr);
+	return *WadlPrt;
+}
 
 
