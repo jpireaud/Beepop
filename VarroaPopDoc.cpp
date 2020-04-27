@@ -405,7 +405,8 @@ void CVarroaPopDoc::WeatherFileMissing()
 	CString msg = "  This Session has no associated Weather File\n";
 	msg += "You will have to specify one before you run a simulation";
 	MyMessageBox(msg);
-	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_WeatherFileName = "";
+	if (gl_RunGUI)
+		((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_WeatherFileName = "";
 }
 
 void CVarroaPopDoc::WeatherFileLoaded(bool loaded, const CString& filename)
