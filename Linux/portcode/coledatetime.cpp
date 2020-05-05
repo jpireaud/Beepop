@@ -131,11 +131,15 @@ bool COleDateTime::operator <= (const COleDateTime& other) const
 
 CString COleDateTime::Format(const char* format) const
 {
+    CString string;
     std::time_t l_time = std::chrono::system_clock::to_time_t(m_time_point);
     auto tm = std::localtime(&l_time);
-    std::stringstream ss;
-    ss << std::put_time(tm, format);
-	CString string(ss.str());
+    if (tm != nullptr)
+    {
+        std::stringstream ss;
+        ss << std::put_time(tm, format);
+        string = ss.str();
+    }
     return string;
 }
 
@@ -146,6 +150,17 @@ bool COleDateTime::ParseDateTime(const CString& dateTimeStr, DWORD dwFlags)
 
     dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
 
+    // Handles the 3 supported formats if the dwFlags is not specified
+    const std::map<size_t, std::string> supportedDateTimeFormatsLengths = {
+        {strlen("00/00/0000 00:00:00"), "%m/%d/%Y %H:%M:%S"},
+        {strlen("00/00/0000"), "%m/%d/%Y"},
+        {strlen("00:00:00"), "%H:%M:%S"}
+    };
+
+    // Status will be set to error if stream isn't valid after get_time or the dateTimeStr is not in the right format
+    m_status = valid;
+    
+    // Paser 
     if (dwFlags == VAR_DATEVALUEONLY)
     {
         // let's try to parse only a date
@@ -160,25 +175,23 @@ bool COleDateTime::ParseDateTime(const CString& dateTimeStr, DWORD dwFlags)
     }
     else 
     {
-        const char* dateTimeFormat = "%m/%d/%Y %H:%M:%S";
-        stream >> std::get_time(&dt, dateTimeFormat);
-        if (stream.fail())
+        auto dtIndex = supportedDateTimeFormatsLengths.find(dateTimeStr.GetLength());
+        if (dtIndex != supportedDateTimeFormatsLengths.end())
         {
-            // let's try to parse only a date
-            const char* dateFormat = "%m/%d/%Y";
-            stream >> std::get_time(&dt, dateFormat);
-            if (stream.fail())
-            {
-                // let's try to parse only a time
-                const char* timeFormat = "%H:%M:%S";
-                stream >> std::get_time(&dt, timeFormat);
-            }
+            // let's try to parse using the expected length of the given input
+            auto& dateTimeFormat = dtIndex->second;
+            stream >> std::get_time(&dt, dateTimeFormat.c_str());
+        }
+        else
+        {
+            m_status = error;
         }
     }
+
+    // Convert the given date to a time_point 
     if (!stream.fail())
     {
         m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
-        m_status = valid;
     }
     else
     {
