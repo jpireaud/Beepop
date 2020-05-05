@@ -28,6 +28,7 @@ int main(int argc, char** argv)
 	("forageDayNoTemp", "A forage day is computed only using wind and rain for a given day", cxxopts::value<bool>()->default_value("false"))
 	("hourlyTemperaturesEstimation", "Compute hourly temperatures estimation", cxxopts::value<bool>()->default_value("false"))
 	("pendingForagerFirst", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
+	("forageDayAdultBeesAging", "Aging process of the Adults is the same as foragers, where an aging day is dependant on forage increment", cxxopts::value<bool>()->default_value("false"))
 	("binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85)", cxxopts::value<std::string>())
 	;
 
@@ -189,6 +190,10 @@ int main(int argc, char** argv)
 			if (arguments.count("binaryWeatherFileFormat") == 1)
 			{
 				GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set(arguments["binaryWeatherFileFormat"].as<std::string>());
+			}
+			if (arguments.count("forageDayAdultBeesAging") == 1)
+			{
+            	GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection.Set(arguments["forageDayAdultBeesAging"].as<bool>());
 			}
 		}
 		else
