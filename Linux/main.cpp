@@ -12,8 +12,30 @@ namespace bfs = boost::filesystem;
 
 void LoadVRPFile(CVarroaPopSession& session, const CString& filename);
 
+#ifdef WINDOWS
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+{
+	LPWSTR* argvW = nullptr;
+	int argc = 0;
+
+	argvW = CommandLineToArgvW(pCmdLine, &argc);
+	if (argvW == nullptr)
+	{
+		std::cerr << "Unable to parse command line" << std::endl;
+		return 10;
+	}
+
+	char** argv = nullptr;
+	*argv = new char[argc];
+	for (int i = 0; i < argc; i++)
+	{
+		argv[i] = new char[wcslen(argvW[i]) + 1];
+		wsprintf(argv[i], "%ws", argvW[i]);
+	}
+#else
 int main(int argc, char** argv)
 {
+#endif
 	cxxopts::Options options("VarroaPop", "Command Line version of the VarroaPop app");
 
 	// Here we omit the log file since it is not used in the VarroaPop app
@@ -233,7 +255,16 @@ int main(int argc, char** argv)
 	// Run simulation
 	session.Simulate();
 
-    return 0;
+#ifdef WINDOWS
+	for(int i=0; i<argc; i++)
+	{
+		delete[] argv[i];
+	}
+	delete[] argv;
+	LocalFree(argv);
+#else
+#endif
+	return 0;
 }
 
 void LoadVRPFile(CVarroaPopSession& session, const CString& filename)

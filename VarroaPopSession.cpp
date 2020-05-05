@@ -641,7 +641,7 @@ void CVarroaPopSession::Simulate()
 			"%6d", // Colony size
 			"%6d", // Adult Drones
 			"%6d", // Adult Workers
-			"%6d", // Forgers
+			"%6d", // Foragers
 			"%6d", // Drones Brood
 			"%6d", // Wkr Brood
 			"%6d", // Drone Larv
