@@ -4,7 +4,9 @@
 
 #include <string>
 
-// This class mimic the needed bahavior of the ATL CString class for the VarroaPop project
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CString
 {
 public:

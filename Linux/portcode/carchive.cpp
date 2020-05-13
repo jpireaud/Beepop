@@ -40,6 +40,7 @@ void CArchive::operator<<(const COleDateTime& date)
     mStream.write((const char*)&dt, sizeof(DATE));
 }
 
+// The following implementation is coming from arccore.cpp
 void AfxWriteStringLength(CArchive& ar, UINT_PTR nLength)
 {
     if (nLength < 255)
@@ -66,6 +67,7 @@ void AfxWriteStringLength(CArchive& ar, UINT_PTR nLength)
     }
 }
 
+// The following implementation is coming from arccore.cpp
 UINT_PTR AfxReadStringLength(CArchive& ar)
 {
     UINT_PTR nLength;

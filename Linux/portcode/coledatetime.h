@@ -10,6 +10,13 @@
 
 class COleDateTimeSpan;
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ * 
+ * TODO: Current implemenation uses std::chrono which has the desavantage of not supporting
+ * dates before January 1st 1970 which is not the case with the COleDateTime of MFC. We should
+ * refactor to another library that does.
+ */
 class COleDateTime
 {
 public:
@@ -81,6 +88,9 @@ protected:
 	DateTimeStatus m_status;
 };
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class COleDateTimeSpan
 {
 public:

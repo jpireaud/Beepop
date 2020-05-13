@@ -10,12 +10,19 @@
 #include <cstddef>
 #include <map>
 
+/**
+ * TODO: Improve the way to replace the behavior the of MFC POSITION structure since
+ * this implementation is not efficient (lots of allocations)
+ */
 namespace CMapStringToObNs { struct InnerPosition : public __POSITION {
 	InnerPosition(const typename std::map<CString, CObject*>::const_iterator& it) : m_it(it) {}
 	InnerPosition* copy() { return new InnerPosition(m_it); }
     std::map<CString, CObject*>::const_iterator m_it;
 }; }
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CMapStringToOb : public CObject
 {
 public:
