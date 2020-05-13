@@ -3,6 +3,7 @@ import datetime
 import multiprocessing as mp
 import plots
 import os
+import re
 import subprocess
 from threading import Lock
 
@@ -17,9 +18,12 @@ def safe_print(*a, **b):
 
 def parse_binary_format(filename):
     binary_format = {'observed':'Observed', 'modeled':'Modeled', 'rcp85':'Rcp85'}
-    for item in filename.split('-'):
+    for item in re.split('-|/|.txt', filename):
         if item in binary_format.keys():
             return binary_format[item]
+    item = os.path.splitext(os.path.basename(filename))[0]
+    if item in binary_format.keys():
+        return binary_format[item]
     raise Exception('No valid binary format specifier in input filename (observed|modeled|rcp85)-<weather_file>.txt')
 
 
@@ -68,7 +72,6 @@ if __name__ == '__main__':
 
     command = arguments.exe + ' -f -v ' + arguments.vrp + ' -i ' + arguments.input_file + ' --binaryWeatherFileFormat '
     command += parse_binary_format(arguments.input_file)
-
     if arguments.weather_file:
         command += ' -w ' + arguments.weather_file
 
@@ -79,8 +82,15 @@ if __name__ == '__main__':
                       ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst'],
                       ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']]
 
+    # set prefix for output data
     prefix = os.path.splitext(os.path.basename(arguments.input_file))[0]
-
+    # add location information to prefix if not present
+    if not re.search(r'\d+.\d+_-?\d+.\d+', prefix):
+        if arguments.weather_file:
+            prefix += '-' + os.path.basename(arguments.weather_file)
+        else:
+            raise Exception('Location information need to be present either in input_file name or weather_file ex:data_46.03125_-118.34375')
+        
     output_directory = os.path.join(arguments.output_directory, prefix)
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
