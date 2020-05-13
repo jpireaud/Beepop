@@ -11,6 +11,9 @@ struct CFileStatus
 	ULONGLONG m_size; // size in Bytes
 };
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CFile
 {
 public:
@@ -57,6 +60,9 @@ protected:
 	std::string m_fileName;
 };
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CFileException
 {
 public:
@@ -68,6 +74,9 @@ protected:
 	std::string m_message;
 };
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CStdioFile : public CFile
 {
 public:

@@ -4,6 +4,9 @@
 
 class CArchive;
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CObject
 {
 public:

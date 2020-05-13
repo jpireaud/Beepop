@@ -10,12 +10,19 @@
 #include <cstddef>
 #include <list>
 
+/**
+ * TODO: Improve the way to replace the behavior the of MFC POSITION structure since
+ * this implementation is not efficient (lots of allocations)
+ */
 namespace CObListNs { struct InnerPosition : public __POSITION {
 	InnerPosition(const std::list<CObject*>::const_iterator& it) : m_it(it) {}
 	InnerPosition* copy() { return new InnerPosition(m_it); }
     std::list<CObject*>::const_iterator m_it;
 }; }
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CObList : public CObject
 {
 public:
@@ -50,12 +57,19 @@ protected:
     std::list<CObject*> m_data;
 };
 
+/**
+ * TODO: Improve the way to replace the behavior the of MFC POSITION structure since
+ * this implementation is not efficient (lots of allocations)
+ */
 namespace CStringListNs { struct InnerPosition : public __POSITION {
 	InnerPosition(const std::list<CString>::const_iterator& it) : m_it(it) {}
 	InnerPosition* copy() { return new InnerPosition(m_it); }
     std::list<CString>::const_iterator m_it;
 }; }
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CStringList : public CObject
 {
 public:

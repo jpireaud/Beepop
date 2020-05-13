@@ -6,6 +6,9 @@
 
 #include <vector>
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 template<class TYPE, class ARG_TYPE = const TYPE&>
 class CArray : public CObject
 {

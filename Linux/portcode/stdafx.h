@@ -2,6 +2,9 @@
 #ifndef STDAFX_CUSTOM_H
 #define STDAFX_CUSTOM_H
 
+/**
+ * Void all MFC macros 
+ */
 #define DECLARE_DYNCREATE(Class) public:
 #define IMPLEMENT_DYNCREATE(Class, BaseClass) // void
 
@@ -27,6 +30,9 @@
 #include <memory>
 #define DEBUG_NEW new
 
+/**
+ * Make the TRACE method to work using the fmt dependency
+ */
 #include "fmt/printf.h"
 #ifdef TRACE
 #define TRACE(...) fmt::printf(__VA_ARGS__)
@@ -40,6 +46,9 @@
 #endif
 #endif
 
+/**
+ * Typedef MFC types to standard types
+ */
 #include <cstdint>
 typedef int32_t BOOL;
 typedef unsigned char BYTE;
@@ -62,6 +71,9 @@ typedef double DATE;
 #define VAR_TIMEVALUEONLY ((DWORD)0x00000001) /* return time value */
 #define VAR_DATEVALUEONLY ((DWORD)0x00000002) /* return date value */
 
+/**
+ * Redeclare the SYSTEMTIME structure for non-Windows systems
+ */
 #ifndef WINDOWS
 #ifndef _SYSTEMTIME_
 #define _SYSTEMTIME_
@@ -109,6 +121,9 @@ typedef struct {
 #include "ctime.h"
 #include "cuintarray.h"
 
+/**
+ * Make CString serializable in fmt formater
+ */
 #include "fmt/format.h"
 template<>
 struct fmt::formatter<CString>
@@ -124,6 +139,9 @@ std::ostream &operator<<(std::ostream &stream, const CString& string);
 
 #include "cstring.format.h"
 
+/**
+ * Define strcpy_s on non-Windows systems
+ */
 #if !defined(_WIN32) && !defined(_WIN64) && !defined(__STDC_LIB_EXT1__)
 #define strcpy_s strcpy
 #define strtok_s(_In, _Delim, _SafeToken) strtok(_In, _Delim)

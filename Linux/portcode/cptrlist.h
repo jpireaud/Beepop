@@ -8,18 +8,28 @@
 #include <memory>
 #include <list>
 
+/**
+ * TODO: Improve the way to replace the behavior the of MFC POSITION structure since
+ * this implementation is not efficient (lots of allocations)
+ */
 namespace CPtrListNs { template<class TYPE> struct InnerPosition : public __POSITION {
 	InnerPosition(const typename std::list<TYPE>::const_iterator& it) : m_it(it) {}
 	InnerPosition* copy() { return new InnerPosition(m_it); }
     typename std::list<TYPE>::const_iterator m_it;
 }; }
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CPtrList : public CObject
 {
     public:
     
 };
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 template<class BASE_CLASS, class TYPE>
 class CTypedPtrList
 {

@@ -8,6 +8,9 @@
 #include <cstdint>
 #include <vector>
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CStringArray : public CObject
 {
 public:
