@@ -7,6 +7,9 @@
 #include <cstdint>
 #include <vector>
 
+/**
+ * Only supports the necessary interface for the good behavior of VarroaPop
+ */
 class CUIntArray : public CObject
 {
 public:

@@ -881,11 +881,6 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 
 	if (theEvent->IsForageDay())
 	{
-		// Here we keep a local Caboose object to aggregate all bees that are going to become
-		// foragers after successful calls to CAdultlist::Update
-		CAdult lCaboose;
-		CAdult* lastValidCaboose = NULL;
-
 		// Here we age adults given the ForageInc of the current day
 		POSITION pos = PendingAdults.GetHeadPosition();
 		CAdult* pendingAdult;
@@ -895,9 +890,10 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 			pendingAdult->SetForageInc(theAdult->GetForageInc() + theEvent->GetForageInc());
 		}
 
-		// All adults with a ForageInc >= 1.0 will enter the Adult boxcar
+		// All adults with a ForageInc >= 1.0 will enter the Adult boxcar in a new Brood
 		pos = PendingAdults.GetTailPosition();
 		POSITION oldpos;
+		CBrood* brood = nullptr;
 		while (pos != NULL)
 		{
 			oldpos = pos;  // Save old position for possible deletion
@@ -907,22 +903,16 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 				pendingAdult->SetForageInc(0.0);
 
 				// Here we give back control to the Adult list default implementation
-				CBrood* brood = new CBrood(pendingAdult->GetNumber());
-				brood->m_Mites = pendingAdult->GetMites();
-				brood->m_PropVirgins = pendingAdult->GetPropVirgins();
-
-				// Add adults (brood) appropriately aged using ForageInc to the Adultlist.
-				CAdultlist::Update(brood, theColony, theEvent, bWorkder);
-
-				if (Caboose)
+				if (brood == nullptr)
 				{
-					// We need to delete the lastValidCaboose since it will not be processed afterwards
-					if (lastValidCaboose)
-					{
-						delete lastValidCaboose;
-					}
-					lastValidCaboose = Caboose;
-					lCaboose.SetNumber(lCaboose.GetNumber() + Caboose->GetNumber());
+					brood = new CBrood(pendingAdult->GetNumber());
+					brood->m_Mites = pendingAdult->GetMites();
+					brood->m_PropVirgins = pendingAdult->GetPropVirgins();
+				}
+				else
+				{
+					brood->SetNumber(brood->GetNumber() + pendingAdult->GetNumber());
+					// TODO: update mites and propVirgins
 				}
 
 				PendingAdults.RemoveAt(oldpos);
@@ -930,11 +920,10 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 			}
 		}
 
-		if (lastValidCaboose)
+		if (brood != nullptr)
 		{
-			// Overwrite the Caboose number with the aggregated one from all CAdultlist::Update calls
-			Caboose = lastValidCaboose;
-			Caboose->SetNumber(lCaboose.GetNumber());
+			// Add adults (brood) appropriately aged using ForageInc to the Adultlist.
+			CAdultlist::Update(brood, theColony, theEvent, bWorkder);
 		}
 	}
 }
@@ -950,6 +939,11 @@ int CAdultlistA::GetQuantity()
 		quan += temp->GetNumber();
 	}
 	return quan;
+}
+
+int CAdultlistA::GetActiveQuantity()
+{
+	return CAdultlist::GetQuantity();
 }
 
 void CAdultlistA::KillAll()

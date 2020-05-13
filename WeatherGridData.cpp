@@ -276,7 +276,7 @@ namespace WeatherGridDataNs
         int count = 0;
         for (size_t h = 0; h < hourly_temperatures.size(); h++)
         {
-            if (h > sunrise&& h <= sunset)
+            if (h > sunrise && h <= sunset)
             {
                 if (hourly_temperatures[h] > temperatureMinThreshold && hourly_temperatures[h] < temperatureMaxThreshold)
                     count++;

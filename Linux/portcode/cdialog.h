@@ -29,12 +29,18 @@
 
 class CDataExchange;
 
+/**
+ * Empty class to be able to compile the VarroaPop application
+ */
 class CPoint
 {
 public:
 	CPoint(uint32_t x, uint32_t y);
 };
 
+/**
+ * Empty class to be able to compile the VarroaPop application
+ */
 class CWnd : public CCmdTarget
 {
 public:
@@ -46,6 +52,9 @@ public:
 	void DestroyWindow();
 };
 
+/**
+ * Empty class to be able to compile the VarroaPop application
+ */
 class CDialog : public CWnd
 {
 public:

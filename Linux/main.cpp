@@ -12,26 +12,47 @@ namespace bfs = boost::filesystem;
 
 void LoadVRPFile(CVarroaPopSession& session, const CString& filename);
 
-#ifdef WINDOWS
+#define VP_WIN_MAIN
+// #undef VP_WIN_MAIN
+
+#if defined(VP_WIN_MAIN) && defined(WINDOWS)
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	LPWSTR* argvW = nullptr;
+	LPWSTR* argvWide = nullptr;
 	int argc = 0;
 
-	argvW = CommandLineToArgvW(pCmdLine, &argc);
-	if (argvW == nullptr)
+	// Get module filename
+	char moduleFileName[MAX_PATH];
+	GetModuleFileName(NULL, moduleFileName, MAX_PATH);
+
+	// Get command line arguments under the form of argc, argv (argv being wide character)
+	argvWide = CommandLineToArgvW(pCmdLine, &argc);
+	if (argvWide == nullptr)
 	{
 		std::cerr << "Unable to parse command line" << std::endl;
 		return 10;
 	}
 
+	// Wide character to character conversion
 	char** argv = nullptr;
-	*argv = new char[argc];
-	for (int i = 0; i < argc; i++)
+	argv = new char*[argc+1];
+	int argvIndex = 0;
+	// Copy the module filename as the first argument of the argv array
+	argv[argvIndex] = new char[strlen(moduleFileName) + 1];
+	sprintf(argv[argvIndex], "%s", moduleFileName);
+	argvIndex++;
+	// Process command line options
+	for (int i=0; i < argc; i++, argvIndex++)
 	{
-		argv[i] = new char[wcslen(argvW[i]) + 1];
-		wsprintf(argv[i], "%ws", argvW[i]);
+		argv[argvIndex] = new char[wcslen(argvWide[i]) + 1];
+		wsprintf(argv[argvIndex], "%ws", argvWide[i]);
 	}
+
+	// Increment argc to reflect the addition of the module filename
+	argc++;
+
+	// We need argc for proper deallocation but it is altered by options.parse so let's make a copy
+	int argv_size = argc;
 #else
 int main(int argc, char** argv)
 {
@@ -255,13 +276,13 @@ int main(int argc, char** argv)
 	// Run simulation
 	session.Simulate();
 
-#ifdef WINDOWS
-	for(int i=0; i<argc; i++)
+#if defined(VP_WIN_MAIN) && defined(WINDOWS)
+	for(int i=0; i< argv_size; i++)
 	{
 		delete[] argv[i];
 	}
 	delete[] argv;
-	LocalFree(argv);
+	LocalFree(argvWide);
 #else
 #endif
 	return 0;

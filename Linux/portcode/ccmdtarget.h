@@ -4,6 +4,9 @@
 
 #include "cobject.h"
 
+/**
+ * Empty class to be able to compile the VarroaPop application
+ */
 class CCmdTarget : public CObject
 {
 public:

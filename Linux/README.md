@@ -18,3 +18,9 @@ To time an execution you can use:
 
 - On Linux: `time ./<build>/VarroaPop -d VarroaPop/files/ -v exe/default.vrp -o output/vp_output_linux.txt -i input/vp_linux.txt -f`
 - On Windows (PowerShell): `Measure-Command {start-process Release\VarroaPop.exe -argumentlist "exe\default.vrp /b /or output\vp_output_win.txt /i input\vp_input.txt" -wait}` 
+
+Simulation scripts
+
+py simulations.py  --exe ..\Linux\build-windows\Release\VarroaPop.exe --vrp VarroaPy\VarroaPy\files\exe\simplified.vrp --output_directory . --input_file VarroaPy\VarroaPy\files\input\win-rcp85-data_46.03125_-118.34375.txt --weather_file Rcp85Binary\data_46.03125_-118.34375
+
+py plots.py --directory win-rcp85-data_46.03125_-118.34375 --display_temperature_data --prefix win-rcp85-data_46.03125_-118.34375 --start_date 2051-01-01 --end_date 2051-08-31

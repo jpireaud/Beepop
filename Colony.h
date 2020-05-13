@@ -92,6 +92,7 @@ public:
 	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
 	virtual void Serialize(CArchive& ar);
 	virtual void KillAll();
+	virtual int GetActiveQuantity() { return GetQuantity(); }
 	void UpdateLength(int len, bool bWorker = true);
 	int MoveToEnd(int QuantityToMove, int MinAge);
 };
@@ -112,6 +113,7 @@ public:
 	~CAdultlistA() { KillAll(); }
 	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
 	virtual int GetQuantity();
+	virtual int GetActiveQuantity();
 	virtual void KillAll();
 };
 
