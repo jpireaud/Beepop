@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from string import Template
 
 
-column_names = ["Date", "Colony Size","Adult Drones","Active Adult Workers","Inactive Adult Workers", "Active Foragers", "Inactive Foragers", "Capped Drone Brood", "Capped Worker Brood",
+column_names = ["Date", "Colony Size","Adult Drones","Adult Workers","Foragers", "Active Foragers", "Capped Drone Brood", "Capped Worker Brood",
              "Drone Larvae", "Worker Larvae", "Drone Eggs", "Worker Eggs", "Total Eggs", "DD", "L", "N", "P", "dd", "l", "n", "Free Mites", "Drone Brood Mites",
              "Worker Brood Mites", "Mites/Drone Cell", "Mites/Worker Cell", "Mites Dying", "Proportion Mites Dying",
              "Colony Pollen (g)", "Pollen Pesticide Concentration", "Colony Nectar", "Nectar Pesticide Concentration",
              "Dead Drone Larvae", "Dead Worker Larvae", "Dead Drone Adults", "Dead Worker Adults", "Dead Foragers",
-             "Queen Strength", "Average Temperature (celsius)", "Rain", "Min Temp", "Max Temp", "Daylight hours", "Activity Ratio"]
+             "Queen Strength", "Average Temperature (celsius)", "Rain", "Min Temp", "Max Temp", "Daylight hours", "Forage Inc"]
 
 # original verion of varroapop
 
@@ -30,8 +30,9 @@ class Plotter:
 
     def do_plot(self, output_directory, output_filename):
         global column_names
+        global column_names_original
         # override column_names if working with previous version of the VarroaPop application
-        # column_names = column_names_original
+        #column_names = column_names_original
 
         # read output file skipping the first 6 lines
         output = pd.read_table(output_filename, delim_whitespace=True, header=None, names=column_names, skiprows=6)
@@ -46,7 +47,13 @@ class Plotter:
         #     plot_title = 'current'
         plot_title = os.path.splitext(os.path.basename(output_filename))[0]
         # add Inactive Foragers column
-        colunms = ['Colony Size', 'Active Adult Workers', 'Inactive Adult Workers', 'Adult Drones', 'Active Foragers', 'Inactive Foragers']
+        output['Inactive Foragers'] = output['Foragers'] - output['Active Foragers']
+        #colunms = ['Colony Size', 'Adult Workers', 'Adult Drones', 'Foragers', 'Worker Larvae', 'Worker Eggs', 'Capped Worker Brood']
+        colunms = ['Colony Size', 'Adult Workers', 'Adult Drones', 'Foragers']
+
+        # original data lines
+        # output['Inactive Foragers'] = output['Colony Size'] - output['Adult Drones'] - output['Adult Workers'] - output['Foragers']
+        # colunms = ['Colony Size', 'Adult Workers', 'Adult Drones', 'Foragers', 'Inactive Foragers']
 
         plt.figure()
 
@@ -57,9 +64,9 @@ class Plotter:
 
         if self.display_temperature_data and 'Min Temp' in output.keys():
             # Use weighted averages to reduce noise of min and max temperature data
-            output['Min Temp'] = output['Min Temp'].ewm(span=7, adjust=True).mean()
+            #output['Min Temp'] = output['Min Temp'].ewm(span=7, adjust=True).mean()
             min_temp_plot_pd = output.plot(x='Datetime', y='Min Temp', secondary_y=True, color='lightgrey', ax=bees_plot_pd)
-            output['Max Temp'] = output['Max Temp'].ewm(span=7, adjust=True).mean()
+            #output['Max Temp'] = output['Max Temp'].ewm(span=7, adjust=True).mean()
             max_temp_plot_pd = output.plot(x='Datetime', y='Max Temp', secondary_y=True, color='darkgrey', ax=bees_plot_pd)
             min_temp_plot_pd.axhline(12, color="lightgrey", linestyle="--")
             max_temp_plot_pd.axhline(43.3, color="lightgrey", linestyle="--")
@@ -67,8 +74,8 @@ class Plotter:
         # Display Active Ration
         if self.display_activity_ratio:
             # output['Activity Ratio'] = output['Activity Ratio'].ewm(span=7, adjust=True).mean()
-            ratio_plot = output.plot(x='Datetime', y='Activity Ratio', secondary_y=True, color='darkgrey', ax=bees_plot_pd)
-            ratio_plot.set_ylabel('Activity Ratio')
+            ratio_plot = output.plot(x='Datetime', y='Forage Inc', secondary_y=True, color='darkgrey', ax=bees_plot_pd)
+            ratio_plot.set_ylabel('Forage Inc')
 
         # The following line allow us to get a specific window from the data
         if self.start_date is not None and self.end_date is not None:

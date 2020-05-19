@@ -639,10 +639,9 @@ void CVarroaPopSession::Simulate()
 			"%s", // "Initial or Date"
 			"%6d", // Colony size
 			"%8d", // Adult Drones
-			"%8d", // Active Adult Workers
-			"%8d", // Inactive Adult Workers
+			"%8d", // Adult Workers
 			"%8d", // Foragers
-			"%8d", // Inactive Foragers
+			"%8d", // Active Foragers
 			"%7d", // Drones Brood
 			"%6d", // Wkr Brood
 			"%6d", // Drone Larv
@@ -709,21 +708,20 @@ void CVarroaPopSession::Simulate()
 		int TotForagingDays = 0;
 
 		CString CurSize;
-		CurSize.Format("                            Active  Inactive                     Capped  Capped																														               Prop           Conc            Conc                                             ");
-		m_ResultsFileHeader.AddTail(CurSize);			             
-		CurSize.Format("            Colony  Adult   Adult   Adult      Active  Inactive  Drone   Wkr     Drone  Wkr   Drone  Wkr   Total                                                         Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony  Pollen  Colony  Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave           Min     Max      Daylight  Activity");
-		m_ResultsFileHeader.AddTail(CurSize);			             
-		CurSize.Format("     Date   Size    Drones  Wkr     Wkr        Forgrs  Forgrs    Brood   Brood   Larv   Larv  Eggs   Eggs  Eggs      DD      L      N      P       dd       l       n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest    Nectar  Pest     DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp  Rain    Temp    Temp     Hours     Ratio");
+		CurSize.Format("                                                      Capped  Capped																														               Prop           Conc            Conc                                             ");
+		m_ResultsFileHeader.AddTail(CurSize);			    
+		CurSize.Format("            Colony  Adult     Adult           Active    Drone   Wkr     Drone  Wkr   Drone  Wkr   Total                                                         Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony  Pollen  Colony  Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave           Min     Max      Daylight  Forage");
+		m_ResultsFileHeader.AddTail(CurSize);			    
+		CurSize.Format("     Date   Size    Drones    Wkr     Forgrs  Forgrs    Brood   Brood   Larv   Larv  Eggs   Eggs  Eggs      DD      L      N      P       dd       l       n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest    Nectar  Pest     DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp  Rain    Temp    Temp     Hours     Inc");
 		m_ResultsFileHeader.AddTail(CurSize);
 		CurSize.Format(m_ResultsFileFormatStg,
 			//pEvent->GetDateStg("%m/%d/%Y"), 
 			"Initial   ", // "Initial or Date"
 			theColony.GetColonySize(), // Colony size
 			theColony.Dadl.GetQuantity(), // Adult Drones
-			theColony.Wadl().GetActiveQuantity(), // Active Adult Workers
-			theColony.Wadl().GetQuantity() - theColony.Wadl().GetActiveQuantity(), // Inactive Adult Workers
+			theColony.Wadl().GetQuantity(), // Adult Workers
+			theColony.foragers.GetQuantity(), // Forgers
 			theColony.foragers.GetActiveQuantity(), // Active Forgers
-			theColony.foragers.GetQuantity() - theColony.foragers.GetActiveQuantity(), // Inactive Forgers
 			theColony.CapDrn.GetQuantity(), // Drones Brood
 			theColony.CapWkr.GetQuantity(), // Wkr Brood
 			theColony.Dlarv.GetQuantity(), // Drone Larv
@@ -830,10 +828,9 @@ void CVarroaPopSession::Simulate()
 					pEvent->GetDateStg("%m/%d/%Y"),
 					theColony.GetColonySize(),
 					theColony.Dadl.GetQuantity(),
-					theColony.Wadl().GetActiveQuantity(),
-					theColony.Wadl().GetQuantity() - theColony.Wadl().GetActiveQuantity(), // Inactive Adult Workers
+					theColony.Wadl().GetQuantity(),
+					theColony.foragers.GetQuantity(), // Forgers
 					theColony.foragers.GetActiveQuantity(), // Active Forgers
-					theColony.foragers.GetQuantity() - theColony.foragers.GetActiveQuantity(), // Inactive Forgers
 					theColony.CapDrn.GetQuantity(),
 					theColony.CapWkr.GetQuantity(),
 					theColony.Dlarv.GetQuantity(),

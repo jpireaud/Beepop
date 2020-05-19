@@ -941,11 +941,6 @@ int CAdultlistA::GetQuantity()
 	return quan;
 }
 
-int CAdultlistA::GetActiveQuantity()
-{
-	return CAdultlist::GetQuantity();
-}
-
 void CAdultlistA::KillAll()
 {
 	CAdultlist::KillAll();

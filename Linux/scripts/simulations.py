@@ -18,6 +18,7 @@ def safe_print(*a, **b):
 
 def parse_binary_format(filename):
     binary_format = {'observed':'Observed', 'modeled':'Modeled', 'rcp85':'Rcp85'}
+    filename = os.path.basename(filename)
     for item in re.split('-|/|.txt', filename):
         if item in binary_format.keys():
             return binary_format[item]
@@ -77,8 +78,8 @@ if __name__ == '__main__':
 
     # let's simulate for the different options we have
     configurations = [[],
-                      ['hourlyTemperaturesEstimation'],
-                      ['forageDayNoTemp', 'hourlyTemperaturesEstimation'],
+                      #['hourlyTemperaturesEstimation'],
+                      #['forageDayNoTemp', 'hourlyTemperaturesEstimation'],
                       ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst'],
                       ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']]
 
@@ -90,7 +91,7 @@ if __name__ == '__main__':
             prefix += '-' + os.path.basename(arguments.weather_file)
         else:
             raise Exception('Location information need to be present either in input_file name or weather_file ex:data_46.03125_-118.34375')
-        
+
     output_directory = os.path.join(arguments.output_directory, prefix)
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
