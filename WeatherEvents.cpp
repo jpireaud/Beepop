@@ -40,9 +40,10 @@ void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
 		//
 		// Decide if this is a foraging day.  This requires:
 		//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-		//    Windspeed <= 21.12 m/s                AND
+		//    Windspeed <= 8.94 m/s                 AND
 		//    Rainfall <= .197 inches
 		//
+		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 		event->SetForage((event->GetMaxTemp() > 12.0) && (windSpeed <= 21.13) &&
 			(event->GetMaxTemp() <= 43.33) && (event->GetRainfall() <= 0.197));
 	}
@@ -50,9 +51,10 @@ void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
 	{
 		//
 		// Decide if this is a foraging day.  This requires:
-		//    Windspeed <= 21.12 m/s                AND
+		//    Windspeed <= 8.94 m/s                AND
 		//    Rainfall <= .197 inches
 		//
+		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 		event->SetForage((windSpeed <= 21.13) && (event->GetRainfall() <= 0.197));
 	}
 	// Here we set the Forage Increment using the default method, may be change later depending on execution options
@@ -763,7 +765,10 @@ CEvent* CWeatherFile::LineToEvent()
 
 	tempEvent->SetMaxTemp(maxtemp);
 	tempEvent->SetMinTemp(mintemp);
-	tempEvent->SetRainfall((float)atof(TokenStgArray[m_HeaderRainCol-Offset]));
+
+	const double rainfall = atof(TokenStgArray[m_HeaderRainCol - Offset]) * 0.0394;
+	tempEvent->SetRainfall(rainfall); // convert mm to inches
+
 	tempEvent->SetLineNum(m_CurrentLine);
 	tempEvent->SetDaylightHours((float)atof(TokenStgArray[m_HeaderSolarRadCol-Offset]));
 	tempEvent->SetTemp((float)(maxtemp+mintemp)/2);
@@ -1294,13 +1299,14 @@ Years present: 1961-1990
 				
 				// Decide if this is a foraging day.  This requires:
 				//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-				//    Windspeed <= 21.12 m/s                AND
+				//    Windspeed <= 8.94 m/s                AND
 				//    Rainfall <= .197 inches
 				//
+				// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 				double windspeed = atof(TokenArray[12]);
 				pEvent->SetForage(
 					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= 21.13) && 
+					(windspeed <= 8.94) &&
 					(pEvent->GetMaxTemp() <= 43.33) && 
 					(pEvent->GetRainfall() < 0.197));
 					
@@ -1446,13 +1452,14 @@ Fry, M.M., Rothman, G., Young, D.F., and Thurman, N., 2016.  Daily gridded weath
 				
 				// Decide if this is a foraging day.  This requires:
 				//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-				//    Windspeed <= 21.12 m/s                AND
+				//    Windspeed <= 8.94 m/s                AND
 				//    Rainfall <= .197 inches
 				//
+				// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 				double windspeed = atof(TokenArray[6])/100;  // Convert from cm/s to m/s
 				pEvent->SetForage(
 					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= 21.13) && 
+					(windspeed <= 8.94) &&
 					(pEvent->GetMaxTemp() <= 43.33) && 
 					(pEvent->GetRainfall() < 0.197));
 					
@@ -1511,7 +1518,9 @@ bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
 			event->SetTemp((accessor.TMAX() + accessor.TMIN()) * 0.5);
 			event->SetMaxTemp(accessor.TMAX());
 			event->SetMinTemp(accessor.TMIN());
-			event->SetRainfall(accessor.PPT());
+
+			const double rainfall = accessor.PPT() * 0.0394;
+			event->SetRainfall(rainfall); // convert mm to inches
 
 			const double windSpeed = accessor.WIND();
 			UpdateForageAttributeForEvent(event, windSpeed);
