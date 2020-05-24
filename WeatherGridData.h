@@ -45,7 +45,7 @@ struct DataItemAccessor
 
     DataItemAccessor(const GridDataType& dataItem) : m_dataItem(dataItem) {}
 
-    // Precipitations in inches
+    // Precipitations in mm
     double PPT()
     {
         const static double pptMultiplier = 1.0 / 40.0;

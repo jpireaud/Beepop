@@ -38,11 +38,13 @@ public:
 	// This option will affect the way we elect a day as a Forage day
 	// If true:
 	//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-	//    Windspeed <= 21.12 m/s                AND
+	//    Windspeed <= 8.94 m/s                AND
 	//    Rainfall <= .197 inches
 	// else if false:
-	//    Windspeed <= 21.12 m/s                AND
+	//    Windspeed <= 8.94 m/s                AND
 	//    Rainfall <= .197 inches
+	//
+	// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 	Option<bool> ForageDayElectionBasedOnTemperatures = true;
 	// This option will affect wth weather file data and binary data (Observed, Historical, and RCP)
 	// Hourly temperature estimation will be used to enhance Forager aging increment.
