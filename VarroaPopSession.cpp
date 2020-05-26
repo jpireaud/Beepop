@@ -393,7 +393,7 @@ void CVarroaPopSession::UpdateResults(int DayCount, CEvent* pEvent)
 	}
 	if (m_AW)	// Adult Workers
 	{
-		m_SimResults[seriesID++][DayCount-1] = theColony.Wadl().GetQuantity();
+		m_SimResults[seriesID++][DayCount-1] = theColony.Wadl.GetQuantity();
 		if (m_FirstResultEntry) m_SimLabels.AddTail("Adult Workers");
 	}
 	if (m_CS)	// Colony Size
@@ -679,6 +679,7 @@ void CVarroaPopSession::Simulate()
 			"%8.3f", // Max Temp
 			"%8.2f", // Daylight Hours
 			"%8.2f", // Activity Ratio (Forage Inc)
+			"%8d", // Forage Day
 			NULL
 		};
 
@@ -708,18 +709,18 @@ void CVarroaPopSession::Simulate()
 		int TotForagingDays = 0;
 
 		CString CurSize;
-		CurSize.Format("                                                      Capped  Capped																														               Prop           Conc            Conc                                             ");
+		CurSize.Format("                                                        Capped  Capped																												              Prop           Conc            Conc                                             ");
 		m_ResultsFileHeader.AddTail(CurSize);			    
-		CurSize.Format("            Colony  Adult     Adult           Active    Drone   Wkr     Drone  Wkr   Drone  Wkr   Total                                                         Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony  Pollen  Colony  Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave           Min     Max      Daylight  Forage");
+		CurSize.Format("            Colony  Adult     Adult           Active    Drone   Wkr     Drone  Wkr   Drone  Wkr   Total                                                         Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony  Pollen  Colony  Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave           Min     Max      Daylight  Forage  Forage");
 		m_ResultsFileHeader.AddTail(CurSize);			    
-		CurSize.Format("     Date   Size    Drones    Wkr     Forgrs  Forgrs    Brood   Brood   Larv   Larv  Eggs   Eggs  Eggs      DD      L      N      P       dd       l       n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest    Nectar  Pest     DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp  Rain    Temp    Temp     Hours     Inc");
+		CurSize.Format("     Date   Size    Drones    Wkr     Forgrs  Forgrs    Brood   Brood   Larv   Larv  Eggs   Eggs  Eggs      DD      L      N      P       dd       l       n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest    Nectar  Pest     DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp  Rain    Temp    Temp     Hours     Inc     Day");
 		m_ResultsFileHeader.AddTail(CurSize);
 		CurSize.Format(m_ResultsFileFormatStg,
 			//pEvent->GetDateStg("%m/%d/%Y"), 
 			"Initial   ", // "Initial or Date"
 			theColony.GetColonySize(), // Colony size
 			theColony.Dadl.GetQuantity(), // Adult Drones
-			theColony.Wadl().GetQuantity(), // Adult Workers
+			theColony.Wadl.GetQuantity(), // Adult Workers
 			theColony.foragers.GetQuantity(), // Forgers
 			theColony.foragers.GetActiveQuantity(), // Active Forgers
 			theColony.CapDrn.GetQuantity(), // Drones Brood
@@ -758,7 +759,8 @@ void CVarroaPopSession::Simulate()
 			0.0, // Min Temp
 			0.0, // Max Temp
 			0.0, // Daylight Hours
-			0.0 // Activity Ratio
+			0.0, // Activity Ratio
+			0
 		);
 		m_ResultsText.AddTail(CurSize);
 
@@ -828,7 +830,7 @@ void CVarroaPopSession::Simulate()
 					pEvent->GetDateStg("%m/%d/%Y"),
 					theColony.GetColonySize(),
 					theColony.Dadl.GetQuantity(),
-					theColony.Wadl().GetQuantity(),
+					theColony.Wadl.GetQuantity(),
 					theColony.foragers.GetQuantity(), // Forgers
 					theColony.foragers.GetActiveQuantity(), // Active Forgers
 					theColony.CapDrn.GetQuantity(),
@@ -867,7 +869,8 @@ void CVarroaPopSession::Simulate()
 					pEvent->GetMinTemp(),
 					pEvent->GetMaxTemp(),
 					pEvent->GetDaylightHours(),
-					pEvent->GetForageInc()
+					pEvent->GetForageInc(),
+					pEvent->IsForageDay()
 				);
 				m_ResultsText.AddTail(CurSize);
 			}
