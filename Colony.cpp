@@ -669,7 +669,7 @@ void CForagerlistA::SetLength(int len)
 //
 // CAdultlist - Drones and Workers
 //
-void CAdultlist::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorker)
+void CAdultlist::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorker)
 // The Capped Brood coming in are converted to Adults and pushed onto the list.
 // If the list is now greater than the specified number of days, the
 // bottom of the list is removed and assigned to the Caboose for Workers or the 
@@ -846,97 +846,38 @@ void CAdultlist::Serialize(CArchive &ar)
 // Adult bees are aging. The aging process is now depending on the daylight hours and the 
 // estimated daily temperatures to match Foragers aging.
 //
-void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder)
+void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorker)
 {
-	// Here we create an Adult only for thepurpose of aging using the ForageInc
-	CAdult* theAdult = new CAdult(theBrood->GetNumber());
-	theAdult->SetMites(theBrood->m_Mites);
-	theAdult->SetPropVirgins(theBrood->m_PropVirgins);
-	theAdult->SetLifespan(WADLLIFE);
-
-	// Add the Adult to the Pending Adults list
-	if (PendingAdults.GetCount() == 0)
+	if (PendingBrood == nullptr)
 	{
-		PendingAdults.AddHead(theAdult);
+		PendingBrood = new CBrood();
 	}
-	else
-	{
-		// check if the latest pending adult is still 0 day old if yes add the numbers
-		POSITION pos = PendingAdults.GetHeadPosition();
-		CAdult* pendingAdult = (CAdult*)PendingAdults.GetNext(pos);
-		if (pendingAdult->GetForageInc() == 0.0)
-		{
-			pendingAdult->SetNumber(pendingAdult->GetNumber() + theAdult->GetNumber());
-			delete theAdult;
-		}
-		else
-		{
-			PendingAdults.AddHead(theAdult);
-		}
-	}
+	PendingBrood->SetNumber(PendingBrood->GetNumber() + theBrood->GetNumber());
+	PendingBrood->m_Mites = theBrood->m_Mites;
+	PendingBrood->m_PropVirgins = theBrood->m_PropVirgins;
+	delete theBrood;
 
 	// Make sure the Caboose pointer is reset since the object
 	// may have been delete by the foragers list implementation
 	Caboose = NULL;
 
-	if (theEvent->IsForageDay())
+	// Age worker adults if queen is laying worker eggs
+	// const bool aging = !bWorker || !GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection() || (theEvent->IsForageDay() && queen->GetWeggs()->GetNumber() > 0);
+	const bool aging = (bWorker && theColony->Wlarv.GetQuantity() > 0);
+	if (aging)
 	{
-		// Here we age adults given the ForageInc of the current day
-		POSITION pos = PendingAdults.GetHeadPosition();
-		CAdult* pendingAdult;
-		while (pos != NULL) // Increment the forageIncrement for Pending List
-		{
-			pendingAdult = (CAdult*)PendingAdults.GetNext(pos);
-			pendingAdult->SetForageInc(theAdult->GetForageInc() + theEvent->GetForageInc());
-		}
+		CAdultlist::Update(PendingBrood, theColony, queen, theEvent, bWorker);
 
-		// All adults with a ForageInc >= 1.0 will enter the Adult boxcar in a new Brood
-		pos = PendingAdults.GetTailPosition();
-		POSITION oldpos;
-		CBrood* brood = nullptr;
-		while (pos != NULL)
-		{
-			oldpos = pos;  // Save old position for possible deletion
-			pendingAdult = (CAdult*)PendingAdults.GetPrev(pos);
-			if (pendingAdult->GetForageInc() >= 1.0)
-			{
-				pendingAdult->SetForageInc(0.0);
-
-				// Here we give back control to the Adult list default implementation
-				if (brood == nullptr)
-				{
-					brood = new CBrood(pendingAdult->GetNumber());
-					brood->m_Mites = pendingAdult->GetMites();
-					brood->m_PropVirgins = pendingAdult->GetPropVirgins();
-				}
-				else
-				{
-					brood->SetNumber(brood->GetNumber() + pendingAdult->GetNumber());
-					// TODO: update mites and propVirgins
-				}
-
-				PendingAdults.RemoveAt(oldpos);
-				delete pendingAdult;
-			}
-		}
-
-		if (brood != nullptr)
-		{
-			// Add adults (brood) appropriately aged using ForageInc to the Adultlist.
-			CAdultlist::Update(brood, theColony, theEvent, bWorkder);
-		}
+		PendingBrood = nullptr;
 	}
 }
 
 int CAdultlistA::GetQuantity()
 {
 	int quan = CAdultlist::GetQuantity();
-	POSITION pos = PendingAdults.GetHeadPosition();
-	CAdult* temp;
-	while (pos != NULL)
+	if (PendingBrood != 0)
 	{
-		temp = (CAdult*)PendingAdults.GetNext(pos);
-		quan += temp->GetNumber();
+		quan += PendingBrood->GetNumber();
 	}
 	return quan;
 }
@@ -944,7 +885,8 @@ int CAdultlistA::GetQuantity()
 void CAdultlistA::KillAll()
 {
 	CAdultlist::KillAll();
-	PendingAdults.KillAll();
+	delete PendingBrood;
+	PendingBrood = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2205,9 +2147,9 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		// End Forgers killed due to pesticide
 
 		//TRACE("Date: %s\n",pEvent->GetDateStg());
-		Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, pEvent, false);
+		Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, &queen, pEvent, false);
 		//TRACE("HB Before Update:%s\n",Wadl().Status());
-		Wadl().Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
+		Wadl().Update((CBrood*)CapWkr.GetCaboose(), this, &queen, pEvent, true);
 		//TRACE(" HB After Update:%s\n",Wadl().Status());
 		//TRACE("    Worker Caboose Quan: %d\n", Wadl().GetCaboose()->number);
 		foragers.Update((CAdult*)Wadl().GetCaboose(), pEvent);

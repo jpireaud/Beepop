@@ -18,6 +18,8 @@ IMPLEMENT_DYNCREATE(CBee, CCmdTarget)
 
 CBee::CBee()
 {
+	number = 0;
+	age = 0.0;
 	Alive = true;
 }
 
