@@ -89,7 +89,7 @@ public:
 	virtual ~CAdultlist() {}
 	CAdult* GetCaboose() { return Caboose; }
 	void ClearCaboose() { Caboose = NULL; }
-	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorkder = true);
 	virtual void Serialize(CArchive& ar);
 	virtual void KillAll();
 	void UpdateLength(int len, bool bWorker = true);
@@ -110,7 +110,7 @@ public:
 
 	CAdultlistA() {}
 	~CAdultlistA() { KillAll(); }
-	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorkder = true);
 	virtual int GetQuantity();
 	virtual void KillAll();
 };

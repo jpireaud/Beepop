@@ -669,7 +669,7 @@ void CForagerlistA::SetLength(int len)
 //
 // CAdultlist - Drones and Workers
 //
-void CAdultlist::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorker)
+void CAdultlist::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorker)
 // The Capped Brood coming in are converted to Adults and pushed onto the list.
 // If the list is now greater than the specified number of days, the
 // bottom of the list is removed and assigned to the Caboose for Workers or the 
@@ -846,7 +846,7 @@ void CAdultlist::Serialize(CArchive &ar)
 // Adult bees are aging. The aging process is now depending on the daylight hours and the 
 // estimated daily temperatures to match Foragers aging.
 //
-void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder)
+void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorkder)
 {
 	// Here we create an Adult only for thepurpose of aging using the ForageInc
 	CAdult* theAdult = new CAdult(theBrood->GetNumber());
@@ -879,7 +879,7 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 	// may have been delete by the foragers list implementation
 	Caboose = NULL;
 
-	if (theEvent->IsForageDay())
+	if (bWorkder && queen->GetWeggs()->number > 0 && theEvent->IsForageDay())
 	{
 		// Here we age adults given the ForageInc of the current day
 		POSITION pos = PendingAdults.GetHeadPosition();
@@ -923,7 +923,7 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent,
 		if (brood != nullptr)
 		{
 			// Add adults (brood) appropriately aged using ForageInc to the Adultlist.
-			CAdultlist::Update(brood, theColony, theEvent, bWorkder);
+			CAdultlist::Update(brood, theColony, queen, theEvent, bWorkder);
 		}
 	}
 }
@@ -2205,9 +2205,9 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		// End Forgers killed due to pesticide
 
 		//TRACE("Date: %s\n",pEvent->GetDateStg());
-		Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, pEvent, false);
+		Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, &queen, pEvent, false);
 		//TRACE("HB Before Update:%s\n",Wadl().Status());
-		Wadl().Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
+		Wadl().Update((CBrood*)CapWkr.GetCaboose(), this, &queen, pEvent, true);
 		//TRACE(" HB After Update:%s\n",Wadl().Status());
 		//TRACE("    Worker Caboose Quan: %d\n", Wadl().GetCaboose()->number);
 		foragers.Update((CAdult*)Wadl().GetCaboose(), pEvent);
