@@ -29,6 +29,8 @@ int main(int argc, char** argv)
 	("hourlyTemperaturesEstimation", "Compute hourly temperatures estimation", cxxopts::value<bool>()->default_value("false"))
 	("pendingForagerFirst", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
 	("binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85)", cxxopts::value<std::string>())
+	("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
+	("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 	;
 
 	options.add_options("help")
@@ -189,6 +191,14 @@ int main(int argc, char** argv)
 			if (arguments.count("binaryWeatherFileFormat") == 1)
 			{
 				GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set(arguments["binaryWeatherFileFormat"].as<std::string>());
+			}
+			if (arguments.count("windspeed") == 1)
+			{
+				GlobalOptions::Get().WindspeedThreshold.Set(arguments["windspeed"].as<double>());
+			}
+			if (arguments.count("rainfall") == 1)
+			{
+				GlobalOptions::Get().RainfallThreshold.Set(arguments["rainfall"].as<double>());
 			}
 		}
 		else

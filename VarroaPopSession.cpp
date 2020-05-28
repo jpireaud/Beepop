@@ -675,6 +675,11 @@ void CVarroaPopSession::Simulate()
 			"%6.3f", // Queen Strength
 			"%6.3f", // Ave Temp
 			"%6.3f", // Rain
+			"%8.3f", // Min Temp
+			"%8.3f", // Max Temp
+			"%8.2f", // Daylight Hours
+			"%8.2f", // Activity Ratio (Forage Inc)
+			"%8d", // Forage Day
 			NULL
 		};
 
@@ -704,11 +709,11 @@ void CVarroaPopSession::Simulate()
 		int TotForagingDays = 0;
 
 		CString CurSize;
-		CurSize.Format("                                        Capped  Capped                                                                                                                     Prop           Conc          Conc                                             ");
+		CurSize.Format("                                                        Capped  Capped																												              Prop           Conc            Conc                                             ");
 		m_ResultsFileHeader.AddTail(CurSize);
-		CurSize.Format("            Day Light Colony  Adult  Adult         Drone   Wkr    Drone  Wkr    Drone  Wkr  Total                                          Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony Pollen Colony Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave");
+		CurSize.Format("            Colony  Adult     Adult           Active    Drone   Wkr     Drone  Wkr   Drone  Wkr   Total                                                         Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony  Pollen  Colony  Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave           Min     Max      Daylight  Forage  Forage");
 		m_ResultsFileHeader.AddTail(CurSize);
-		CurSize.Format("     Date     Hours    Size   Drones   Wkr   Forgrs Brood  Brood   Larv   Larv    Eggs  Eggs  Eggs  DD    L    N     P      dd    l    n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest  Nectar  Pest    DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp   Rain");
+		CurSize.Format("     Date   Size    Drones    Wkr     Forgrs  Forgrs    Brood   Brood   Larv   Larv  Eggs   Eggs  Eggs      DD      L      N      P       dd       l       n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest    Nectar  Pest     DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp  Rain    Temp    Temp     Hours     Inc     Day");
 		m_ResultsFileHeader.AddTail(CurSize);
 		CurSize.Format(m_ResultsFileFormatStg,
 			//pEvent->GetDateStg("%m/%d/%Y"), 
@@ -750,7 +755,12 @@ void CVarroaPopSession::Simulate()
 			0, // Dead Foragers
 			theColony.queen.GetQueenStrength(), // Queen Strength
 			0.0, // Ave Temp
-			0.0 // Rain
+			0.0, // Rain
+			0.0, // Min Temp
+			0.0, // Max Temp
+			0.0, // Daylight Hours
+			0.0, // Activity Ratio
+			0	 // Forage Day
 		);
 		m_ResultsText.AddTail(CurSize);
 
@@ -856,7 +866,12 @@ void CVarroaPopSession::Simulate()
 					theColony.m_DeadForagersPesticide,
 					theColony.queen.GetQueenStrength(),
 					pEvent->GetTemp(),
-					pEvent->GetRainfall()
+					pEvent->GetRainfall(),
+					pEvent->GetMinTemp(),
+					pEvent->GetMaxTemp(),
+					pEvent->GetDaylightHours(),
+					pEvent->GetForageInc(),
+					pEvent->IsForageDay()
 				);
 				m_ResultsText.AddTail(CurSize);
 			}

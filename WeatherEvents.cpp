@@ -44,8 +44,8 @@ void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
 		//    Rainfall <= .197 inches
 		//
 		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
-		event->SetForage((event->GetMaxTemp() > 12.0) && (windSpeed <= 21.13) &&
-			(event->GetMaxTemp() <= 43.33) && (event->GetRainfall() <= 0.197));
+		event->SetForage((event->GetMaxTemp() > 12.0) && (windSpeed <= GlobalOptions::Get().WindspeedThreshold()) &&
+			(event->GetMaxTemp() <= 43.33) && (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
 	}
 	else
 	{
@@ -55,7 +55,7 @@ void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
 		//    Rainfall <= .197 inches
 		//
 		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
-		event->SetForage((windSpeed <= 21.13) && (event->GetRainfall() <= 0.197));
+		event->SetForage((windSpeed <= GlobalOptions::Get().WindspeedThreshold()) && (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
 	}
 	// Here we set the Forage Increment using the default method, may be change later depending on execution options
 	event->SetForageInc(12.0, event->GetMaxTemp(), event->GetTemp());
@@ -1306,9 +1306,9 @@ Years present: 1961-1990
 				double windspeed = atof(TokenArray[12]);
 				pEvent->SetForage(
 					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= 8.94) &&
+					(windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
 					(pEvent->GetMaxTemp() <= 43.33) && 
-					(pEvent->GetRainfall() < 0.197));
+					(pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
 					
 				pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
 
@@ -1459,9 +1459,9 @@ Fry, M.M., Rothman, G., Young, D.F., and Thurman, N., 2016.  Daily gridded weath
 				double windspeed = atof(TokenArray[6])/100;  // Convert from cm/s to m/s
 				pEvent->SetForage(
 					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= 8.94) &&
+					(windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
 					(pEvent->GetMaxTemp() <= 43.33) && 
-					(pEvent->GetRainfall() < 0.197));
+					(pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
 					
 				pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
 

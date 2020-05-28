@@ -532,7 +532,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 			CAdult* pendingAdult = (CAdult*)PendingForagers.GetNext(pos);
 			if (pendingAdult->GetForageInc() == 0.0)
 			{
-				pendingAdult->SetNumber(pendingAdult->GetNumber() + theAdult->GetNumber());
+				pendingAdult->SetNumber(theAdult->GetNumber() + theAdult->GetNumber());
 				delete theAdult;
 				ForagerCount--;
 			}
@@ -555,7 +555,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 		while (pos != NULL) // Increment the forageIncrement for Pending List
 		{
 			pendingAdult = (CAdult*)PendingForagers.GetNext(pos);
-			pendingAdult->SetForageInc(pendingAdult->GetForageInc() + theDay->GetForageInc());
+			pendingAdult->SetForageInc(theAdult->GetForageInc() + theDay->GetForageInc());
 		}
 		pos = PendingForagers.GetTailPosition();
 		POSITION oldpos;

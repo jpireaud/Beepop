@@ -53,6 +53,11 @@ public:
 	// Foragers will always be added to the PendingForagers list first so they'll age regarding the Forager increment.
 	Option<bool> ShouldAddForagersToPendingForagersFirst = false;
 
+	// This option affect the Windspeed threshold to determinate if the current day can be a Forage Day
+	Option<double> WindspeedThreshold = 8.94;
+
+	// This option affect the Rainfall threshold to determinate if the current day can be a Forage Day
+	Option<double> RainfallThreshold = 0.197;
 	// Weather file options
 
 	// If the weather file to be loaded is in bynary format, this specify which format to use
