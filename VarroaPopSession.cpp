@@ -637,25 +637,25 @@ void CVarroaPopSession::Simulate()
 
 		const char* formatData[] = {
 			"%s", // "Initial or Date"
-			"%.f", // Day Light Hours
 			"%6d", // Colony size
-			"%6d", // Adult Drones
-			"%6d", // Adult Workers
-			"%6d", // Forgers
-			"%6d", // Drones Brood
+			"%8d", // Adult Drones
+			"%8d", // Adult Workers
+			"%8d", // Foragers
+			"%8d", // Active Foragers
+			"%7d", // Drones Brood
 			"%6d", // Wkr Brood
 			"%6d", // Drone Larv
 			"%6d", // Wkr Larv
 			"%6d", // Drone Eggs
 			"%6d", // Wkr Eggs
 			"%6d", // Total Eggs
-			"%.2f", // DD 
-			"%.2f", // L 
-			"%.2f", // N 
-			"%.2f", // P 
-			"%.2f", // dd 
-			"%.2f", // l 
-			"%05.2f", // n 
+			"%7.2f", // DD 
+			"%6.2f", // L 
+			"%6.2f", // N 
+			"%8.2f", // P 
+			"%7.2f", // dd 
+			"%6.2f", // l 
+			"%8.2f", // n 
 			"%6d", // Free Mites
 			"%6d", // DBrood Mites
 			"%6d", // WBrood Mites
@@ -663,17 +663,17 @@ void CVarroaPopSession::Simulate()
 			"%6.2f", // WMite / Cell
 			"%6d", // Mites Dying
 			"%6.2f", // Prop Mites Dying
-			"%6.1f", // Colony Pollen
+			"%8.1f", // Colony Pollen
 			"%6.3f", // Conc Pollen Pest
-			"%6.1f", // Colony Nectar
+			"%8.1f", // Colony Nectar
 			"%6.3f", // Conc Nectar Pest
 			"%6d", // Dead DLarv
 			"%6d", // Dead WLarv
 			"%6d", // Dead DAdlt
 			"%6d", // Dead WAdlt
 			"%6d", // Dead Foragers
-			"%6.3f", // Queen Strength
-			"%6.3f", // Ave Temp
+			"%8.3f", // Queen Strength
+			"%8.3f", // Ave Temp
 			"%6.3f", // Rain
 			"%8.3f", // Min Temp
 			"%8.3f", // Max Temp
@@ -718,11 +718,11 @@ void CVarroaPopSession::Simulate()
 		CurSize.Format(m_ResultsFileFormatStg,
 			//pEvent->GetDateStg("%m/%d/%Y"), 
 			"Initial   ", // "Initial or Date"
-			pEvent->GetDaylightHours(),
 			theColony.GetColonySize(), // Colony size
 			theColony.Dadl.GetQuantity(), // Adult Drones
 			theColony.Wadl.GetQuantity(), // Adult Workers
-			theColony.foragers.GetActiveQuantity(), // Forgers
+			theColony.foragers.GetQuantity(), // Forgers
+			theColony.foragers.GetActiveQuantity(), // Active Forgers
 			theColony.CapDrn.GetQuantity(), // Drones Brood
 			theColony.CapWkr.GetQuantity(), // Wkr Brood
 			theColony.Dlarv.GetQuantity(), // Drone Larv
@@ -828,11 +828,10 @@ void CVarroaPopSession::Simulate()
 
 				CurSize.Format(m_ResultsFileFormatStg,
 					pEvent->GetDateStg("%m/%d/%Y"),
-					pEvent->GetDaylightHours(),
 					theColony.GetColonySize(),
 					theColony.Dadl.GetQuantity(),
 					theColony.Wadl.GetQuantity(),
-					//theColony.foragers.GetQuantity(),
+					theColony.foragers.GetQuantity(),
 					theColony.foragers.GetActiveQuantity(),
 					theColony.CapDrn.GetQuantity(),
 					theColony.CapWkr.GetQuantity(),

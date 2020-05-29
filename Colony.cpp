@@ -2065,7 +2065,8 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	CapDrn.Update((CLarva*)Dlarv.GetCaboose());
 	CapWkr.Update((CLarva*)Wlarv.GetCaboose());
 	int NumberOfNonAdults = Wlarv.GetQuantity() +  Dlarv.GetQuantity() + CapDrn.GetQuantity() + CapWkr.GetQuantity();
-	if ((NumberOfNonAdults > 0) || (pEvent->IsForageDay()))
+	const bool ForageIncIsValid = GlobalOptions::Get().ForageDayElectionBasedOnTemperatures() || pEvent->GetForageInc() > 0.0;
+	if ((NumberOfNonAdults > 0) || (pEvent->IsForageDay() && ForageIncIsValid))
 	{
 		// Foragers killed due to pesticide.  Recruit precocious Adult Workers to be foragers - Add them to the last Adult Boxcar
 		// The last boxcar will be moved to the Caboose when Wadl.Update is called a little later.  The Wadl Caboose will be moved to the 
@@ -2083,12 +2084,16 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		}
 		// End Forgers killed due to pesticide
 
-		//TRACE("Date: %s\n",pEvent->GetDateStg());
-		Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, pEvent, false);
-		//TRACE("HB Before Update:%s\n",Wadl.Status());
-		Wadl.Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
-		//TRACE(" HB After Update:%s\n",Wadl.Status());
-		//TRACE("    Worker Caboose Quan: %d\n", Wadl.GetCaboose()->number);
+		//if (GlobalOptions::Get().ForageDayElectionBasedOnTemperatures() || )
+		{
+			//TRACE("Date: %s\n",pEvent->GetDateStg());
+			Dadl.Update((CBrood*)CapDrn.GetCaboose(), this, pEvent, false);
+			//TRACE("HB Before Update:%s\n",Wadl.Status());
+			Wadl.Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
+			//TRACE(" HB After Update:%s\n",Wadl.Status());
+			//TRACE("    Worker Caboose Quan: %d\n", Wadl.GetCaboose()->number);
+		}
+
 		foragers.Update((CAdult*)Wadl.GetCaboose(), pEvent);
 		//TRACE("Updated Foragers:%s\n",foragers.Status());
 	}
