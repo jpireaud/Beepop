@@ -5,8 +5,12 @@
 #include "stdafx.h"
 #include "VarroaPop.h"
 #include "WeatherEvents.h"
+#include "WeatherGridData.h"
 #include "CreateWeatherHdr.h"
+#include "GlobalOptions.h"
 #include "math.h"
+
+#include <algorithm>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -27,7 +31,35 @@ int CountChars(CString instg, TCHAR testchar)
 	return count;
 }
 
-
+// Compute the Forage and ForageInc attributes of a newly created event
+void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
+{
+	const bool forageDayBasedOnTemperatures = GlobalOptions::Get().ForageDayElectionBasedOnTemperatures();
+	if (forageDayBasedOnTemperatures)
+	{
+		//
+		// Decide if this is a foraging day.  This requires:
+		//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
+		//    Windspeed <= 8.94 m/s                 AND
+		//    Rainfall <= .197 inches
+		//
+		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
+		event->SetForage((event->GetMaxTemp() > 12.0) && (windSpeed <= GlobalOptions::Get().WindspeedThreshold()) &&
+			(event->GetMaxTemp() <= 43.33) && (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
+	}
+	else
+	{
+		//
+		// Decide if this is a foraging day.  This requires:
+		//    Windspeed <= 8.94 m/s                AND
+		//    Rainfall <= .197 inches
+		//
+		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
+		event->SetForage((windSpeed <= GlobalOptions::Get().WindspeedThreshold()) && (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
+	}
+	// Here we set the Forage Increment using the default method, may be change later depending on execution options
+	event->SetForageInc(12.0, event->GetMaxTemp(), event->GetTemp());
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -733,26 +765,15 @@ CEvent* CWeatherFile::LineToEvent()
 
 	tempEvent->SetMaxTemp(maxtemp);
 	tempEvent->SetMinTemp(mintemp);
-	tempEvent->SetRainfall((float)atof(TokenStgArray[m_HeaderRainCol-Offset]));
+
+	const double rainfall = atof(TokenStgArray[m_HeaderRainCol - Offset]) * 0.0394;
+	tempEvent->SetRainfall(rainfall); // convert mm to inches
+
 	tempEvent->SetLineNum(m_CurrentLine);
 	tempEvent->SetDaylightHours((float)atof(TokenStgArray[m_HeaderSolarRadCol-Offset]));
 	tempEvent->SetTemp((float)(maxtemp+mintemp)/2);
 
-	//
-	// Decide if this is a foraging day.  This requires:
-	//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-	//    Windspeed <= 21.12 m/s                AND
-	//    Rainfall <= .197 inches
-	//
-	tempEvent->SetForage((tempEvent->GetMaxTemp() > 12.0) && (windspeed <= 21.13) &&
-		(tempEvent->GetMaxTemp() <= 43.33) && (tempEvent->GetRainfall() <= 0.197));
-	tempEvent->SetForageInc(12.0, tempEvent->GetMaxTemp(), tempEvent->GetTemp());
-
-	// TEST TEST TEST
-	if (tempEvent->IsForageDay())
-	{
-		int i = 1;
-	}
+	UpdateForageAttributeForEvent(tempEvent, windspeed);
 
 	//  The m_Time attribute is a little more complicated.  
 	if (m_DateType == DOY) //Day of Year Format
@@ -982,7 +1003,16 @@ CEvent* CWeatherEvents::GetDayEvent(COleDateTime theTime)
 	return NULL;
 }
 
+struct GridDataTypeId
+{
+	static const char Observed[];
+	static const char Modeled[];
+	static const char Rcp85[];
+};
 
+const char GridDataTypeId::Observed[] = "Observed";
+const char GridDataTypeId::Modeled[] = "Modeled";
+const char GridDataTypeId::Rcp85[] = "Rcp85";
 
 bool CWeatherEvents::LoadWeatherFile(CString FileName)
 {
@@ -998,78 +1028,107 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 	{
 		return(LoadEPAWeatherFileWEA(FileName));
 	}
-	else // Load legacy VarroaPop weather files .wth
+	else
 	{
-		CWeatherFile theFile;
-		CFileException ex;
-		if (!theFile.Open(FileName,CFile::modeRead|CFile::shareDenyNone, &ex))
+		// Check if the file is in Binary
+		const std::string binaryIdentifier = GlobalOptions::Get().BinaryWeatherFileFormatIdentifier();
+		if (!binaryIdentifier.empty())
 		{
-			TCHAR   szCause[255];
-			CString strFormatted;
-			ex.GetErrorMessage(szCause, 255);
-			strFormatted = _T("The data file could not be opened because of this error: ");
-			strFormatted += szCause;
-			//MyMessageBox(strFormatted);
-			return false;
-		}
-			
-		// Clear the Weather Event List;
-		ClearAllEvents();
-
-
-		// Does the file have a header?
-		if (!theFile.IsHeaderPresent())
-		{
-			if((MyMessageBox("This Weather file has no Header \n Would you Like to Create One?",
-				MB_YESNO) == IDNO)) return false;
-			if (!theFile.CreateHeader())
+			// loading binary weather 
+			if (binaryIdentifier == GridDataTypeId::Observed)
+				LoadWeatherGridDataBinaryFile<ObservedHistoricalItem>(FileName);
+			else if (binaryIdentifier == GridDataTypeId::Modeled)
+				LoadWeatherGridDataBinaryFile<ModeledHistoricalItem>(FileName);
+			else if (binaryIdentifier == GridDataTypeId::Rcp85)
+				LoadWeatherGridDataBinaryFile<Rcp85>(FileName);
+			else
 			{
-				CString msg = "Error reading file header: ";
-				if (theFile.GetError().GetLength()!=0) MyMessageBox(msg + theFile.GetError());
-				return false;  //  Header Construction Failed
+				CString stg = "Error Binary Weather File Identifier Not Supported: ";
+				MyMessageBox(stg + binaryIdentifier.c_str());
+				return false;  //  Header Loading Failed
 			}
 		}
-
-		// Load the Header info into theFile object
-		if (!theFile.DigestHeader()) 
+		else
 		{
-			CString stg = "Error Reading Weather File Header: ";
-			MyMessageBox(stg + theFile.GetError());
-			return false;  //  Header Loading Failed
-		}
-
-		// Prepare Progress Bar
-		int Step = 0;
-		float val = 0.0;
-		CDialog ProgressDlg;
-		CPoint Offset(10,10);
-		CProgressCtrl* pProgress;
-		if (gl_RunGUI)
-		{
-			ProgressDlg.Create(IDD_PROGRESS);
-			ProgressDlg.SetWindowText("Loading Weather File "+FileName);
-			pProgress = (CProgressCtrl*)ProgressDlg.GetDlgItem(IDC_PROGRESS);
-			if (theFile.m_Size != 0) val = float(10)/theFile.m_Size;
-			else val = 0;
-		}
-
-		// Now Process the Data
-		CEvent* pEvent = theFile.GetNextEvent();
-		while (pEvent != NULL)
+			// Load legacy VarroaPop weather files .wth
+			CWeatherFile theFile;
+			CFileException ex;
+			if (!theFile.Open(FileName, CFile::modeRead | CFile::shareDenyNone, &ex))
 			{
-				if ((val > float(Step)/theFile.m_BytesRead)&&(gl_RunGUI))
+				TCHAR   szCause[255];
+				CString strFormatted;
+				ex.GetErrorMessage(szCause, 255);
+				strFormatted = _T("The data file could not be opened because of this error: ");
+				strFormatted += szCause;
+				//MyMessageBox(strFormatted);
+				return false;
+			}
+
+			// Clear the Weather Event List;
+			ClearAllEvents();
+
+			// Does the file have a header?
+			if (!theFile.IsHeaderPresent())
+			{
+				if ((MyMessageBox("This Weather file has no Header \n Would you Like to Create One?",
+					MB_YESNO) == IDNO)) return false;
+				if (!theFile.CreateHeader())
+				{
+					CString msg = "Error reading file header: ";
+					if (theFile.GetError().GetLength() != 0) MyMessageBox(msg + theFile.GetError());
+					return false;  //  Header Construction Failed
+				}
+			}
+
+			// Load the Header info into theFile object
+			if (!theFile.DigestHeader())
+			{
+				CString stg = "Error Reading Weather File Header: ";
+				MyMessageBox(stg + theFile.GetError());
+				return false;  //  Header Loading Failed
+			}
+
+			// Prepare Progress Bar
+			int Step = 0;
+			float val = 0.0;
+			CDialog ProgressDlg;
+			CPoint Offset(10, 10);
+			CProgressCtrl* pProgress;
+			if (gl_RunGUI)
+			{
+				ProgressDlg.Create(IDD_PROGRESS);
+				ProgressDlg.SetWindowText("Loading Weather File " + FileName);
+				pProgress = (CProgressCtrl*)ProgressDlg.GetDlgItem(IDC_PROGRESS);
+				if (theFile.m_Size != 0) val = float(10) / theFile.m_Size;
+				else val = 0;
+			}
+
+			std::vector<CEvent*> events;
+
+			// Now Process the Data
+			CEvent* pEvent = theFile.GetNextEvent();
+			while (pEvent != NULL)
+			{
+				if ((val > float(Step) / theFile.m_BytesRead) && (gl_RunGUI))
 				{
 					pProgress->StepIt();
 					Step++;
 				}
 				//TRACE("Adding a weather event \n");
 				AddEvent(pEvent);
+				events.push_back(pEvent);
 				TRACE("Weather Date: %s\n", pEvent->GetDateStg());
 				pEvent = theFile.GetNextEvent();
 			}
-		if (gl_RunGUI) ProgressDlg.DestroyWindow();
+			if (gl_RunGUI) ProgressDlg.DestroyWindow();
 
-	SetFileName(FileName);
+			SetFileName(FileName);
+
+			if (GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation())
+			{
+				ComputeHourlyTemperatureEstimationAndUpdateForageInc(events);
+			}
+		}
 	}
 
 	HasBeenInitialized = true;
@@ -1240,15 +1299,16 @@ Years present: 1961-1990
 				
 				// Decide if this is a foraging day.  This requires:
 				//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-				//    Windspeed <= 21.12 m/s                AND
+				//    Windspeed <= 8.94 m/s                AND
 				//    Rainfall <= .197 inches
 				//
+				// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 				double windspeed = atof(TokenArray[12]);
 				pEvent->SetForage(
 					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= 21.13) && 
+					(windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
 					(pEvent->GetMaxTemp() <= 43.33) && 
-					(pEvent->GetRainfall() < 0.197));
+					(pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
 					
 				pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
 
@@ -1392,15 +1452,16 @@ Fry, M.M., Rothman, G., Young, D.F., and Thurman, N., 2016.  Daily gridded weath
 				
 				// Decide if this is a foraging day.  This requires:
 				//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-				//    Windspeed <= 21.12 m/s                AND
+				//    Windspeed <= 8.94 m/s                AND
 				//    Rainfall <= .197 inches
 				//
+				// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 				double windspeed = atof(TokenArray[6])/100;  // Convert from cm/s to m/s
 				pEvent->SetForage(
 					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= 21.13) && 
+					(windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
 					(pEvent->GetMaxTemp() <= 43.33) && 
-					(pEvent->GetRainfall() < 0.197));
+					(pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
 					
 				pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
 
@@ -1417,6 +1478,66 @@ Fry, M.M., Rothman, G., Young, D.F., and Thurman, N., 2016.  Daily gridded weath
 	HasBeenInitialized = true;
 	return true;
 
+}
+
+template<typename GridDataType>
+bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
+{
+	// Clear the Weather Event List;
+	ClearAllEvents();
+
+	const bool computeHourlyTemperaturesEstimation = GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation();
+
+	WeatherGridData<GridDataType> data = WeatherGridDataNs::LoadGridData<GridDataType>(static_cast<const char*>(FileName));
+	auto& items = data.data();
+	if (items.size() > 0)
+	{
+		SetFileName(FileName);
+
+		// Get the latiture based on the filename 
+		double latitude = WeatherGridDataNs::GetLatitudeFromFilename(static_cast<const char*>(GetFileName()));
+
+		COleDateTime date = data.getStartTime();
+		COleDateTimeSpan oneDay(1, 0, 0, 0);
+
+		std::vector<CEvent*> events;
+		events.reserve(items.size());
+
+		for (size_t itemIndex = 0; itemIndex < items.size(); itemIndex++)
+		{
+			auto& item = items[itemIndex];
+			DataItemAccessor<GridDataType> accessor(item);
+
+			CEvent* event = new CEvent();
+			event->SetLineNum(itemIndex);
+			event->SetTime(date);
+			if (!computeHourlyTemperaturesEstimation)
+			{
+				event->SetDaylightHours(WeatherGridDataNs::DayLength(latitude, WeatherGridDataNs::ComputeJDay(date)).daylength);
+			}
+			event->SetTemp((accessor.TMAX() + accessor.TMIN()) * 0.5);
+			event->SetMaxTemp(accessor.TMAX());
+			event->SetMinTemp(accessor.TMIN());
+
+			const double rainfall = accessor.PPT() * 0.0394;
+			event->SetRainfall(rainfall); // convert mm to inches
+
+			const double windSpeed = accessor.WIND();
+			UpdateForageAttributeForEvent(event, windSpeed);
+
+			AddEvent(event);
+			events.push_back(event);
+
+			date += oneDay;
+		}
+
+		if (computeHourlyTemperaturesEstimation)
+		{
+			ComputeHourlyTemperatureEstimationAndUpdateForageInc(events);
+		}
+	}
+	HasBeenInitialized = true;
+	return true;
 }
 
 double CWeatherEvents::GetLatitudeFromFileName(CString WeatherFileName)
@@ -1510,6 +1631,86 @@ double CWeatherEvents::CalcDaylightFromLatitude(double Lat, int DayNum)
 	return DaylightHours;
 }
 
+void CWeatherEvents::ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::vector<CEvent*>& events)
+{
+	try
+	{
+		const size_t eventsCount = events.size();
+
+		// Get the latiture based on the filename 
+		double latitude = WeatherGridDataNs::GetLatitudeFromFilename((const char*)GetFileName());
+
+		// Compute all daylengths as a first step to keep the solstice
+		std::vector<WeatherGridDataNs::DayLengthResult> dayLengths;
+		dayLengths.reserve(eventsCount);
+
+		float solstice = 0.0;
+
+		for (auto it = events.begin(); it != events.end(); it++)
+		{
+			const auto dayLength = WeatherGridDataNs::DayLength(latitude, WeatherGridDataNs::ComputeJDay((*it)->GetTime()));
+			dayLengths.push_back(dayLength);
+			solstice = (std::max)(dayLength.daylength, solstice);
+		}
+
+		CEvent* prevEvent = nullptr;
+		CEvent* event = nullptr;
+		for(size_t eventIndex=0; eventIndex<eventsCount; eventIndex++)
+		{	
+			CEvent* event = events[eventIndex];
+			const size_t nextIndex = eventIndex + 1;
+			CEvent* nextEvent = nextIndex < eventsCount? events[nextIndex] : nullptr;
+
+			// alter ForageInc taking into account estimated hourly temperature
+
+			WeatherGridDataNs::HourlyTempraturesEstimator estimator;
+
+			estimator.tmin = event->GetMinTemp();
+			estimator.tmax = event->GetMaxTemp();
+
+			auto& dayData = dayLengths[eventIndex];
+
+			estimator.sunrise = dayData.sunrise;
+			estimator.sunset = dayData.sunset;
+			estimator.daylength = dayData.daylength;
+
+			if (prevEvent != nullptr)
+			{
+				auto& prevDayData = dayLengths[eventIndex - 1];
+
+				estimator.prev_tmin = prevEvent->GetMinTemp();
+				estimator.prev_tmax = prevEvent->GetMaxTemp();
+				estimator.prev_sunset = prevDayData.sunset;
+			}
+
+			if (nextEvent != nullptr)
+			{
+				auto& nextDayData = dayLengths[eventIndex + 1];
+
+				estimator.next_tmin = nextEvent->GetMinTemp();
+				estimator.next_sunrise = nextDayData.sunrise;
+			}
+
+			estimator.compute();
+
+			int flighingDayLightHours = estimator.count_dayligth();
+
+			event->SetDaylightHours(estimator.daylength);
+			event->SetForageInc((std::min)(static_cast<float>(flighingDayLightHours), dayData.daylength) / solstice);
+
+			prevEvent = event;
+			event = nextEvent;
+		}
+	}
+	catch (std::exception & e)
+	{
+		// This exception only impact the computation of the adjusted Forage Increment, 
+		// simulation is able to continue anyway
+		CString stg = "Cannot extract latitude from filename: ";
+		MyMessageBox(stg + GetFileName());
+	}
+}
+
 void CWeatherEvents::Serialize(CArchive& ar)
 {
 
@@ -1522,7 +1723,6 @@ void CWeatherEvents::Serialize(CArchive& ar)
 		// TODO: add loading code here
 	}
 }
-
 
 
 

@@ -275,16 +275,28 @@ bool COleDateTime::GetAsDATE(DATE& date) const
     return true;
 }
 
-COleDateTime COleDateTime::operator+(const COleDateTimeSpan& span)
+COleDateTime COleDateTime::operator+(const COleDateTimeSpan& span) const
 {
     auto time_point = m_time_point + span.m_span;
     return COleDateTime(time_point);
 }
 
-COleDateTime COleDateTime::operator-(const COleDateTimeSpan& span)
+COleDateTime COleDateTime::operator-(const COleDateTimeSpan& span) const
 {
     auto time_point = m_time_point - span.m_span;
     return COleDateTime(time_point);
+}
+
+COleDateTime& COleDateTime::operator+=(const COleDateTimeSpan& span)
+{
+    m_time_point += span.m_span;
+    return *this;
+}
+
+COleDateTime& COleDateTime::operator-=(const COleDateTimeSpan& span)
+{
+    m_time_point -= span.m_span;
+    return *this;
 }
 
 COleDateTimeSpan COleDateTime::operator-(const COleDateTime& date) const
