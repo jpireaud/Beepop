@@ -73,6 +73,11 @@ void CVPCommandLineInfo::ParseParam( LPCTSTR lpszParam, BOOL bFlag, BOOL bLast )
 		{
 			m_CurFlag = FLBinaryWeatherFileFormat;
 		}
+		else if (Param == "foragedayadultbeesaging")
+		{
+			m_CurFlag = FLNone;
+			GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection.Set(true);
+		}
 		else m_CurFlag = FLInvalid;
 	}
 	else

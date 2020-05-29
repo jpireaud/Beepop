@@ -393,7 +393,7 @@ void CVarroaPopSession::UpdateResults(int DayCount, CEvent* pEvent)
 	}
 	if (m_AW)	// Adult Workers
 	{
-		m_SimResults[seriesID++][DayCount-1] = theColony.Wadl.GetQuantity();
+		m_SimResults[seriesID++][DayCount-1] = theColony.Wadl().GetQuantity();
 		if (m_FirstResultEntry) m_SimLabels.AddTail("Adult Workers");
 	}
 	if (m_CS)	// Colony Size
@@ -720,7 +720,7 @@ void CVarroaPopSession::Simulate()
 			"Initial   ", // "Initial or Date"
 			theColony.GetColonySize(), // Colony size
 			theColony.Dadl.GetQuantity(), // Adult Drones
-			theColony.Wadl.GetQuantity(), // Adult Workers
+			theColony.Wadl().GetQuantity(), // Adult Workers
 			theColony.foragers.GetQuantity(), // Forgers
 			theColony.foragers.GetActiveQuantity(), // Active Forgers
 			theColony.CapDrn.GetQuantity(), // Drones Brood
@@ -830,7 +830,7 @@ void CVarroaPopSession::Simulate()
 					pEvent->GetDateStg("%m/%d/%Y"),
 					theColony.GetColonySize(),
 					theColony.Dadl.GetQuantity(),
-					theColony.Wadl.GetQuantity(),
+					theColony.Wadl().GetQuantity(),
 					theColony.foragers.GetQuantity(),
 					theColony.foragers.GetActiveQuantity(),
 					theColony.CapDrn.GetQuantity(),

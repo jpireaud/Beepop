@@ -28,6 +28,7 @@ int main(int argc, char** argv)
 	("forageDayNoTemp", "A forage day is computed only using wind and rain for a given day", cxxopts::value<bool>()->default_value("false"))
 	("hourlyTemperaturesEstimation", "Compute hourly temperatures estimation", cxxopts::value<bool>()->default_value("false"))
 	("pendingForagerFirst", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
+	("forageDayAdultBeesAging", "Aging process of the Adults is the same as foragers, where an aging day is dependant on forage increment", cxxopts::value<bool>()->default_value("false"))
 	("binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85)", cxxopts::value<std::string>())
 	("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 	("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
@@ -192,6 +193,10 @@ int main(int argc, char** argv)
 			{
 				GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set(arguments["binaryWeatherFileFormat"].as<std::string>());
 			}
+			if (arguments.count("forageDayAdultBeesAging") == 1)
+			{
+            	GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection.Set(arguments["forageDayAdultBeesAging"].as<bool>());
+			}
 			if (arguments.count("windspeed") == 1)
 			{
 				GlobalOptions::Get().WindspeedThreshold.Set(arguments["windspeed"].as<double>());
@@ -238,7 +243,7 @@ int main(int argc, char** argv)
 	// Run simulation
 	session.Simulate();
 
-    return 0;
+	return 0;
 }
 
 void LoadVRPFile(CVarroaPopSession& session, const CString& filename)

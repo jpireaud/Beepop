@@ -89,8 +89,9 @@ CompareMatcher<Container, C> Compare(const Container& comparator, const C& compa
     return CompareMatcher<Container, C>(comparator, compare);
 }
 
-auto EqualsApprox(const std::array<std::float_t, 24>& comparator) {
-    return Compare(comparator, [=](std::float_t actual, std::float_t expected) {
+template<typename Type>
+auto EqualsApprox(const std::array<Type, 24>& comparator) {
+    return Compare(comparator, [=](Type actual, Type expected) {
         return actual == Approx(expected);
     });
 }
@@ -264,41 +265,41 @@ TEST_CASE("Temperature Data", "[input]") {
             int Year;
             int Month;
             int Day;
-            double Tmax;
-            double Tmin;
-            double SPH;
-            double SRAD;
-            double Rmax;
-            double Rmin;
-            double latitude;
-            double longitude;
-            double sunrise;
-            double sunset;
-            double daylength;
-            double hour_0;
-            double hour_1;
-            double hour_2;
-            double hour_3;
-            double hour_4;
-            double hour_5;
-            double hour_6;
-            double hour_7;
-            double hour_8;
-            double hour_9;
-            double hour_10;
-            double hour_11;
-            double hour_12;
-            double hour_13;
-            double hour_14;
-            double hour_15;
-            double hour_16;
-            double hour_17;
-            double hour_18;
-            double hour_19;
-            double hour_20;
-            double hour_21;
-            double hour_22;
-            double hour_23;
+            float Tmax;
+            float Tmin;
+            float SPH;
+            float SRAD;
+            float Rmax;
+            float Rmin;
+            float latitude;
+            float longitude;
+            float sunrise;
+            float sunset;
+            float daylength;
+            float hour_0;
+            float hour_1;
+            float hour_2;
+            float hour_3;
+            float hour_4;
+            float hour_5;
+            float hour_6;
+            float hour_7;
+            float hour_8;
+            float hour_9;
+            float hour_10;
+            float hour_11;
+            float hour_12;
+            float hour_13;
+            float hour_14;
+            float hour_15;
+            float hour_16;
+            float hour_17;
+            float hour_18;
+            float hour_19;
+            float hour_20;
+            float hour_21;
+            float hour_22;
+            float hour_23;
 
             void parse(const std::string& line)
             {
@@ -470,7 +471,7 @@ TEST_CASE("Temperature Data", "[input]") {
             }
             estimator.compute();
 
-            std::array<std::float_t, 24> expectedResult = {expectedItem.hour_0,expectedItem.hour_1,expectedItem.hour_2,expectedItem.hour_3,expectedItem.hour_4,expectedItem.hour_5,expectedItem.hour_6,expectedItem.hour_7,expectedItem.hour_8,expectedItem.hour_9,expectedItem.hour_10,expectedItem.hour_11,expectedItem.hour_12,expectedItem.hour_13,expectedItem.hour_14,expectedItem.hour_15,expectedItem.hour_16,expectedItem.hour_17,expectedItem.hour_18,expectedItem.hour_19,expectedItem.hour_20,expectedItem.hour_21,expectedItem.hour_22,expectedItem.hour_23 };            
+            std::array<float, 24> expectedResult = {expectedItem.hour_0,expectedItem.hour_1,expectedItem.hour_2,expectedItem.hour_3,expectedItem.hour_4,expectedItem.hour_5,expectedItem.hour_6,expectedItem.hour_7,expectedItem.hour_8,expectedItem.hour_9,expectedItem.hour_10,expectedItem.hour_11,expectedItem.hour_12,expectedItem.hour_13,expectedItem.hour_14,expectedItem.hour_15,expectedItem.hour_16,expectedItem.hour_17,expectedItem.hour_18,expectedItem.hour_19,expectedItem.hour_20,expectedItem.hour_21,expectedItem.hour_22,expectedItem.hour_23 };            
             CHECK_THAT(estimator.hourly_temperatures, EqualsApprox(expectedResult));
 
             for (size_t hourIndex = 0; hourIndex < 24; hourIndex++)

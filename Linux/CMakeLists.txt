@@ -51,6 +51,7 @@ find_package(cxxopts CONFIG REQUIRED)
 
 set (SOURCES main.cpp varroapopcmdbridge.cpp)
 
+# add_executable(VarroaPop WIN32 ${SOURCES})
 add_executable(VarroaPop ${SOURCES})
 
 target_link_libraries(VarroaPop PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
