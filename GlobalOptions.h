@@ -64,6 +64,10 @@ public:
 	// This option changes the way adult are aged. Basically, their aging will be the same as the Foragers.
 	// Adults will new be added to the PendingAdults list first so they'll age regarding the Forager increment.
 	Option<bool> ShouldAdultsAgeBasedOnForageDayElection = false;
+
+	// This option changes the way adult are aged. Adults will be aging only during the time frame where the
+	// Queen is laying eggs.
+	Option<bool> ShouldAdultsAgeBasedLaidEggs = false;
 	
 	// Weather file options
 

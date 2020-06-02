@@ -77,10 +77,12 @@ if __name__ == '__main__':
 
     # let's simulate for the different options we have
     configurations = [{'Name': 'Current', 'Options': []},
-                      #['hourlyTemperaturesEstimation'],
-                      #['forageDayNoTemp', 'hourlyTemperaturesEstimation'],
-                      {'Name': 'Foragers_Aging', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst']},
-                      #['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']
+                      {'Name': 'AdultAgingWhenEggLaidOnly', 'Options': ['adultAgingBasedOnLaidEggs']},
+                      {'Name': 'HourlyTemp', 'Options': ['hourlyTemperaturesEstimation']},
+                      {'Name': 'HourlyTempForageDayWindAndRain', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation']},
+                      {'Name': 'ForagersFirst', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst']},
+                      {'Name': 'AdultAgingAsForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']},
+                      {'Name': 'AdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs']}
                       ]
 
     # set prefix for output data

@@ -534,7 +534,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 			CAdult* pendingAdult = (CAdult*)PendingForagers.GetNext(pos);
 			if (pendingAdult->GetForageInc() == 0.0)
 			{
-				pendingAdult->SetNumber(theAdult->GetNumber() + theAdult->GetNumber());
+				pendingAdult->SetNumber(pendingAdult->GetNumber() + theAdult->GetNumber());
 				delete theAdult;
 				ForagerCount--;
 			}
@@ -879,7 +879,7 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CE
 	// may have been delete by the foragers list implementation
 	Caboose = NULL;
 
-	if (bWorkder && queen->GetWeggs()->number > 0 && theEvent->IsForageDay())
+	if (bWorkder && theEvent->IsForageDay())
 	{
 		// Here we age adults given the ForageInc of the current day
 		POSITION pos = PendingAdults.GetHeadPosition();
@@ -887,7 +887,7 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CE
 		while (pos != NULL) // Increment the forageIncrement for Pending List
 		{
 			pendingAdult = (CAdult*)PendingAdults.GetNext(pos);
-			pendingAdult->SetForageInc(theAdult->GetForageInc() + theEvent->GetForageInc());
+			pendingAdult->SetForageInc(pendingAdult->GetForageInc() + theEvent->GetForageInc());
 		}
 
 		// All adults with a ForageInc >= 1.0 will enter the Adult boxcar in a new Brood
@@ -925,6 +925,10 @@ void CAdultlistA::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CE
 			// Add adults (brood) appropriately aged using ForageInc to the Adultlist.
 			CAdultlist::Update(brood, theColony, queen, theEvent, bWorkder);
 		}
+	}
+	else // if current bees are not workers let's just process them as usual
+	{
+		CAdultlist::Update(theBrood, theColony, queen, theEvent, bWorkder);
 	}
 }
 
@@ -2185,8 +2189,13 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	Wlarv.Update((CEgg*)Weggs.GetCaboose());
 	CapDrn.Update((CLarva*)Dlarv.GetCaboose());
 	CapWkr.Update((CLarva*)Wlarv.GetCaboose());
+
+	// When the ForageInc is based on temperatures we don't have the aging stoped for Adults as we have during winter 
+	// with the default ForageDay election implementation.
+	// To correct that, we are saying that a forage day is valid if we have favorable flight hours during that day
 	int NumberOfNonAdults = Wlarv.GetQuantity() +  Dlarv.GetQuantity() + CapDrn.GetQuantity() + CapWkr.GetQuantity();
 	const bool ForageIncIsValid = GlobalOptions::Get().ForageDayElectionBasedOnTemperatures() || pEvent->GetForageInc() > 0.0;
+
 	if ((NumberOfNonAdults > 0) || (pEvent->IsForageDay() && ForageIncIsValid))
 	{
 		// Foragers killed due to pesticide.  Recruit precocious Adult Workers to be foragers - Add them to the last Adult Boxcar
@@ -2205,13 +2214,23 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		}
 		// End Forgers killed due to pesticide
 
-		//TRACE("Date: %s\n",pEvent->GetDateStg());
-		Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, &queen, pEvent, false);
-		//TRACE("HB Before Update:%s\n",Wadl().Status());
-		Wadl().Update((CBrood*)CapWkr.GetCaboose(), this, &queen, pEvent, true);
-		//TRACE(" HB After Update:%s\n",Wadl().Status());
-		//TRACE("    Worker Caboose Quan: %d\n", Wadl().GetCaboose()->number);
-		foragers.Update((CAdult*)Wadl().GetCaboose(), pEvent);
+		// Options of aging Adults based on Eggs Laid
+		const bool agingAdults = !GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.GetTeggs() > 0;
+		if (agingAdults)
+		{
+			//TRACE("Date: %s\n",pEvent->GetDateStg());
+			Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, &queen, pEvent, false);
+			//TRACE("HB Before Update:%s\n",Wadl().Status());
+			Wadl().Update((CBrood*)CapWkr.GetCaboose(), this, &queen, pEvent, true);
+			//TRACE(" HB After Update:%s\n",Wadl().Status());
+			//TRACE("    Worker Caboose Quan: %d\n", Wadl().GetCaboose()->number);
+			foragers.Update((CAdult*)Wadl().GetCaboose(), pEvent);
+		}
+		else
+		{
+			foragers.Update(nullptr, pEvent);
+		}
+		
 		//TRACE("Updated Foragers:%s\n",foragers.Status());
 	}
 

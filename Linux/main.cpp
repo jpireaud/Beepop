@@ -19,20 +19,21 @@ int main(int argc, char** argv)
 	// Here we omit the log file since it is not used in the VarroaPop app
 
 	options.add_options("usage")
-	("i,input_file", "Input File: Contains initialization data for simulation values", cxxopts::value<std::string>())
-	("o,output_file", "Output File: Simulation results will be saved at this location", cxxopts::value<std::string>())
-	("v,vrp_file", "[optional] VRP File: If specified the VRP file will be parsed to initialize default simulation values", cxxopts::value<std::string>())
-	("w,weather_file", "[optional] Weather File: Simulation will use this weather file instead of the one in the input file", cxxopts::value<std::string>())
-	("d,working_directory", "[optional] Working Directory: If specified all path provided are relative this path", cxxopts::value<std::string>())
-	("f,force", "Force overwrite of output file if it exists", cxxopts::value<bool>()->default_value("false"))
-	("forageDayNoTemp", "A forage day is computed only using wind and rain for a given day", cxxopts::value<bool>()->default_value("false"))
-	("hourlyTemperaturesEstimation", "Compute hourly temperatures estimation", cxxopts::value<bool>()->default_value("false"))
-	("pendingForagerFirst", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
-	("forageDayAdultBeesAging", "Aging process of the Adults is the same as foragers, where an aging day is dependant on forage increment", cxxopts::value<bool>()->default_value("false"))
-	("binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85)", cxxopts::value<std::string>())
-	("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
-	("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
-	;
+		("i,input_file", "Input File: Contains initialization data for simulation values", cxxopts::value<std::string>())
+		("o,output_file", "Output File: Simulation results will be saved at this location", cxxopts::value<std::string>())
+		("v,vrp_file", "[optional] VRP File: If specified the VRP file will be parsed to initialize default simulation values", cxxopts::value<std::string>())
+		("w,weather_file", "[optional] Weather File: Simulation will use this weather file instead of the one in the input file", cxxopts::value<std::string>())
+		("d,working_directory", "[optional] Working Directory: If specified all path provided are relative this path", cxxopts::value<std::string>())
+		("f,force", "Force overwrite of output file if it exists", cxxopts::value<bool>()->default_value("false"))
+		("forageDayNoTemp", "A forage day is computed only using wind and rain for a given day", cxxopts::value<bool>()->default_value("false"))
+		("hourlyTemperaturesEstimation", "Compute hourly temperatures estimation", cxxopts::value<bool>()->default_value("false"))
+		("pendingForagerFirst", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
+		("forageDayAdultBeesAging", "Aging process of the Adults is the same as foragers, where an aging day is dependant on forage increment", cxxopts::value<bool>()->default_value("false"))
+		("adultAgingBasedOnLaidEggs", "Adults age only if the Queen is laying eggs", cxxopts::value<bool>()->default_value("false"))
+		("binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85)", cxxopts::value<std::string>())
+		("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
+		("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
+		;
 
 	options.add_options("help")
 	("h,help", "Displays help message")
@@ -195,7 +196,11 @@ int main(int argc, char** argv)
 			}
 			if (arguments.count("forageDayAdultBeesAging") == 1)
 			{
-            	GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection.Set(arguments["forageDayAdultBeesAging"].as<bool>());
+				GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection.Set(arguments["forageDayAdultBeesAging"].as<bool>());
+			}
+			if (arguments.count("adultAgingBasedOnLaidEggs") == 1)
+			{
+				GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs.Set(arguments["adultAgingBasedOnLaidEggs"].as<bool>());
 			}
 			if (arguments.count("windspeed") == 1)
 			{
