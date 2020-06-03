@@ -82,7 +82,8 @@ if __name__ == '__main__':
                       {'Name': 'HourlyTempForageDayWindAndRain', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation']},
                       {'Name': 'ForagersFirst', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst']},
                       {'Name': 'AdultAgingAsForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']},
-                      {'Name': 'AdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs']}
+                      {'Name': 'AdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs']},
+                      {'Name': 'AdultAgingWhenEggLaidLarvaeAndBroodBecomeAdults', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']}
                       ]
 
     # set prefix for output data

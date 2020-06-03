@@ -68,6 +68,10 @@ public:
 	// This option changes the way adult are aged. Adults will be aging only during the time frame where the
 	// Queen is laying eggs.
 	Option<bool> ShouldAdultsAgeBasedLaidEggs = false;
+
+	// This option changes the way eggs and brood are aged. They will be aging only during the time frame where the
+	// Queen is laying eggs. This options is activated only if ShouldAdultsAgeBasedLaidEggs is true.
+	Option<bool> ShouldLarvaeAndBroodBecomeBeesAfterAdultsStopedAging = false;
 	
 	// Weather file options
 

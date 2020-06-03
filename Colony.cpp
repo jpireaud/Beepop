@@ -669,6 +669,32 @@ void CForagerlistA::SetLength(int len)
 //
 // CAdultlist - Drones and Workers
 //
+void CAdultlist::Add(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorker)
+{
+	ASSERT(theBrood);
+	{
+		CAdult* theAdult = new CAdult(theBrood->GetNumber());
+		if (bWorker) WorkerCount++;
+		else DroneCount++;
+		theAdult->SetMites(theBrood->m_Mites);
+		theAdult->SetPropVirgins(theBrood->m_PropVirgins);
+		theAdult->SetLifespan(WADLLIFE);
+		delete theBrood;  // These brood are now  gone
+
+		POSITION pos = GetHeadPosition();
+		CAdult* adult = (CAdult*)GetNext(pos);
+		if (adult != NULL)
+		{
+			adult->SetNumber(adult->GetNumber() + theAdult->GetNumber());
+			adult->SetMites(adult->GetMites() + theAdult->GetMites());
+			adult->SetPropVirgins(adult->GetPropVirgins() * theAdult->GetPropVirgins());
+		}
+		else
+		{
+			AddHead(theAdult);
+		}
+	}
+}
 void CAdultlist::Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorker)
 // The Capped Brood coming in are converted to Adults and pushed onto the list.
 // If the list is now greater than the specified number of days, the
@@ -2214,7 +2240,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		}
 		// End Forgers killed due to pesticide
 
-		// Options of aging Adults based on Eggs Laid
+		// Options of aging Adults based on Laid Eggs
 		const bool agingAdults = !GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.GetTeggs() > 0;
 		if (agingAdults)
 		{
@@ -2228,6 +2254,13 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		}
 		else
 		{
+			if (GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() && GlobalOptions::Get().ShouldLarvaeAndBroodBecomeBeesAfterAdultsStopedAging() && NumberOfNonAdults > 0)
+			{
+				// Let's make sure brood are becoming adults
+				Dadl.Add((CBrood*)CapDrn.GetCaboose(), this, &queen, pEvent, false);
+				Wadl().Add((CBrood*)CapWkr.GetCaboose(), this, &queen, pEvent, true);
+			}
+
 			foragers.Update(nullptr, pEvent);
 		}
 		

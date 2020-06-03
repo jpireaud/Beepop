@@ -89,6 +89,8 @@ public:
 	virtual ~CAdultlist() {}
 	CAdult* GetCaboose() { return Caboose; }
 	void ClearCaboose() { Caboose = NULL; }
+	//! Add method simply add theBrood to the Adults without making the adults age
+	virtual void Add(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorkder = true);
 	virtual void Update(CBrood* theBrood, CColony* theColony, CQueen* queen, CEvent* theEvent, bool bWorkder = true);
 	virtual void Serialize(CArchive& ar);
 	virtual void KillAll();

@@ -30,6 +30,7 @@ int main(int argc, char** argv)
 		("pendingForagerFirst", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
 		("forageDayAdultBeesAging", "Aging process of the Adults is the same as foragers, where an aging day is dependant on forage increment", cxxopts::value<bool>()->default_value("false"))
 		("adultAgingBasedOnLaidEggs", "Adults age only if the Queen is laying eggs", cxxopts::value<bool>()->default_value("false"))
+		("larvaeAndBroodBecomeBeesAfterAdultsStopedAging", "If adultAgingBasedOnLaidEggs is activated, larvae and brood will still be added to first Adults box card", cxxopts::value<bool>()->default_value("false"))
 		("binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85)", cxxopts::value<std::string>())
 		("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 		("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
@@ -201,6 +202,10 @@ int main(int argc, char** argv)
 			if (arguments.count("adultAgingBasedOnLaidEggs") == 1)
 			{
 				GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs.Set(arguments["adultAgingBasedOnLaidEggs"].as<bool>());
+			}
+			if (arguments.count("larvaeAndBroodBecomeBeesAfterAdultsStopedAging") == 1)
+			{
+				GlobalOptions::Get().ShouldLarvaeAndBroodBecomeBeesAfterAdultsStopedAging.Set(arguments["larvaeAndBroodBecomeBeesAfterAdultsStopedAging"].as<bool>());
 			}
 			if (arguments.count("windspeed") == 1)
 			{
