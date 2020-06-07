@@ -1,6 +1,6 @@
-#include "VarroaPop.h"
+#include "varroapop.h"
 
-bool gl_RunGUI;
+bool gl_RunGUI = false;
 
 int MyMessageBox( LPCTSTR lpszText, UINT nType, UINT nIDHelp )
 {

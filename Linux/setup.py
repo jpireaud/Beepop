@@ -9,6 +9,10 @@ def get_data_model_root():
     return os.path.abspath(os.path.join(get_linux_root(), "datamodel"))
 
 
+def get_port_code_root():
+    return os.path.abspath(os.path.join(get_linux_root(), "portcode"))
+
+
 def get_project_root():
     return os.path.abspath(os.path.join(get_linux_root(), ".."))
 
@@ -86,6 +90,14 @@ def get_data_model_files():
         "WeatherGridData.cpp"
     ]
 
+def get_port_code_headers():
+    headers = []
+    dir_it = os.scandir(get_port_code_root()) 
+    for dir_item in dir_it:
+        if dir_item.is_file and dir_item.name.endswith('.h'):
+            headers.append(dir_item.name)
+    return headers
+
 
 def fix_include_directives(source, target):
     with open(source, 'r') as code_file:
@@ -94,8 +106,9 @@ def fix_include_directives(source, target):
     set_file_as_writable(target)
     if len(result):
         with open(target, 'w') as code_file:
+            port_code_headers = get_port_code_headers()
             for include in result:
-                if any(file.lower() == include.lower() for file in get_data_model_files()):
+                if any(file.lower() == include.lower() for file in get_data_model_files()) or any(file == include.lower() for file in port_code_headers):
                     code_file_content = code_file_content.replace(include, include.lower())
             code_file.write(code_file_content)
     else:
