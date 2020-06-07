@@ -2241,7 +2241,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		// End Forgers killed due to pesticide
 
 		// Options of aging Adults based on Laid Eggs
-		const bool agingAdults = !GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.GetTeggs() > 0;
+		const bool agingAdults = !GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.GetTeggs() > 0 || pEvent->GetForageInc() > GlobalOptions::Get().ForageIncImpactAdultAgingWhenNoEggs();
 		if (agingAdults)
 		{
 			//TRACE("Date: %s\n",pEvent->GetDateStg());

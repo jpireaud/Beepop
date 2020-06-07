@@ -69,6 +69,10 @@ public:
 	// Queen is laying eggs.
 	Option<bool> ShouldAdultsAgeBasedLaidEggs = false;
 
+	// When ShouldAdultsAgeBasedLaidEggs is activated, this option affect the threashold for which even if no eggs are laid, the forage inc 
+	// indicates that foragers are going out and adults should be age. 1.0 deactivate the option since forage inc is [0.0, 1.0]
+	Option<double> ForageIncImpactAdultAgingWhenNoEggs = 1.0;
+
 	// This option changes the way eggs and brood are aged. They will be aging only during the time frame where the
 	// Queen is laying eggs. This options is activated only if ShouldAdultsAgeBasedLaidEggs is true.
 	Option<bool> ShouldLarvaeAndBroodBecomeBeesAfterAdultsStopedAging = false;

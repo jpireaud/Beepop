@@ -76,15 +76,19 @@ if __name__ == '__main__':
         command += ' -w ' + arguments.weather_file
 
     # let's simulate for the different options we have
-    configurations = [{'Name': 'Current', 'Options': []},
-                      {'Name': 'AdultAgingWhenEggLaidOnly', 'Options': ['adultAgingBasedOnLaidEggs']},
-                      {'Name': 'HourlyTemp', 'Options': ['hourlyTemperaturesEstimation']},
-                      {'Name': 'HourlyTempForageDayWindAndRain', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation']},
-                      {'Name': 'ForagersFirst', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst']},
-                      {'Name': 'AdultAgingAsForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']},
-                      {'Name': 'AdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs']},
-                      {'Name': 'AdultAgingWhenEggLaidLarvaeAndBroodBecomeAdults', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']}
-                      ]
+    configurations = [
+        {'Name': 'Current', 'Options': []},
+        {'Name': 'AdultAgingWhenEggLaid', 'Options': ['adultAgingBasedOnLaidEggs']},
+        {'Name': 'AdultAgingWhenEggLaidFixedLarvaeAndBrood', 'Options': ['adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']},
+        {'Name': 'AdultAgingWhenEggLaidFixedLarvaeAndBroodFixedAdults', 'Options': ['adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'forageIncThresholdForAdultsAgingWhenLaidEggs 0.5']},
+        {'Name': 'HourlyTemp', 'Options': ['hourlyTemperaturesEstimation']},
+        {'Name': 'HourlyTempForageDayWindAndRain', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation']},
+        {'Name': 'ForagersFirst', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst']},
+        {'Name': 'AdultAgingAsForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaidFixedLarvaeAndBrood', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaidFixedLarvaeAndBroodFixedAdults', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'forageIncThresholdForAdultsAgingWhenLaidEggs 0.5']}
+    ]
 
     # set prefix for output data
     prefix = os.path.splitext(os.path.basename(arguments.input_file))[0]
