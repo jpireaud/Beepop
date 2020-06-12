@@ -104,10 +104,18 @@ void CQueen::Serialize(CArchive& ar)
 	CBee::Serialize(ar);
 }
 
-
-
-
-
+double CQueen::ComputeL(const double& DaylightHours) const 
+{
+	double L = 0.0;
+	if (DaylightHours > 9.5)
+	{
+		L = log10((DaylightHours + 0.3) * 0.1) * 7.889;
+//		L = -5.15 + 0.809*DaylightHours - (0.0262*DaylightHours*DaylightHours);
+	}
+	if (L < 0) L = 0;
+	if (L > 1.0) L = 1.0;
+	return L;
+}
 
 void CQueen::LayEggs(int LayDays, double DegreeDays, double DaylightHours, int NumForagers, 
 					 double LarvPerBee)
@@ -161,14 +169,7 @@ void CQueen::LayEggs(int LayDays, double DegreeDays, double DaylightHours, int N
 		if (DD > 1) DD = 1;
 		if (DegreeDays == 0) DD = 0;
 
-		if (DaylightHours <= 9.5) L = 0;
-		else
-		{
-			L = log10((DaylightHours+0.3)*0.1)*7.889;
-//			L = -5.15 + 0.809*DaylightHours - (0.0262*DaylightHours*DaylightHours);
-		}
-		if (L < 0) L = 0;
-		if (L > 1.0) L = 1.0;
+		L = ComputeL(DaylightHours);
 
 		N = (log10((NumForagers*0.001)+1))*0.672;
 		if (N<0) N = 0;

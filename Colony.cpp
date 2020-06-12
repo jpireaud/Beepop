@@ -2241,7 +2241,8 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		// End Forgers killed due to pesticide
 
 		// Options of aging Adults based on Laid Eggs
-		const bool agingAdults = !GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.GetTeggs() > 0 || pEvent->GetForageInc() > GlobalOptions::Get().ForageIncImpactAdultAgingWhenNoEggs();
+		// Aging of adults is actually function of DaylightHours 
+		const bool agingAdults = !GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.ComputeL(pEvent->GetDaylightHours()) > 0;
 		if (agingAdults)
 		{
 			//TRACE("Date: %s\n",pEvent->GetDateStg());

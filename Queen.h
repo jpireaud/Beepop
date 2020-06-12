@@ -29,7 +29,6 @@ class CQueen : public CBee  {
 	int m_Vars[5][2];  // Declares the array of MaxEggs and InitialSperm based on 1..5 queen strengths
 
 
-
   public:
 	double GetPropDroneEggs();
 	CQueen();
@@ -62,6 +61,9 @@ class CQueen : public CBee  {
 
 	CQueen& operator=(const CQueen& theQueen);
 
+	// Return the value of L which is the DaylightHours based component
+	// to the computation of laid eggs.
+	double ComputeL(const double& DaylightHours) const;
 };
 
 #endif // !defined(AFX_QUEEN_H__8C6C41B8_7899_11D2_8D9A_0020AF233A70__INCLUDED_)
