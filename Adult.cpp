@@ -18,17 +18,21 @@ static char THIS_FILE[]=__FILE__;
 
 CAdult::CAdult()
 {
-	m_CurrentAge = 0;
+	m_Lifespan = 0.0;
+	m_CurrentAge = 0.0;
 	m_Mites = 0;
-	m_ForageInc = 0;
+	m_Virgins = 0.0;
+	m_ForageInc = 0.0;
 	number = 0;
 }
 
 CAdult::CAdult(int theNumber)
 {
-	m_CurrentAge = 0;
+	m_Lifespan = 0.0;
+	m_CurrentAge = 0.0;
 	m_Mites = 0;
-	m_ForageInc = 0;
+	m_Virgins = 0.0;
+	m_ForageInc = 0.0;
 	number = theNumber;
 }
 

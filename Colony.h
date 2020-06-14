@@ -119,6 +119,20 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// CAdultlistB - This implementation changes the aging process to age bees hives using exclusively 
+// Forage Inc.
+//
+class CAdultlistB : public CAdultlist
+{
+public:
+
+	CAdultlistB() {}
+	~CAdultlistB() { KillAll(); }
+	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+};
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // CForagerlist - this is a type of CAdultList implementing Forager behaviors
 //
 class CForagerlist : public CAdultlist

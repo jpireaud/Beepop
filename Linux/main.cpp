@@ -35,6 +35,7 @@ int main(int argc, char** argv)
 		("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 		("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 		("forageIncThresholdForAdultsAgingWhenLaidEggs", "Specifies the forage inc threshold after even if eggs are not laid adults will still be aged when adultAgingBasedOnLaidEggs option is selected", cxxopts::value<double>())
+		("progressiveAging", "Adults and/or Foragers age using Forage Inc using a dynamic list, we age every box card of the list and remove the box cards where GetCurrent() > GetLifespan()", cxxopts::value<bool>()->default_value("false"))
 		;
 
 	options.add_options("help")
@@ -219,6 +220,10 @@ int main(int argc, char** argv)
 			if (arguments.count("forageIncThresholdForAdultsAgingWhenLaidEggs") == 1)
 			{
 				GlobalOptions::Get().ForageIncImpactAdultAgingWhenNoEggs.Set(arguments["forageIncThresholdForAdultsAgingWhenLaidEggs"].as<double>());
+			}
+			if (arguments.count("progressiveAging") == 1)
+			{
+				GlobalOptions::Get().ShouldUseProgressiveAging.Set(arguments["progressiveAging"].as<bool>());
 			}
 		}
 		else

@@ -15,7 +15,7 @@
 class CAdult : public CBee  {
   private:
 	float m_Lifespan;
-	int m_CurrentAge;
+	float m_CurrentAge;
 	CMite m_Mites;
 	double m_Virgins;
 	double m_ForageInc;
@@ -25,11 +25,11 @@ class CAdult : public CBee  {
 	CAdult(int Num);
 	CAdult(CAdult* oldAdult);
 	void SetLifespan(int span) {m_Lifespan = (float)span;}
-	void SetCurrentAge(int age) {m_CurrentAge = age;}
+	void SetCurrentAge(float age) {m_CurrentAge = age;}
 	void SetPropVirgins(double prop) {m_Virgins = prop;}
 	double GetPropVirgins() {return m_Virgins;}
-	void IncrementAge() {m_CurrentAge++;}
-	int GetCurrentAge() {return m_CurrentAge;}
+	void IncrementAge(float increment) {m_CurrentAge += increment;}
+	float GetCurrentAge() {return m_CurrentAge;}
 	int GetLifespan() {return int(m_Lifespan);}
 	void SetForageInc( double Inc ) {m_ForageInc = Inc;}
 	double GetForageInc() {return m_ForageInc;}

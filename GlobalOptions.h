@@ -52,6 +52,9 @@ public:
 	// This option changes the way forager are processed on non foraging days.
 	// Foragers will always be added to the PendingForagers list first so they'll age regarding the Forager increment.
 	Option<bool> ShouldAddForagersToPendingForagersFirst = false;
+	// Foragers age using Forage Inc using a dynamic list, we age every box card of the list and remove the box
+	// cards where GetCurrent() > GetLifespan()
+	Option<bool> ShouldUseProgressiveAging = false;
 
 	// This option affect the Windspeed threshold to determinate if the current day can be a Forage Day
 	Option<double> WindspeedThreshold = 8.94;
