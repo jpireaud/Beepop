@@ -27,15 +27,12 @@ int main(int argc, char** argv)
 		("f,force", "Force overwrite of output file if it exists", cxxopts::value<bool>()->default_value("false"))
 		("forageDayNoTemp", "A forage day is computed only using wind and rain for a given day", cxxopts::value<bool>()->default_value("false"))
 		("hourlyTemperaturesEstimation", "Compute hourly temperatures estimation", cxxopts::value<bool>()->default_value("false"))
-		("pendingForagerFirst", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
-		("forageDayAdultBeesAging", "Aging process of the Adults is the same as foragers, where an aging day is dependant on forage increment", cxxopts::value<bool>()->default_value("false"))
+		("foragersAlwaysAgeBasedOnForageInc", "All new foragers go first in the pending foragers list to improve aging process", cxxopts::value<bool>()->default_value("false"))
 		("adultAgingBasedOnLaidEggs", "Adults age only if the Queen is laying eggs", cxxopts::value<bool>()->default_value("false"))
-		("larvaeAndBroodBecomeBeesAfterAdultsStopedAging", "If adultAgingBasedOnLaidEggs is activated, larvae and brood will still be added to first Adults box card", cxxopts::value<bool>()->default_value("false"))
 		("binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85)", cxxopts::value<std::string>())
 		("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 		("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
-		("forageIncThresholdForAdultsAgingWhenLaidEggs", "Specifies the forage inc threshold after even if eggs are not laid adults will still be aged when adultAgingBasedOnLaidEggs option is selected", cxxopts::value<double>())
-		("progressiveAging", "Adults and/or Foragers age using Forage Inc using a dynamic list, we age every box card of the list and remove the box cards where GetCurrent() > GetLifespan()", cxxopts::value<bool>()->default_value("false"))
+		("daylighthours", "Specifies the DaylightHours threshold after which the Queen stop laying eggs, default is 9.5", cxxopts::value<double>())
 		;
 
 	options.add_options("help")
@@ -183,31 +180,23 @@ int main(int argc, char** argv)
 			}
 			if (arguments.count("forageDayNoTemp") == 1)
 			{
-				GlobalOptions::Get().ForageDayElectionBasedOnTemperatures.Set(!arguments["forageDayNoTemp"].as<bool>());
+				GlobalOptions::Get().ShouldForageDayElectionBasedOnTemperatures.Set(!arguments["forageDayNoTemp"].as<bool>());
 			}
 			if (arguments.count("hourlyTemperaturesEstimation") == 1)
 			{
 				GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation.Set(arguments["hourlyTemperaturesEstimation"].as<bool>());
 			}
-			if (arguments.count("pendingForagerFirst") == 1)
+			if (arguments.count("foragersAlwaysAgeBasedOnForageInc") == 1)
 			{
-				GlobalOptions::Get().ShouldAddForagersToPendingForagersFirst.Set(arguments["pendingForagerFirst"].as<bool>());
+				GlobalOptions::Get().ShouldForagersAlwaysAgeBasedOnForageInc.Set(arguments["foragersAlwaysAgeBasedOnForageInc"].as<bool>());
 			}
 			if (arguments.count("binaryWeatherFileFormat") == 1)
 			{
 				GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set(arguments["binaryWeatherFileFormat"].as<std::string>());
 			}
-			if (arguments.count("forageDayAdultBeesAging") == 1)
-			{
-				GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection.Set(arguments["forageDayAdultBeesAging"].as<bool>());
-			}
 			if (arguments.count("adultAgingBasedOnLaidEggs") == 1)
 			{
 				GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs.Set(arguments["adultAgingBasedOnLaidEggs"].as<bool>());
-			}
-			if (arguments.count("larvaeAndBroodBecomeBeesAfterAdultsStopedAging") == 1)
-			{
-				GlobalOptions::Get().ShouldLarvaeAndBroodBecomeBeesAfterAdultsStopedAging.Set(arguments["larvaeAndBroodBecomeBeesAfterAdultsStopedAging"].as<bool>());
 			}
 			if (arguments.count("windspeed") == 1)
 			{
@@ -217,13 +206,9 @@ int main(int argc, char** argv)
 			{
 				GlobalOptions::Get().RainfallThreshold.Set(arguments["rainfall"].as<double>());
 			}
-			if (arguments.count("forageIncThresholdForAdultsAgingWhenLaidEggs") == 1)
+			if (arguments.count("daylighthours") == 1)
 			{
-				GlobalOptions::Get().ForageIncImpactAdultAgingWhenNoEggs.Set(arguments["forageIncThresholdForAdultsAgingWhenLaidEggs"].as<double>());
-			}
-			if (arguments.count("progressiveAging") == 1)
-			{
-				GlobalOptions::Get().ShouldUseProgressiveAging.Set(arguments["progressiveAging"].as<bool>());
+				GlobalOptions::Get().DaylightHoursThreshold.Set(arguments["daylighthours"].as<double>());
 			}
 		}
 		else

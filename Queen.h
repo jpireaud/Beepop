@@ -29,6 +29,7 @@ class CQueen : public CBee  {
 	int m_Vars[5][2];  // Declares the array of MaxEggs and InitialSperm based on 1..5 queen strengths
 
 
+
   public:
 	double GetPropDroneEggs();
 	CQueen();

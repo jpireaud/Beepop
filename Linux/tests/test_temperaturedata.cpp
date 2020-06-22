@@ -143,6 +143,12 @@ TEST_CASE("Temperature Data", "[input]") {
         CHECK(ComputeJDay(COleDateTime(2020, 12, 31, 0, 0, 0)) == 366);
     }
 
+    SECTION("GetLatitudeFromFileName"){
+
+        INFO("Add test cases");
+        CHECK(false);
+    }
+
     SECTION("daylength") {
 
         DayLengthResult northPole1 = { -99.0f, -99.0f, 0.0f };

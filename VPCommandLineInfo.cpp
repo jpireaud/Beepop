@@ -6,8 +6,6 @@
 #include "varroapop.h"
 #include "VPCommandLineInfo.h"
 
-#include "GlobalOptions.h"
-
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -54,30 +52,6 @@ void CVPCommandLineInfo::ParseParam( LPCTSTR lpszParam, BOOL bFlag, BOOL bLast )
 			m_CurFlag = FLNone; // no parameter after /b
 			CLBackground = true;
 		}
-		else if (Param == "foragedaynotemp")
-		{
-			m_CurFlag = FLNone;
-			GlobalOptions::Get().ForageDayElectionBasedOnTemperatures.Set(false);
-		}
-		else if (Param == "hourlytempestimation")
-		{
-			m_CurFlag = FLNone;
-			GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation.Set(true);
-		}
-		else if (Param == "pendingforagersfirst")
-		{
-			m_CurFlag = FLNone;
-			GlobalOptions::Get().ShouldAddForagersToPendingForagersFirst.Set(true);
-		}
-		else if (Param == "binaryweatherfileformat")
-		{
-			m_CurFlag = FLBinaryWeatherFileFormat;
-		}
-		else if (Param == "foragedayadultbeesaging")
-		{
-			m_CurFlag = FLNone;
-			GlobalOptions::Get().ShouldAdultsAgeBasedOnForageDayElection.Set(true);
-		}
 		else m_CurFlag = FLInvalid;
 	}
 	else
@@ -106,12 +80,8 @@ void CVPCommandLineInfo::ParseParam( LPCTSTR lpszParam, BOOL bFlag, BOOL bLast )
 				break;
 			case FLBackground:
 				CLBackground = true;
-				m_CurFlag = FLNone;
 				break;
-			case FLBinaryWeatherFileFormat:
-				GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set(static_cast<const char*>(lpszParam));
 				m_CurFlag = FLNone;
-				break;
 			default:;
 
 		}

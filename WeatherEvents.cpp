@@ -34,7 +34,7 @@ int CountChars(CString instg, TCHAR testchar)
 // Compute the Forage and ForageInc attributes of a newly created event
 void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
 {
-	const bool forageDayBasedOnTemperatures = GlobalOptions::Get().ForageDayElectionBasedOnTemperatures();
+	const bool forageDayBasedOnTemperatures = GlobalOptions::Get().ShouldForageDayElectionBasedOnTemperatures();
 	if (forageDayBasedOnTemperatures)
 	{
 		//
@@ -1503,6 +1503,7 @@ bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
 		std::vector<CEvent*> events;
 		events.reserve(items.size());
 
+		// Create events using data from binary file
 		for (size_t itemIndex = 0; itemIndex < items.size(); itemIndex++)
 		{
 			auto& item = items[itemIndex];
