@@ -564,7 +564,13 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 		}
 		pos = PendingForagers.GetTailPosition();
 
-		// TODO: Here we can have several hives of Foragers that Reach 1 day of age, we should not make others age more than 2 days
+		// Here we can have several hives of Foragers that Reach 1 day of age, 
+		// we should not make others age more than 2 days
+
+		// Keep information either we should age the foragers by 1 day
+		bool addHead = false;
+		CAdult* foragersHead = new CAdult();
+
 		POSITION oldpos;
 		while (pos != NULL)
 		{
@@ -572,19 +578,32 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 			pendingAdult = (CAdult*)PendingForagers.GetPrev(pos);
 			if (pendingAdult->GetForageInc() >= 1.0)
 			{
-				pendingAdult->SetForageInc(0.0);
-				AddHead(pendingAdult);
+				// At least one hive reached 1 day
+				addHead = true;
+
+				// Update the bees count on the foragers head to be added
+				foragersHead->SetNumber(foragersHead->GetNumber() + pendingAdult->GetNumber());
+
+				// Remove and delete the current pending adult
 				PendingForagers.RemoveAt(oldpos);
-				if (GetCount() == m_ListLength + 1)
-				{
-					Caboose = (CAdult*)RemoveTail();
-					delete Caboose;
-					ForagerCount--;
-					Caboose = NULL;
-				}
-				else Caboose = NULL;
+				delete pendingAdult;
 			}
 		}
+		// In case we need to age the Foragers, let's add the new head
+		if (addHead)
+		{
+			AddHead(foragersHead);
+		}
+		else delete foragersHead;
+		// If the foragers list is full let's remove the oldest hive
+		if (GetCount() == m_ListLength + 1)
+		{
+			Caboose = (CAdult*)RemoveTail();
+			delete Caboose;
+			ForagerCount--;
+			Caboose = NULL;
+		}
+		else Caboose = NULL;
 	}
 	else if (!pendingForagersFirst)
 	{
