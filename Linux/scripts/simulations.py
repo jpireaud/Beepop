@@ -96,7 +96,8 @@ if __name__ == '__main__':
     configurations = [
         {'Name': 'Current', 'Options': []},
         {'Name': 'ForagersAging', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'foragersAlwaysAgeBasedOnForageInc']},
-        {'Name': 'ForagersAgingAdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'foragersAlwaysAgeBasedOnForageInc', 'adultAgingBasedOnLaidEggs']}
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'foragersAlwaysAgeBasedOnForageInc', 'adultAgingBasedOnLaidEggs']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaid_InOut', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'foragersAlwaysAgeBasedOnForageInc', 'adultAgingBasedOnLaidEggs', 'inOutEvents']}
     ]
 
     # set prefix for output data

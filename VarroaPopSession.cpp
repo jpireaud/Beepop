@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "GlobalOptions.h"
 #include "VarroaPop.h"
 #include "VarroaPopSession.h"
 
@@ -872,6 +873,22 @@ void CVarroaPopSession::Simulate()
 					pEvent->GetForageInc(),
 					pEvent->IsForageDay()
 				);
+				if (GlobalOptions::Get().ShouldOutputInOutCounts())
+				{
+					CurSize.Format("%s %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d"
+						, CurSize
+						, theColony.m_InOutEvent.m_NewWEggs
+						, theColony.m_InOutEvent.m_NewDEggs
+						, theColony.m_InOutEvent.m_WEggsToLarv
+						, theColony.m_InOutEvent.m_DEggsToLarv
+						, theColony.m_InOutEvent.m_WLarvToBrood
+						, theColony.m_InOutEvent.m_DLarvToBrood
+						, theColony.m_InOutEvent.m_WBroodToAdult
+						, theColony.m_InOutEvent.m_DBroodToAdult
+						, theColony.m_InOutEvent.m_WAdultToForagers
+						, theColony.m_InOutEvent.m_WinterMortalityForagersLoss
+						, theColony.m_InOutEvent.m_DeadForagers);
+				}
 				m_ResultsText.AddTail(CurSize);
 			}
 			

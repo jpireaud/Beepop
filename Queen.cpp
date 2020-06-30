@@ -6,6 +6,7 @@
 #include "VarroaPop.h"
 #include "Bee.h"
 #include "Egg.h"
+#include "GlobalOptions.h"
 #include "Queen.h"
 #include "math.h"
 
@@ -107,7 +108,7 @@ void CQueen::Serialize(CArchive& ar)
 double CQueen::ComputeL(const double& DaylightHours) const 
 {
 	double L = 0.0;
-	if (DaylightHours > 9.5)
+	if (DaylightHours > GlobalOptions::Get().DaylightHoursThreshold())
 	{
 		L = log10((DaylightHours + 0.3) * 0.1) * 7.889;
 //		L = -5.15 + 0.809*DaylightHours - (0.0262*DaylightHours*DaylightHours);

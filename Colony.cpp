@@ -486,7 +486,7 @@ void CForagerlistA::KillAll()
 	//Caboose->SetNumber(0);
 }
 
-void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
+void CForagerlistA::Update(CAdult* theAdult, CColony* theColony, CEvent* theDay)
 // The Adult Workers coming in are added to the Forager list.
 // If the day is a foraging day, the new adult is pushed onto 
 // the Pending Forager list and the list is aged one forage increment(.25, .5, .75, or 1.0)
@@ -599,9 +599,7 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 		if (GetCount() == m_ListLength + 1)
 		{
 			Caboose = (CAdult*)RemoveTail();
-			delete Caboose;
 			ForagerCount--;
-			Caboose = NULL;
 		}
 		else Caboose = NULL;
 	}
@@ -653,7 +651,12 @@ void CForagerlistA::Update(CAdult* theAdult, CEvent* theDay)
 		{
 			theForager = (CAdult*)GetNext(pos);
 			Number = theForager->GetNumber();
-			Number = int(Number*(1 - WINTER_MORTALITY_PER_DAY));
+			int NewNumber = Number * (1 - WINTER_MORTALITY_PER_DAY);
+
+			// Update stats for Foragers killed due to winter mortality
+			theColony->m_InOutEvent.m_WinterMortalityForagersLoss += Number - NewNumber;
+
+			Number = NewNumber;
 			theForager->SetNumber(Number);
 		}
 	}
@@ -2121,15 +2124,36 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
    }
 
 #endif
+
+   m_InOutEvent.Reset();
 	
 	queen.LayEggs(DayNum,pEvent->GetTemp(),pEvent->GetDaylightHours(),
 		foragers.GetQuantity(), LarvPerBee);
+
+	// Update stats for new eggs
+	m_InOutEvent.m_NewWEggs = queen.GetWeggsCount();
+	m_InOutEvent.m_NewDEggs = queen.GetDeggsCount();
+	
 	Deggs.Update(queen.GetDeggs());
 	Weggs.Update(queen.GetWeggs());
+
+	// Update stats for new larvae
+	m_InOutEvent.m_WEggsToLarv = Weggs.GetCaboose()->GetNumber();
+	m_InOutEvent.m_DEggsToLarv = Deggs.GetCaboose()->GetNumber();
+		
 	Dlarv.Update((CEgg*)Deggs.GetCaboose());
 	Wlarv.Update((CEgg*)Weggs.GetCaboose());
+	
+	// Update stats for new brood
+	m_InOutEvent.m_WLarvToBrood = Wlarv.GetCaboose()->GetNumber();
+	m_InOutEvent.m_DLarvToBrood = Dlarv.GetCaboose()->GetNumber();
+
 	CapDrn.Update((CLarva*)Dlarv.GetCaboose());
 	CapWkr.Update((CLarva*)Wlarv.GetCaboose());
+
+	// Update stats for new Adults
+	m_InOutEvent.m_WBroodToAdult = CapWkr.GetCaboose()->GetNumber();
+	m_InOutEvent.m_DBroodToAdult = CapDrn.GetCaboose()->GetNumber();
 
 	// When the ForageInc is based on temperatures we don't have the aging stoped for Adults as we have during winter 
 	// with the default ForageDay election implementation.
@@ -2166,7 +2190,11 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			Wadl.Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
 			//TRACE(" HB After Update:%s\n",Wadl.Status());
 			//TRACE("    Worker Caboose Quan: %d\n", Wadl.GetCaboose()->number);
-			foragers.Update((CAdult*)Wadl.GetCaboose(), pEvent);
+
+			// Update stats for new Foragers
+			m_InOutEvent.m_WAdultToForagers = Wadl.GetCaboose()->GetNumber();
+
+			foragers.Update((CAdult*)Wadl.GetCaboose(), this, pEvent);
 		}
 		else
 		{
@@ -2177,8 +2205,14 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 				Wadl.Add((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
 			}
 
-			foragers.Update(nullptr, pEvent);
+			// Update stats for new Foragers
+			m_InOutEvent.m_WAdultToForagers = 0;
+
+			foragers.Update(nullptr, this, pEvent);
 		}
+
+		// Update stats for dead Foragers
+		m_InOutEvent.m_DeadForagers = foragers.GetCaboose()? foragers.GetCaboose()->GetNumber() : 0;
 		
 		//TRACE("Updated Foragers:%s\n",foragers.Status());
 	}

@@ -76,4 +76,7 @@ public:
 	// - Modeled
 	// - Rcp85
 	Option<std::string> BinaryWeatherFileFormatIdentifier;
+
+	// Additional Output Data
+	Option<bool> ShouldOutputInOutCounts = false;
 };

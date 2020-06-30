@@ -33,6 +33,7 @@ int main(int argc, char** argv)
 		("windspeed", "Specifies the windspeed threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 		("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 		("daylighthours", "Specifies the DaylightHours threshold after which the Queen stop laying eggs, default is 9.5", cxxopts::value<double>())
+		("inOutEvents", "Output additional information adding the following data -- NewWEggs NewDEggs WEggsToLarv DEggsToLarv WLarvToBrood DLarvToBrood WBroodToAdult DBroodToAdult WAdultToForagers WinterMortalityForagersLoss DeadForagers", cxxopts::value<bool>()->default_value("false"))
 		;
 
 	options.add_options("help")
@@ -209,6 +210,10 @@ int main(int argc, char** argv)
 			if (arguments.count("daylighthours") == 1)
 			{
 				GlobalOptions::Get().DaylightHoursThreshold.Set(arguments["daylighthours"].as<double>());
+			}
+			if (arguments.count("inOutEvents") == 1)
+			{
+				GlobalOptions::Get().ShouldOutputInOutCounts.Set(arguments["inOutEvents"].as<bool>());
 			}
 		}
 		else

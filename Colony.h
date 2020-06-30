@@ -137,7 +137,7 @@ private:
 public:
 	CForagerlistA();
 	~CForagerlistA();
-	void Update(CAdult* theAdult, CEvent* theEvent);
+	void Update(CAdult* theAdult, CColony* theColony, CEvent* theEvent);
 	void ClearPendingForagers();
 	void KillAll();
 	int GetQuantity();  // Total Forarger Quantity including UnemployedForagers
@@ -357,6 +357,26 @@ public:
 
 	CEPAData m_EPAData;		// EPA-related data structure
 
+	// Additional statistics on Cabooose events
+	struct InOutEvent
+	{
+		void Reset() {
+			memset(this, 0, sizeof(InOutEvent));
+		}
+
+		int m_NewWEggs = -1;
+		int m_NewDEggs = -1;
+		int m_WEggsToLarv = -1;
+		int m_DEggsToLarv = -1;
+		int m_WLarvToBrood = -1;
+		int m_DLarvToBrood = -1;
+		int m_WBroodToAdult = -1;
+		int m_DBroodToAdult = -1;
+		int m_WAdultToForagers = -1; 
+		int m_WinterMortalityForagersLoss = -1;
+		int m_DeadForagers = -1;
+	};
+	InOutEvent m_InOutEvent;
 
 
 // Operations

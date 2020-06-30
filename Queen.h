@@ -39,7 +39,9 @@ class CQueen : public CBee  {
 		double LarvPerBee);
 	CEgg* GetWeggs();
 	CEgg* GetDeggs();
-	int GetTeggs() { return m_Teggs; }
+	int GetTeggs() const { return m_Teggs; }
+	int GetWeggsCount() const { return m_Weggs; }
+	int GetDeggsCount() const { return m_Deggs; }
 	double GetDD() { return m_DD; }
 	double GetL() { return m_L; }
 	double GetN() { return m_N; }
