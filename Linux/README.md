@@ -1,6 +1,8 @@
-Created by Julien Pireaud (jpireaud at gmail dot com)
+Created by Julien Pireaud 
 
 This file is to guide you through compile VarroaPop simulator on Linux / macOS
+
+## Compilation
 
 Run setup.py to prepare the Linux folder to be ready to build
 
@@ -19,8 +21,13 @@ To time an execution you can use:
 - On Linux: `time ./<build>/VarroaPop -d VarroaPop/files/ -v exe/default.vrp -o output/vp_output_linux.txt -i input/vp_linux.txt -f`
 - On Windows (PowerShell): `Measure-Command {start-process Release\VarroaPop.exe -argumentlist "exe\default.vrp /b /or output\vp_output_win.txt /i input\vp_input.txt" -wait}` 
 
-Simulation scripts
+## Run Simulations
 
-py simulations.py  --exe ..\Linux\build-windows\Release\VarroaPop.exe --vrp VarroaPy\VarroaPy\files\exe\simplified.vrp --output_directory . --input_file VarroaPy\VarroaPy\files\input\win-rcp85-data_46.03125_-118.34375.txt --weather_file Rcp85Binary\data_46.03125_-118.34375
-
-py plots.py --directory win-rcp85-data_46.03125_-118.34375 --display_temperature_data --prefix win-rcp85-data_46.03125_-118.34375 --start_date 2051-01-01 --end_date 2051-08-31
+The options that we keep for now are:
+ - `-f` to force overwriting existing files
+ - `-v simplified.vrp` minimal VRP file
+ - `-i rcp85-input.txt` 
+ - `--binaryWeatherFileFormat Rcp85` specifies the binary format of the weather file Observed|Modeled|Rcp85 
+ - `-w data_46.03125_-118.34375` weather file 
+ - `-o output.txt` output file 
+ - `--forageDayNoTemp  --hourlyTemperaturesEstimation  --foragersAlwaysAgeBasedOnForageInc  --adultAgingBasedOnLaidEggs  --inOutEvents` options to properly run the simulations with the selected aging model
