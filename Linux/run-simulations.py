@@ -30,7 +30,7 @@ weathers = [
     Weather('Rcp85Binary', 'rcp85.txt')
 ]
 
-build_directory = 'build/Release/'
+build_directory = 'build/'
 
 now = datetime.datetime.now()
 output_directory = now.strftime("results-%Y%m%d%H%M%S")
@@ -53,4 +53,4 @@ if __name__ == '__main__':
             sub_command += ' --output_directory ' + os.path.join(output_directory, place.city)
             sub_command += ' --input_file ../Simulations/VarroaPy/VarroaPy/files/input/' + weather.input_filename
             sub_command += ' --weather_file ../Simulations/' + weather.type + '/' + place.weather_filename
-            subprocess.run(os.path.normpath(sub_command))
+            subprocess.call(os.path.normpath(sub_command), shell=True)

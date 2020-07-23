@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import multiprocessing as mp
-import plots
 import os
 import re
 import subprocess

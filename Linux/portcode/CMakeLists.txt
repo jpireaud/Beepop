@@ -19,7 +19,7 @@ set(SOURCES carchive.cpp
             cuintarray.cpp
             position.cpp
             stdafx.cpp
-            VarroaPop.cpp )
+            varroapop.cpp )
 
 add_library(VarroaPopLinuxPort ${SOURCES})
 target_link_libraries(VarroaPopLinuxPort PRIVATE fmt::fmt)

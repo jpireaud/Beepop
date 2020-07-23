@@ -11,10 +11,11 @@ For C++ dependency management we use Hunter package manager.
 To compile in release:
 
 1. create a directory <build>
-2. move in <build> directory
-3. prepare cmake folder `cmake -DCMAKE_BUILD_TYPE=Release ..`
-4. call `cmake --build <build> --target VarroaPop -- -j <number of threads>`
-5. call program `./<build>/VarroaPop -h`
+1. move in <build> directory
+1. execute `python ../setup.py` to generate appropriate CMakeLists.txt file for datamodel
+1. prepare cmake folder `cmake -DCMAKE_BUILD_TYPE=Release ..`
+1. call `cmake --build <build> --target VarroaPop -- -j <number of threads>`
+1. call program `./<build>/VarroaPop -h`
 
 To time an execution you can use:
 
