@@ -755,6 +755,9 @@ void CAdultlist::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, 
 			Caboose->number *= GetPropTransition();
 			if (!bWorker) 
 			{
+				// Update stats for dead drones
+				theColony->m_InOutEvent.m_DeadDAdults = Caboose->GetNumber();
+
 				delete Caboose;
 				DroneCount--;
 				Caboose = NULL;
@@ -2114,10 +2117,10 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		Wadl.SetPropTransition(1.0);
    }
 
-//#define DEBUG_SPECIFIC_DAY
+#define DEBUG_SPECIFIC_DAY
 #ifdef DEBUG_SPECIFIC_DAY
 
-   if (theDate.GetYear() == 2006 && theDate.GetMonth() == 2 && theDate.GetDay() == 5)
+   if (theDate.GetYear() == 2009 && theDate.GetMonth() == 2 && theDate.GetDay() == 26)
    {
 	   // let's see why we age adults
 	   int myLocalVar = 2;
@@ -2177,6 +2180,8 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			notification.Format("%d Foragers killed by pesticide - recruiting workers", ForagersToBeKilled);
 			AddEventNotification(pEvent->GetDateStg("%m/%d/%Y"), notification);
 		}
+		// Update stats for foragers killes by pesticides
+		m_InOutEvent.m_ForagersKilledByPesticide = ForagersToBeKilled;
 		// End Forgers killed due to pesticide
 
 		// Options of aging Adults based on Laid Eggs
@@ -2191,7 +2196,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			//TRACE(" HB After Update:%s\n",Wadl.Status());
 			//TRACE("    Worker Caboose Quan: %d\n", Wadl.GetCaboose()->number);
 
-			// Update stats for new Foragers
+			// Update stats for adults becoming foragers
 			m_InOutEvent.m_WAdultToForagers = Wadl.GetCaboose()->GetNumber();
 
 			foragers.Update((CAdult*)Wadl.GetCaboose(), this, pEvent);

@@ -31,3 +31,15 @@ The options that we keep for now are:
  - `-w data_46.03125_-118.34375` weather file 
  - `-o output.txt` output file 
  - `--forageDayNoTemp  --hourlyTemperaturesEstimation  --foragersAlwaysAgeBasedOnForageInc  --adultAgingBasedOnLaidEggs  --inOutEvents` options to properly run the simulations with the selected aging model
+
+## Helper scrips 
+
+- `run-simulations.py` will run simulations for omak, wenatchee, walla-walla with historical and future weather simulations. Make sure the path to executable in the script is correct.
+- `scripts/plots.py` sample script which aim to automate plots generation, this is out of date but is a good source of inspiration
+- `scripts/simulations.py` sample script to call VarroaPop simulations with different sets of options
+
+## Weather format supported 
+
+- ObservedHistorical starting 1/1/1979 
+- ModeledHistorical starting 1/1/1950
+- Rcp85 starting 1/1/2006

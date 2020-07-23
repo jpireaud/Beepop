@@ -372,6 +372,8 @@ public:
 		int m_DLarvToBrood = -1;
 		int m_WBroodToAdult = -1;
 		int m_DBroodToAdult = -1;
+		int m_DeadDAdults = -1;
+		int m_ForagersKilledByPesticide = -1;
 		int m_WAdultToForagers = -1; 
 		int m_WinterMortalityForagersLoss = -1;
 		int m_DeadForagers = -1;

@@ -875,7 +875,7 @@ void CVarroaPopSession::Simulate()
 				);
 				if (GlobalOptions::Get().ShouldOutputInOutCounts())
 				{
-					CurSize.Format("%s %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d"
+					CurSize.Format("%s %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d"
 						, CurSize
 						, theColony.m_InOutEvent.m_NewWEggs
 						, theColony.m_InOutEvent.m_NewDEggs
@@ -885,6 +885,8 @@ void CVarroaPopSession::Simulate()
 						, theColony.m_InOutEvent.m_DLarvToBrood
 						, theColony.m_InOutEvent.m_WBroodToAdult
 						, theColony.m_InOutEvent.m_DBroodToAdult
+						, theColony.m_InOutEvent.m_DeadDAdults
+						, theColony.m_InOutEvent.m_ForagersKilledByPesticide
 						, theColony.m_InOutEvent.m_WAdultToForagers
 						, theColony.m_InOutEvent.m_WinterMortalityForagersLoss
 						, theColony.m_InOutEvent.m_DeadForagers);

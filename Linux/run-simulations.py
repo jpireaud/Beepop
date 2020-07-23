@@ -26,11 +26,11 @@ places = [
 ]
 
 weathers = [
-    Weather('ObservedHistoricalBinary', 'observed-requeen-delay-5days.txt'),
-    Weather('Rcp85Binary', 'rcp85-requeen-delay-5days.txt')
+    Weather('ObservedHistoricalBinary', 'observed.txt'),
+    Weather('Rcp85Binary', 'rcp85.txt')
 ]
 
-build_directory = 'build-revisit-workers-and-foragers-aging/Release/'
+build_directory = 'build/Release/'
 
 now = datetime.datetime.now()
 output_directory = now.strftime("results-%Y%m%d%H%M%S")
