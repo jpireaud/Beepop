@@ -2,11 +2,17 @@
 
 # excluse Linux build directory
 Linux/*build*
+Linux/.vscode/
 
 # exclude everything in the Linux/DataModel folder except CMakeLists.txt.template file
 Linux/datamodel/*
 !Linux/datamodel/CMakeLists.txt.template
 
+# exclude Jupyter lab files
+.ipynb_checkpoints
+
+# exclude idea files in Simulations foldes
+Simulations/.idea/
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,pycharm,visualstudio,visualstudiocode,git
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,pycharm,visualstudio,visualstudiocode,git

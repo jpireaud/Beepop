@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "VarroaPop.h"
+#include "ColdStorageSimulator.h"
 #include "Colony.h"
 #include "GlobalOptions.h"
 #include <math.h>
@@ -2009,26 +2010,25 @@ int CColony::GetColonySize()
 	return(Dadl.GetQuantity() + Wadl.GetQuantity() + foragers.GetQuantity());
 }
 
-
 void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 {
 
-	float LarvPerBee = float(Wlarv.GetQuantity() + Dlarv.GetQuantity())/
-					(Wadl.GetQuantity() + Dadl.GetQuantity() + foragers.GetQuantity());
+	float LarvPerBee = float(Wlarv.GetQuantity() + Dlarv.GetQuantity()) /
+		(Wadl.GetQuantity() + Dadl.GetQuantity() + foragers.GetQuantity());
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// Apply Date Range values
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-   CString dateStg = pEvent->GetDateStg("%m/%d/%Y");
-   COleDateTime theDate;
-   if (theDate.ParseDateTime(dateStg)) // The date string was valid
-   {
+	CString dateStg = pEvent->GetDateStg("%m/%d/%Y");
+	COleDateTime theDate;
+	if (theDate.ParseDateTime(dateStg)) // The date string was valid
+	{
 		double PropTransition;
-		
+
 		// Eggs Transition Rate
-		if ((m_InitCond.m_EggTransitionDRV.GetActiveValue(theDate,PropTransition))  && (m_InitCond.m_EggTransitionDRV.IsEnabled()))
+		if ((m_InitCond.m_EggTransitionDRV.GetActiveValue(theDate, PropTransition)) && (m_InitCond.m_EggTransitionDRV.IsEnabled()))
 		{
-			Deggs.SetPropTransition(PropTransition/100);
-			Weggs.SetPropTransition(PropTransition/100);
+			Deggs.SetPropTransition(PropTransition / 100);
+			Weggs.SetPropTransition(PropTransition / 100);
 		}
 		else
 		{
@@ -2036,10 +2036,10 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			Weggs.SetPropTransition(1.0);
 		}
 		// Larvae Transition Rate
-		if ((m_InitCond.m_LarvaeTransitionDRV.GetActiveValue(theDate,PropTransition)) && (m_InitCond.m_LarvaeTransitionDRV.IsEnabled()))
+		if ((m_InitCond.m_LarvaeTransitionDRV.GetActiveValue(theDate, PropTransition)) && (m_InitCond.m_LarvaeTransitionDRV.IsEnabled()))
 		{
-			Dlarv.SetPropTransition(PropTransition/100);
-			Wlarv.SetPropTransition(PropTransition/100);
+			Dlarv.SetPropTransition(PropTransition / 100);
+			Wlarv.SetPropTransition(PropTransition / 100);
 		}
 		else
 		{
@@ -2047,10 +2047,10 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			Wlarv.SetPropTransition(1.0);
 		}
 		// Brood Transition Rate
-		if ((m_InitCond.m_BroodTransitionDRV.GetActiveValue(theDate,PropTransition)) && (m_InitCond.m_BroodTransitionDRV.IsEnabled()))
+		if ((m_InitCond.m_BroodTransitionDRV.GetActiveValue(theDate, PropTransition)) && (m_InitCond.m_BroodTransitionDRV.IsEnabled()))
 		{
-			CapDrn.SetPropTransition(PropTransition/100);
-			CapWkr.SetPropTransition(PropTransition/100);
+			CapDrn.SetPropTransition(PropTransition / 100);
+			CapWkr.SetPropTransition(PropTransition / 100);
 		}
 		else
 		{
@@ -2058,10 +2058,10 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			CapWkr.SetPropTransition(1.0);
 		}
 		// Adults Transition Rate
-		if ((m_InitCond.m_AdultTransitionDRV.GetActiveValue(theDate,PropTransition)) && (m_InitCond.m_AdultTransitionDRV.IsEnabled()))
+		if ((m_InitCond.m_AdultTransitionDRV.GetActiveValue(theDate, PropTransition)) && (m_InitCond.m_AdultTransitionDRV.IsEnabled()))
 		{
-			Dadl.SetPropTransition(PropTransition/100);
-			Wadl.SetPropTransition(PropTransition/100);
+			Dadl.SetPropTransition(PropTransition / 100);
+			Wadl.SetPropTransition(PropTransition / 100);
 		}
 		else
 		{
@@ -2072,7 +2072,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		// A reduction moves Adults to caboose in boxcars > new max limit
 		// An increase adds empty boxcars up to the new max limit
 		double AdultAgeLimit;
-		if ((m_InitCond.m_AdultLifespanDRV.GetActiveValue(theDate,AdultAgeLimit)) && (m_InitCond.m_AdultLifespanDRV.IsEnabled()))
+		if ((m_InitCond.m_AdultLifespanDRV.GetActiveValue(theDate, AdultAgeLimit)) && (m_InitCond.m_AdultLifespanDRV.IsEnabled()))
 		{
 			if (Wadl.GetLength() != (int)AdultAgeLimit) // Update if new AdultAgeLimit
 			{
@@ -2093,7 +2093,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		// A reduction kills all foragers in boxcars > new max limit
 		// An increase adds empty boxcars to the new max limit
 		double ForagerLifespan;
-		if ((m_InitCond.m_ForagerLifespanDRV.GetActiveValue(theDate,ForagerLifespan)) && (m_InitCond.m_ForagerLifespanDRV.IsEnabled()))
+		if ((m_InitCond.m_ForagerLifespanDRV.GetActiveValue(theDate, ForagerLifespan)) && (m_InitCond.m_ForagerLifespanDRV.IsEnabled()))
 		{
 			m_CurrentForagerLifespan = (int)ForagerLifespan;
 		}
@@ -2102,11 +2102,11 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			m_CurrentForagerLifespan = m_InitCond.m_ForagerLifespan;
 		}
 		foragers.SetLength(m_CurrentForagerLifespan);
-		
-		
-   }
-   else   // Invalid date string - reset to default
-   {
+
+
+	}
+	else   // Invalid date string - reset to default
+	{
 		Deggs.SetPropTransition(1.0);
 		Weggs.SetPropTransition(1.0);
 		Dlarv.SetPropTransition(1.0);
@@ -2115,38 +2115,81 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		CapWkr.SetPropTransition(1.0);
 		Dadl.SetPropTransition(1.0);
 		Wadl.SetPropTransition(1.0);
-   }
+	}
 
 #define DEBUG_SPECIFIC_DAY
 #ifdef DEBUG_SPECIFIC_DAY
 
-   if (theDate.GetYear() == 2009 && theDate.GetMonth() == 2 && theDate.GetDay() == 26)
-   {
-	   // let's see why we age adults
-	   int myLocalVar = 2;
-   }
+	if (theDate.GetYear() == 2051 && theDate.GetMonth() == 4 && theDate.GetDay() == 1)
+	{
+		// let's see why we age adults
+		int myLocalVar = 2;
+	}
 
 #endif
 
-   m_InOutEvent.Reset();
+	// Reset additional output data struct for algorithm intermidiate results
+	m_InOutEvent.Reset();
+
+	queen.LayEggs(DayNum, pEvent->GetTemp(), pEvent->GetDaylightHours(), foragers.GetQuantity(), LarvPerBee);
 	
-	queen.LayEggs(DayNum,pEvent->GetTemp(),pEvent->GetDaylightHours(),
-		foragers.GetQuantity(), LarvPerBee);
+	// Simulate cold storage
+	CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
+	if (coldStorage.IsEnabled())
+	{
+		if (coldStorage.IsAutomatic())
+		{
+			if (queen.ComputeL(pEvent->GetDaylightHours()) == 0)
+			{
+				// In Automatic mode the cold storage is activated if we don't have non adults in the colony anymore
+				coldStorage.Activate();
+			}
+			else
+			{
+				coldStorage.DeActivate();
+			}
+		}
+		coldStorage.Update(*pEvent, queen);
+	}
+
+	CEgg* l_DEggs = queen.GetDeggs();
+	CEgg* l_WEggs = queen.GetWeggs();
+
+	// At the begining of cold storage all eggs are lost
+	if (coldStorage.IsActive() && coldStorage.IsStarting())
+	{
+		l_DEggs->SetNumber(0);
+		l_WEggs->SetNumber(0);
+	}
 
 	// Update stats for new eggs
-	m_InOutEvent.m_NewWEggs = queen.GetWeggsCount();
-	m_InOutEvent.m_NewDEggs = queen.GetDeggsCount();
-	
-	Deggs.Update(queen.GetDeggs());
-	Weggs.Update(queen.GetWeggs());
+	m_InOutEvent.m_NewWEggs = l_WEggs->GetNumber();
+	m_InOutEvent.m_NewDEggs = l_DEggs->GetNumber();
+
+	Deggs.Update(l_DEggs);
+	Weggs.Update(l_WEggs);
+
+	// At the begining of cold storage no eggs become larvae
+	if (coldStorage.IsActive() && coldStorage.IsStarting())
+	{
+		Weggs.GetCaboose()->SetNumber(0);
+		Deggs.GetCaboose()->SetNumber(0);
+	}
 
 	// Update stats for new larvae
 	m_InOutEvent.m_WEggsToLarv = Weggs.GetCaboose()->GetNumber();
 	m_InOutEvent.m_DEggsToLarv = Deggs.GetCaboose()->GetNumber();
-		
+
 	Dlarv.Update((CEgg*)Deggs.GetCaboose());
 	Wlarv.Update((CEgg*)Weggs.GetCaboose());
-	
+
+	// At the begining of cold storage no larvae become brood
+	if (coldStorage.IsActive() && coldStorage.IsStarting())
+	{
+		Wlarv.GetCaboose()->SetNumber(0);
+		Dlarv.GetCaboose()->SetNumber(0);
+	}
+
 	// Update stats for new brood
 	m_InOutEvent.m_WLarvToBrood = Wlarv.GetCaboose()->GetNumber();
 	m_InOutEvent.m_DLarvToBrood = Dlarv.GetCaboose()->GetNumber();
@@ -2158,10 +2201,11 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	m_InOutEvent.m_WBroodToAdult = CapWkr.GetCaboose()->GetNumber();
 	m_InOutEvent.m_DBroodToAdult = CapDrn.GetCaboose()->GetNumber();
 
+	int NumberOfNonAdults = Wlarv.GetQuantity() + Dlarv.GetQuantity() + CapDrn.GetQuantity() + CapWkr.GetQuantity();
+
 	// When the ForageInc is based on temperatures we don't have the aging stoped for Adults as we have during winter 
 	// with the default ForageDay election implementation.
 	// To correct that, we are saying that a forage day is valid if we have favorable flight hours during that day
-	int NumberOfNonAdults = Wlarv.GetQuantity() +  Dlarv.GetQuantity() + CapDrn.GetQuantity() + CapWkr.GetQuantity();
 	const bool ForageIncIsValid = GlobalOptions::Get().ShouldForageDayElectionBasedOnTemperatures() || pEvent->GetForageInc() > 0.0;
 
 	if ((NumberOfNonAdults > 0) || (pEvent->IsForageDay() && ForageIncIsValid))
@@ -2170,8 +2214,8 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		// The last boxcar will be moved to the Caboose when Wadl.Update is called a little later.  The Wadl Caboose will be moved to the 
 		// forager list when forager.Update is called.
 		//
-		int ForagersToBeKilled = QuantityPesticideToKill(&foragers,m_EPAData.m_D_C_Foragers,0,m_EPAData.m_AI_AdultLD50_Contact,m_EPAData.m_AI_AdultSlope_Contact); //Contact Mortality
-		ForagersToBeKilled +=    QuantityPesticideToKill(&foragers, m_EPAData.m_D_D_Foragers, 0, m_EPAData.m_AI_AdultLD50, m_EPAData.m_AI_AdultSlope); //Diet Mortality
+		int ForagersToBeKilled = QuantityPesticideToKill(&foragers, m_EPAData.m_D_C_Foragers, 0, m_EPAData.m_AI_AdultLD50_Contact, m_EPAData.m_AI_AdultSlope_Contact); //Contact Mortality
+		ForagersToBeKilled += QuantityPesticideToKill(&foragers, m_EPAData.m_D_D_Foragers, 0, m_EPAData.m_AI_AdultLD50, m_EPAData.m_AI_AdultSlope); //Diet Mortality
 		int MinAgeToForager = 14;
 		Wadl.MoveToEnd(ForagersToBeKilled, MinAgeToForager);
 		if (ForagersToBeKilled > 0)
@@ -2186,11 +2230,11 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 
 		// Options of aging Adults based on Laid Eggs
 		// Aging of adults is actually function of DaylightHours 
-		const bool agingAdults = !GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.ComputeL(pEvent->GetDaylightHours()) > 0;
+		const bool agingAdults = !coldStorage.IsActive() && (!GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs() || queen.ComputeL(pEvent->GetDaylightHours()) > 0);
 		if (agingAdults)
 		{
 			//TRACE("Date: %s\n",pEvent->GetDateStg());
-			Dadl.Update((CBrood*)CapDrn.GetCaboose(),this, pEvent, false);
+			Dadl.Update((CBrood*)CapDrn.GetCaboose(), this, pEvent, false);
 			//TRACE("HB Before Update:%s\n",Wadl.Status());
 			Wadl.Update((CBrood*)CapWkr.GetCaboose(), this, pEvent, true);
 			//TRACE(" HB After Update:%s\n",Wadl.Status());
@@ -2217,26 +2261,26 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		}
 
 		// Update stats for dead Foragers
-		m_InOutEvent.m_DeadForagers = foragers.GetCaboose()? foragers.GetCaboose()->GetNumber() : 0;
-		
+		m_InOutEvent.m_DeadForagers = foragers.GetCaboose() ? foragers.GetCaboose()->GetNumber() : 0;
+
 		//TRACE("Updated Foragers:%s\n",foragers.Status());
 	}
 
-   ///////////////////////////////////////////////////////////////////////////////////////////////
-   ///////////////////////////////////////////////////////////////////////////////////////////////
-   //
-   // Apply the Pesticide Mortality Impacts Here
-   //
-   ///////////////////////////////////////////////////////////////////////////////////////////////
-   ///////////////////////////////////////////////////////////////////////////////////////////////
-	//TRACE("AIAdultSlope = %f4.2, AIAdultLD50 = %f4.2\n", m_EPAData.m_AI_AdultSlope, m_EPAData.m_AI_AdultLD50);
-   ConsumeFood(pEvent, DayNum);
-   DetermineFoliarDose(DayNum);
-   ApplyPesticideMortality();
-   //
-   ///////////////////////////////////////////////////////////////////////////////////////////////
-
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Apply the Pesticide Mortality Impacts Here
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	 //TRACE("AIAdultSlope = %f4.2, AIAdultLD50 = %f4.2\n", m_EPAData.m_AI_AdultSlope, m_EPAData.m_AI_AdultLD50);
+	ConsumeFood(pEvent, DayNum);
+	DetermineFoliarDose(DayNum);
+	ApplyPesticideMortality();
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////
 }
+
 
 int CColony::GetEggsToday()
 {

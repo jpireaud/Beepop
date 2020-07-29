@@ -262,6 +262,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="ColdStorageSimulator.cpp" />
     <ClCompile Include="Colony.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
@@ -577,6 +578,7 @@
     <ClInclude Include="chartlabelcollection.h" />
     <ClInclude Include="chartstyle.h" />
     <ClInclude Include="chartstylecollection.h" />
+    <ClInclude Include="ColdStorageSimulator.h" />
     <ClInclude Include="Colony.h" />
     <ClInclude Include="ColonyDataPage.h" />
     <ClInclude Include="ColonyResource.h" />

@@ -1,5 +1,6 @@
-#include "varroapopcmdbridge.h"
+#include "coldstoragesimulator.h"
 #include "globaloptions.h"
+#include "varroapopcmdbridge.h"
 
 #include "stdafx.h"
 
@@ -34,6 +35,9 @@ int main(int argc, char** argv)
 		("rainfall", "Specifies the rainfall threshold after which the current day will not be considered as Forage Day", cxxopts::value<double>())
 		("daylighthours", "Specifies the DaylightHours threshold after which the Queen stop laying eggs, default is 9.5", cxxopts::value<double>())
 		("inOutEvents", "Output additional information adding the following data -- NewWEggs NewDEggs WEggsToLarv DEggsToLarv WLarvToBrood DLarvToBrood WBroodToAdult DBroodToAdult WAdultToForagers WinterMortalityForagersLoss DeadForagers", cxxopts::value<bool>()->default_value("false"))
+		("coldStorage", "Activate cold storage", cxxopts::value<bool>()->default_value("false"))
+		("coldStorageStartDate", "Date at which colony is placed in cold storage with format MM/DD", cxxopts::value<std::string>())
+		("coldStorageEndDate", "Date at which colony is removed from cold storage with format MM/DD", cxxopts::value<std::string>())
 		;
 
 	options.add_options("help")
@@ -111,7 +115,7 @@ int main(int argc, char** argv)
 			auto outputDirectory = outputFile.parent_path();
 			if (!bfs::exists(outputFile))
 			{
-				if (!bfs::exists(outputDirectory))
+				if (!outputDirectory.empty() && !bfs::exists(outputDirectory))
 				{
 					if (!bfs::create_directories(outputDirectory))
 					{
@@ -175,10 +179,6 @@ int main(int argc, char** argv)
 					std::cout << "output file will be " << outputFile.string() << std::endl;
 				}
 			}
-			if (error)
-			{
-				return -1;
-			}
 			if (arguments.count("forageDayNoTemp") == 1)
 			{
 				GlobalOptions::Get().ShouldForageDayElectionBasedOnTemperatures.Set(!arguments["forageDayNoTemp"].as<bool>());
@@ -214,6 +214,55 @@ int main(int argc, char** argv)
 			if (arguments.count("inOutEvents") == 1)
 			{
 				GlobalOptions::Get().ShouldOutputInOutCounts.Set(arguments["inOutEvents"].as<bool>());
+			}
+			if (arguments.count("coldStorage") == 1)
+			{
+				CColdStorageSimulator::Get().SetEnabled(arguments["coldStorage"].as<bool>());
+
+				std::regex validateDate("(0?[1-9]|1[0-2])/(0?[1-9]|[1-2][0-9]|3[0-1])");
+				std::smatch dateElements;
+				if (arguments.count("coldStorageStartDate") == 1 && arguments.count("coldStorageEndDate") == 1)
+				{
+					int startMonth=-1, startDay=-1, endMonth=-1, endDay=-1;
+					std::string startDate = arguments["coldStorageStartDate"].as<std::string>();
+					if (std::regex_match(startDate, dateElements, validateDate) && dateElements.size() == 3 && startDate == *dateElements.begin())
+					{
+						startMonth = std::stoi(*(dateElements.begin() + 1));
+						startDay = std::stoi(*(dateElements.begin() + 2));
+					}
+					else
+					{
+						std::cerr << "coldStorageStartDate is not specified correctly " << startDate << " expected MM/DD" << std::endl;
+						error = true;
+					}
+
+					std::string endDate = arguments["coldStorageEndDate"].as<std::string>();
+					if (std::regex_match(endDate, dateElements, validateDate) && dateElements.size() == 3 && endDate == *dateElements.begin())
+					{
+						endMonth = std::stoi(*(dateElements.begin() + 1));
+						endDay = std::stoi(*(dateElements.begin() + 2));
+					}
+					else
+					{
+						std::cerr << "coldStorageEndDate is not specified correctly " << endDate << " expected MM/DD" << std::endl;
+						error = true;
+					}
+					if (startMonth != -1 && startDay != -1 && endMonth != -1 && endDay != -1)
+					{
+						// In the case of the cold storage year is not relevant, let's set it as the default first year
+						CColdStorageSimulator::Get().SetStartDate(COleDateTime(1970, startMonth, startDay, 0, 0, 0));
+						CColdStorageSimulator::Get().SetEndDate(COleDateTime(1970, endMonth, endDay, 0, 0, 0));
+					}
+				}
+				else if (arguments.count("coldStorageStartDate") != arguments.count("coldStorageEndDate"))
+				{
+					std::cerr << "coldStorageStartDate and coldStorageEndDate should be specified together in order for the cold storage to work correctly " << std::endl;
+					error = true;
+				}
+			}
+			if (error)
+			{
+				return -1;
 			}
 		}
 		else

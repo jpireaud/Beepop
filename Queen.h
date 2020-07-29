@@ -9,8 +9,7 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-
-
+#include "EGG.H"
 
 class CQueen : public CBee  {
   private:
@@ -40,8 +39,6 @@ class CQueen : public CBee  {
 	CEgg* GetWeggs();
 	CEgg* GetDeggs();
 	int GetTeggs() const { return m_Teggs; }
-	int GetWeggsCount() const { return m_Weggs; }
-	int GetDeggsCount() const { return m_Deggs; }
 	double GetDD() { return m_DD; }
 	double GetL() { return m_L; }
 	double GetN() { return m_N; }

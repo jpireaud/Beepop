@@ -23,6 +23,9 @@ namespace bd = boost::gregorian;
 #include <boost/algorithm/string.hpp>
 namespace ba = boost::algorithm;
 
+#include "coldstoragesimulator.h"
+#include "queen.h"
+#include "weatherevents.h"
 #include "weathergriddata.h"
 
 using namespace WeatherGridDataNs;
@@ -263,7 +266,149 @@ TEST_CASE("Temperature Data", "[input]") {
             CHECK_THAT(input.hourly_temperatures, EqualsApprox(expectedResult));
         }
     }
+    SECTION("Cold Storage")
+    {
+        CEvent event;
+        event.SetTemp(25.0);
 
+        CQueen queen;
+        queen.SetMaxEggs(2000.0);
+
+        auto& simulator = CColdStorageSimulator::Get();
+
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        simulator.SetEnabled(true);
+
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        simulator.Activate();
+        simulator.Update(event, queen);
+
+        CHECK(simulator.IsActive());
+        CHECK_FALSE(simulator.IsStarting());
+        CHECK_FALSE(simulator.IsEnding());
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // Pick a date where the queen is laying eggs
+        queen.LayEggs(90, 14.0, 12.0, 2000, 1);
+        REQUIRE(queen.GetTeggs() > 0);
+
+        simulator.DeActivate();
+        simulator.Update(event, queen);
+
+        CHECK_FALSE(simulator.IsActive());
+        CHECK_FALSE(simulator.IsStarting());
+        CHECK_FALSE(simulator.IsEnding());
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        // cold storage period in a year        
+        simulator.SetStartDate(COleDateTime(2020, 10, 1, 0, 0, 0));
+        simulator.SetEndDate(COleDateTime(2020, 11, 30, 0, 0, 0));
+
+        // event date is before cold storage period
+        event.SetTime(COleDateTime(2020, 7, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK_FALSE(simulator.IsActive());
+        CHECK_FALSE(simulator.IsStarting());
+        CHECK_FALSE(simulator.IsEnding());
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        // event date is on cold storage period start date
+        event.SetTime(COleDateTime(2020, 10, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.IsActive());
+        CHECK(simulator.IsStarting());
+        CHECK_FALSE(simulator.IsEnding());
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // Pick a date where the queen is not laying eggs (change daylight hours)
+        queen.LayEggs(90, 14.0, 9.0, 2000, 1);
+        REQUIRE(queen.GetTeggs() == 0);
+
+        // event date is during cold storage period 
+        event.SetTime(COleDateTime(2020, 11, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.IsActive());
+        CHECK_FALSE(simulator.IsStarting());
+        CHECK_FALSE(simulator.IsEnding());
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // Pick a date where the queen is laying eggs (change daylight hours)
+        queen.LayEggs(90, 14.0, 12.0, 2000, 1);
+        REQUIRE(queen.GetTeggs() > 0);
+
+        // event date is on cold storage period end date
+        event.SetTime(COleDateTime(2020, 11, 30, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.IsActive());
+        CHECK_FALSE(simulator.IsStarting());
+        CHECK(simulator.IsEnding());
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // event date is after cold storage period 
+        event.SetTime(COleDateTime(2020, 12, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK_FALSE(simulator.IsActive());
+        CHECK_FALSE(simulator.IsStarting());
+        CHECK_FALSE(simulator.IsEnding());
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        // cold storage period on year transition
+        simulator.SetStartDate(COleDateTime(2021, 11, 1, 0, 0, 0));
+        simulator.SetEndDate(COleDateTime(2022, 2, 29, 0, 0, 0));
+
+        // event date is before cold storage period
+        event.SetTime(COleDateTime(2021, 7, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        // event date is on cold storage period start date
+        event.SetTime(COleDateTime(2021, 11, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // event date is during cold storage period 
+        event.SetTime(COleDateTime(2021, 12, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // event date is during cold storage period 
+        event.SetTime(COleDateTime(2022, 1, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // event date is on cold storage period end date
+        event.SetTime(COleDateTime(2022, 3, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.GetTemp(event) == Approx(CColdStorageSimulator::GetDefaultColdStorageTemperature()));
+
+        // event date is after cold storage period 
+        event.SetTime(COleDateTime(2022, 3, 2, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        simulator.SetEnabled(false);
+
+        // event date is on cold storage period end date
+        event.SetTime(COleDateTime(2022, 3, 1, 0, 0, 0));
+        simulator.Update(event, queen);
+
+        CHECK(simulator.GetTemp(event) == Approx(25.0));
+
+        simulator.Reset();
+    }
     SECTION("Hourly temperature from file") {
 
         struct CSVHourlyTemperatureDataItem

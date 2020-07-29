@@ -52,6 +52,8 @@ def get_data_model_files():
         "Brood.cpp",
         "Colony.h",
         "Colony.cpp",
+        "ColdStorageSimulator.h",
+        "ColdStorageSimulator.cpp",
         "ColonyResource.h",
         "ColonyResource.cpp",
         "CreateWeatherHdr.h",

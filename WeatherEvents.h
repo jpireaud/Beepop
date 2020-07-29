@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include <vector>
+#include <string>
 
 class CEvent : public CObject
 {
@@ -31,14 +32,14 @@ public:
 	CEvent(CEvent& event);  // Copy Constructor
 	COleDateTime GetTime() {return m_Time;}
 	CString GetDateStg(CString format = "%d/%m/%Y");
-	double GetTemp() {return m_Temp;}
-	double GetMaxTemp() {return m_MaxTemp;}
-	double GetMinTemp() {return m_MinTemp;}
+	double GetTemp();
+	double GetMaxTemp();
+	double GetMinTemp();
 	double GetRainfall() {return m_Rainfall;}
-	bool IsForageDay() {return m_ForageDay;}
+	bool IsForageDay();
 	bool IsWinterDay();
 	int GetLineNum() {return m_LineNum;}
-	double GetDaylightHours() {return m_DaylightHours;}
+	double GetDaylightHours();
 	void SetTime(COleDateTime time) {m_Time = time;}
 	void SetTemp(double temp) {m_Temp = temp;}
 	void SetMaxTemp(double maxTemp) {m_MaxTemp = maxTemp;}
@@ -47,7 +48,7 @@ public:
 	void SetForage(bool Forage) {m_ForageDay = Forage;}
 	void SetForageInc(double forageInc) {m_ForageInc = forageInc;};
 	void SetForageInc(double TThresh, double TMax, double TAve);
-	double GetForageInc() {return m_ForageInc;}
+	double GetForageInc();
 	void SetLineNum(int line) {m_LineNum = line;}
 	void SetDaylightHours(double hrs) {m_DaylightHours = hrs;}
 	void Serialize(CArchive& ar);

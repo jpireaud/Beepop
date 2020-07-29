@@ -6,11 +6,13 @@
 #include "VarroaPop.h"
 #include "WeatherEvents.h"
 #include "WeatherGridData.h"
+#include "ColdStorageSimulator.h"
 #include "CreateWeatherHdr.h"
 #include "GlobalOptions.h"
 #include "math.h"
 
 #include <algorithm>
+#include <functional>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -18,6 +20,33 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+// This struct is used to make sure that if a method gets called while calling another
+// method, the behavior will be handled by the caller to avoid an infinite recursion
+// Usage:
+// <code>
+//	sometype MyType::GetSomething() const
+//	{
+//	  sometype default = myDefaultValue;
+//	  static call_if_not_calling caller;
+//	  caller.call([this]{
+//	    default = DoSomethingElse(); // soSomethingElse will call GetSomething at some point
+//	  });
+//    return default;
+//	}
+// </code>
+struct call_if_not_calling
+{
+	bool calling = false;
+	void call(std::function<void()> function)
+	{
+		if (!calling)
+		{
+			calling = true;
+			function();	
+			calling = false;
+		}
+	}
+};
 
 //  Free Functions
 int CountChars(CString instg, TCHAR testchar)
@@ -130,6 +159,70 @@ CEvent::CEvent(CEvent& event)  // Copy Constructor
 	m_DaylightHours = event.m_DaylightHours;
 }
 
+double CEvent::GetTemp()
+{
+	double pEventTemp = m_Temp;
+	static call_if_not_calling caller; 
+	caller.call([this, &pEventTemp] {
+		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
+		if (coldStorage.IsEnabled())
+			pEventTemp = coldStorage.GetTemp(*this);
+	});
+	return pEventTemp;
+}
+
+double CEvent::GetMaxTemp()
+{
+	double pEventTemp = m_MaxTemp;
+	static call_if_not_calling caller;
+	caller.call([this, &pEventTemp] {
+		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
+		if (coldStorage.IsEnabled())
+			pEventTemp = coldStorage.GetMaxTemp(*this);
+	});
+	return pEventTemp;
+}
+
+double CEvent::GetMinTemp()
+{
+	double pEventTemp = m_MinTemp;
+	static call_if_not_calling caller;
+	caller.call([this, &pEventTemp] {
+		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
+		if (coldStorage.IsEnabled())
+			pEventTemp = coldStorage.GetMinTemp(*this);
+		});
+	return pEventTemp;
+}
+
+bool CEvent::IsForageDay()
+{
+	bool forageDay = m_ForageDay;
+	static call_if_not_calling caller;
+	caller.call([this, &forageDay] {
+		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
+		if (coldStorage.IsEnabled())
+			forageDay = coldStorage.IsForageDay(*this);
+		});
+	return forageDay;
+}
+
+double CEvent::GetDaylightHours()
+{
+	return m_DaylightHours;
+}
+
+double CEvent::GetForageInc()
+{
+	double forageInc = m_ForageInc;
+	static call_if_not_calling caller;
+	caller.call([this, &forageInc] {
+		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
+		if (coldStorage.IsEnabled())
+			forageInc = coldStorage.GetForageInc(*this);
+		});
+	return forageInc;
+}
 
 CEvent CEvent:: operator = (CEvent& event)
 {
@@ -1724,6 +1817,3 @@ void CWeatherEvents::Serialize(CArchive& ar)
 		// TODO: add loading code here
 	}
 }
-
-
-
