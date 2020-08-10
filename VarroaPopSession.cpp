@@ -714,8 +714,15 @@ void CVarroaPopSession::Simulate()
 		m_ResultsFileHeader.AddTail(CurSize);
 		CurSize.Format("            Colony  Adult     Adult           Active    Drone   Wkr     Drone  Wkr   Drone  Wkr   Total                                                         Free   DBrood WBrood DMite  WMite  Mites  Mites  Colony  Pollen  Colony  Nectar   Dead   Dead   Dead   Dead   Dead    Queen      Ave           Min     Max      Daylight  Forage  Forage");
 		m_ResultsFileHeader.AddTail(CurSize);
+
 		CurSize.Format("     Date   Size    Drones    Wkr     Forgrs  Forgrs    Brood   Brood   Larv   Larv  Eggs   Eggs  Eggs      DD      L      N      P       dd       l       n    Mites  Mites  Mites  /Cell  /Cell  Dying  Dying  Pollen  Pest    Nectar  Pest     DLarv  WLarv  DAdlt  WAdlt  Forgrs  Strength   Temp  Rain    Temp    Temp     Hours     Inc     Day");
+		// Append additional command name if InOut statistics are required
+		if (GlobalOptions::Get().ShouldOutputInOutCounts())
+		{
+			CurSize.Format("%s NewWorkerEggs NewDroneEggs WorkerEggsToLarvae DroneEggsToLarvae WorkerLarvaeToBrood DroneLarvaeToBrood WorkerBroodToAdult DroneBroodToAdult DroneAdultsDying ForagersKilledByPesticides WorkerAdultToForagers WinterMortalityForagersLoss ForagersDying", CurSize);
+		}
 		m_ResultsFileHeader.AddTail(CurSize);
+
 		CurSize.Format(m_ResultsFileFormatStg,
 			//pEvent->GetDateStg("%m/%d/%Y"), 
 			"Initial   ", // "Initial or Date"
@@ -763,6 +770,12 @@ void CVarroaPopSession::Simulate()
 			0.0, // Activity Ratio
 			0	 // Forage Day
 		);
+		// Append additional command name if InOut statistics are required
+		if (GlobalOptions::Get().ShouldOutputInOutCounts())
+		{
+			CurSize.Format("%s %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d"
+				, CurSize, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
 		m_ResultsText.AddTail(CurSize);
 
 
@@ -873,6 +886,7 @@ void CVarroaPopSession::Simulate()
 					pEvent->GetForageInc(),
 					pEvent->IsForageDay()
 				);
+				// Append additional command name if InOut statistics are required
 				if (GlobalOptions::Get().ShouldOutputInOutCounts())
 				{
 					CurSize.Format("%s %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d"

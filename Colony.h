@@ -357,26 +357,28 @@ public:
 
 	CEPAData m_EPAData;		// EPA-related data structure
 
-	// Additional statistics on Cabooose events
+	// Additional statistics
+	// When the option GlobalOptions::Get().ShouldOutputInOutCounts() is activated 
+	// the following count will be appended to the normal output
 	struct InOutEvent
 	{
 		void Reset() {
 			memset(this, 0, sizeof(InOutEvent));
 		}
 
-		int m_NewWEggs = -1;
-		int m_NewDEggs = -1;
-		int m_WEggsToLarv = -1;
-		int m_DEggsToLarv = -1;
-		int m_WLarvToBrood = -1;
-		int m_DLarvToBrood = -1;
-		int m_WBroodToAdult = -1;
-		int m_DBroodToAdult = -1;
-		int m_DeadDAdults = -1;
-		int m_ForagersKilledByPesticide = -1;
-		int m_WAdultToForagers = -1; 
-		int m_WinterMortalityForagersLoss = -1;
-		int m_DeadForagers = -1;
+		int m_NewWEggs = -1; //!< new worker eggs
+		int m_NewDEggs = -1; //!< new drone eggs
+		int m_WEggsToLarv = -1; //!< worker eggs moving to larvae
+		int m_DEggsToLarv = -1; //!< drone eggs moving to larvae
+		int m_WLarvToBrood = -1; //!< worker larvae moving to brood
+		int m_DLarvToBrood = -1; //!< drone larvae moving to brood
+		int m_WBroodToAdult = -1; //!< worker drone moving to adult
+		int m_DBroodToAdult = -1; //!< drone drone moving to adult
+		int m_DeadDAdults = -1; //!< drone adult dying
+		int m_ForagersKilledByPesticide = -1; //!< forager killed by pesticide
+		int m_WAdultToForagers = -1;  //!< worker adult moving to forager
+		int m_WinterMortalityForagersLoss = -1; //!< forager dying to due winter mortality
+		int m_DeadForagers = -1; //!< forager dying
 	};
 	InOutEvent m_InOutEvent;
 

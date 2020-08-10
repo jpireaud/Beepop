@@ -37,6 +37,9 @@ struct Rcp85
     std::int16_t WIND;
 };
 
+// Rcp85 and Rcp45 format have the same binary layout
+typedef Rcp85 Rcp45;
+
 // Accessor to use to create proprietory data structure
 template<typename GridDataType>
 struct DataItemAccessor

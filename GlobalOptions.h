@@ -2,6 +2,12 @@
 
 #include <string>
 
+#ifndef SINGLETON_CSTR_VISIBILITY_PUBLIC
+#define SINGLETON_CSTR_VISIBILITY private:
+#else
+#define SINGLETON_CSTR_VISIBILITY public:
+#endif
+
 // Singleton class to easily add conditional block statements
 // and select them by either:
 // - changing default value in this class
@@ -12,7 +18,7 @@ public:
 	// Returns the single instance of GlobalOptions class
 	static GlobalOptions& Get();
 
-private:
+SINGLETON_CSTR_VISIBILITY
 	GlobalOptions();
 
 public:
@@ -22,11 +28,28 @@ public:
 	public:
 		Option() {}
 		Option(const OptionType& value) { Set(value); }
-		const OptionType& operator()() const { return m_value; }
-		void Set(const OptionType& value) { m_value = value; }
+		virtual ~Option() {}
+		virtual const OptionType& operator()() const { return m_value; }
+		virtual void Set(const OptionType& value) { m_value = value; }
+
+	protected:
+		OptionType m_value;
+	};
+
+	template<typename OptionType>
+	class AggregateOption : Option<OptionType>
+	{
+	public:
+		AggregateOption(GlobalOptions& options) : Option(), m_options(options) {}
+		virtual void Set(const OptionType& value);
+		virtual const OptionType& operator()() const 
+		{
+			throw std::exception("GlobalOptions::AggregateOption::operator()() should not be called directly");
+			return m_value;
+		}
 
 	private:
-		OptionType m_value;
+		GlobalOptions& m_options;
 	};
 
 	// Options
@@ -67,6 +90,11 @@ public:
 	// On non-Foraging days, foragers when added to the Foragers list will not age and they will age
 	// of ForageInc on the next Foraging day instead of aging 1 full day.
 	Option<bool> ShouldForagersAlwaysAgeBasedOnForageInc = false;
+
+	// This options controls ShouldForageDayElectionBasedOnTemperatures, ShouldComputeHourlyTemperatureEstimation and 
+	// ShouldForagersAlwaysAgeBasedOnForageInc when it is set
+	typedef bool ForagerAgingBasedHourlyTemperatureEstimate;
+	AggregateOption<ForagerAgingBasedHourlyTemperatureEstimate> ShouldForagerAgingBasedOnHourlyTemperatureEstimate;
 	
 	// Weather file options
 

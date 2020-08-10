@@ -18,9 +18,12 @@ set(SOURCES main.cpp
             test_cstringlist.cpp 
             test_ctime.cpp 
             test_cuintarray.cpp
+            test_globaloptions.cpp
             test_temperaturedata.cpp )
 
+
 add_executable(VarroaPopTests ${SOURCES})
+target_compile_definitions(VarroaPopDataModel PRIVATE SINGLETON_CSTR_VISIBILITY_PUBLIC)
 target_link_libraries(VarroaPopTests PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
 target_link_libraries(VarroaPopTests PRIVATE Catch2::Catch2)
 target_link_libraries(VarroaPopTests PRIVATE Boost::system Boost::filesystem)

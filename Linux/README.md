@@ -28,7 +28,7 @@ The options that we keep for now are:
  - `-f` to force overwriting existing files
  - `-v simplified.vrp` minimal VRP file
  - `-i rcp85-input.txt` 
- - `--binaryWeatherFileFormat Rcp85` specifies the binary format of the weather file Observed|Modeled|Rcp85 
+ - `--binaryWeatherFileFormat Rcp85` specifies the binary format of the weather file Observed|Modeled|Rcp85|Rcp45 
  - `-w data_46.03125_-118.34375` weather file 
  - `-o output.txt` output file 
  - `--forageDayNoTemp  --hourlyTemperaturesEstimation  --foragersAlwaysAgeBasedOnForageInc  --adultAgingBasedOnLaidEggs  --inOutEvents` options to properly run the simulations with the selected aging model
@@ -44,3 +44,46 @@ The options that we keep for now are:
 - ObservedHistorical starting 1/1/1979 
 - ModeledHistorical starting 1/1/1950
 - Rcp85 starting 1/1/2006
+- Rcp45 starting 1/1/2006
+
+## Changes made to the original VarroaPop codebase
+
+### Changes to existing codebase
+
+- Adult
+    - Changed current age from being an Integer to a Float number. Currently the m_CurrentAge attribute is not used, but it would be useful if we want to use it and age Adults with a portion of a day;
+    - Added missing attributes initialisation in constructors.
+- Beed
+    - Added missing attributes initialisation in constructor.
+- Colony
+    - Added a CAdultList::Add method to be able to add new Adults to the first box card without making other Adults age;
+    - Added InOutEvent structure to add addtional output data on what's moved from one aging structure to the other;
+    - Changed Foragers aging structure with `--foragerAgingBasedOnHourlyTemperatureEstimate`.
+    - Changed Adult aging structure with `--adultAgingBasedOnLaidEggs` option.
+- Queen
+    - Extracted L daylight hours based component of the egg laying equation in CQueen::ComputeL method.
+- VarroaPopSession
+    - Enhanced output formating by extracting parameter specification and adding delimiter afterwards.
+- WeatherEvents
+    - Added ability to load binary data from WSU grid weather data;
+    - Added a common utility function UpdateForageAttributeForEvent to set m_ForageDay and m_ForageInc with the same logic for all types of input weather data;
+    - Added functionnality to CEvent GetTemp, GetMaxTemp, GetMinTemp, IsForageDay and GetForageInc methods to behave correctly in the case we activated the CColdStorageSimulator;
+    - Fixed bad interpretation of Rainfall and Windspeed for WSU grid weather files;
+    - Made Windspeed and Rainfall threasholds customizable.
+
+### Addition to existing codebase
+
+- GlobalOptions
+    - Singleton object used to set global parameters used to control behavior of simulation.
+- ColdStorageSimulator
+    - Singleton object used to simulate cold storage.
+- WeatherGridData
+    - Class used to load different WSU weather grid data files.
+
+
+## Locations
+
+- Walla Walla: 46.03125,-118.34375
+- Richland: 46.28125, -119.34375
+- Wenatchee: 47.40625, -120.34375
+- Omak: 48.40625, -119.53125

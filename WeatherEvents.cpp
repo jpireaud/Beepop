@@ -1101,11 +1101,13 @@ struct GridDataTypeId
 	static const char Observed[];
 	static const char Modeled[];
 	static const char Rcp85[];
+	static const char Rcp45[];
 };
 
 const char GridDataTypeId::Observed[] = "Observed";
 const char GridDataTypeId::Modeled[] = "Modeled";
 const char GridDataTypeId::Rcp85[] = "Rcp85";
+const char GridDataTypeId::Rcp45[] = "Rcp45";
 
 bool CWeatherEvents::LoadWeatherFile(CString FileName)
 {
@@ -1134,6 +1136,8 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 				LoadWeatherGridDataBinaryFile<ModeledHistoricalItem>(FileName);
 			else if (binaryIdentifier == GridDataTypeId::Rcp85)
 				LoadWeatherGridDataBinaryFile<Rcp85>(FileName);
+			else if (binaryIdentifier == GridDataTypeId::Rcp45)
+				LoadWeatherGridDataBinaryFile<Rcp45>(FileName);
 			else
 			{
 				CString stg = "Error Binary Weather File Identifier Not Supported: ";
@@ -1817,3 +1821,7 @@ void CWeatherEvents::Serialize(CArchive& ar)
 		// TODO: add loading code here
 	}
 }
+
+
+
+
