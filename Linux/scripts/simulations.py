@@ -3,28 +3,9 @@ import datetime
 import multiprocessing as mp
 import os
 import re
+import utilities
 import subprocess
 from threading import Lock
-
-safe_print_lock = Lock()
-
-
-def safe_print(*a, **b):
-    # Thread safe print function
-    with safe_print_lock:
-        print(*a, **b)
-
-
-def parse_binary_format(filename):
-    binary_format = {'observed':'Observed', 'modeled':'Modeled', 'rcp85':'Rcp85'}
-    filename = os.path.basename(filename)
-    for item in re.split('-|/|.txt', filename):
-        if item in binary_format.keys():
-            return binary_format[item]
-    item = os.path.splitext(os.path.basename(filename))[0]
-    if item in binary_format.keys():
-        return binary_format[item]
-    raise Exception('No valid binary format specifier in input filename (observed|modeled|rcp85)-<weather_file>.txt')
 
 
 def run_simulation(output_directory, command, configuration):
@@ -43,8 +24,8 @@ def run_simulation(output_directory, command, configuration):
     # Compute elapsed time and update total simulation time
     end_simulation = datetime.datetime.now()
     elapsed_time = end_simulation - start_simulation
-    safe_print('\tCommand      :' + sub_command +
-               '\n\tDuration (s):' + '%.2f' % elapsed_time.total_seconds())
+    utilities.safe_print('\tCommand      :' + sub_command +
+                         '\n\tDuration (s):' + '%.2f' % elapsed_time.total_seconds())
     return elapsed_time.total_seconds()
 
 
@@ -70,7 +51,7 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
 
     command = arguments.exe + ' -f -v ' + arguments.vrp + ' -i ' + arguments.input_file + ' --binaryWeatherFileFormat '
-    command += parse_binary_format(arguments.input_file)
+    command += utilities.parse_binary_format(arguments.input_file)
     if arguments.weather_file:
         command += ' -w ' + arguments.weather_file
 
