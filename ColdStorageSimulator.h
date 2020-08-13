@@ -5,7 +5,7 @@
 #include <string>
 
 class CEvent;
-class CQueen;
+class CColony;
 
 // There are 2 ways to activate cold storage:
 //    - based on an exterior criteria then call Activate / DeActivate to force cold storage
@@ -67,7 +67,7 @@ public:
 	void SetEndDate(const COleDateTime& endDate);
 
 	// Updates the state of the cold storage, call once a simulation day
-	void Update(CEvent& p_Event, CQueen& queen);
+	void Update(CEvent& p_Event, CColony& queen);
 
 	// Reset default values
 	void Reset();

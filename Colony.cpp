@@ -2149,14 +2149,14 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 				coldStorage.DeActivate();
 			}
 		}
-		coldStorage.Update(*pEvent, queen);
+		coldStorage.Update(*pEvent, *this);
 	}
 
 	CEgg* l_DEggs = queen.GetDeggs();
 	CEgg* l_WEggs = queen.GetWeggs();
 
 	// At the begining of cold storage all eggs are lost
-	if (coldStorage.IsActive() && coldStorage.IsStarting())
+	if (coldStorage.IsStarting())
 	{
 		l_DEggs->SetNumber(0);
 		l_WEggs->SetNumber(0);
@@ -2170,7 +2170,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	Weggs.Update(l_WEggs);
 
 	// At the begining of cold storage no eggs become larvae
-	if (coldStorage.IsActive() && coldStorage.IsStarting())
+	if (coldStorage.IsStarting())
 	{
 		Weggs.GetCaboose()->SetNumber(0);
 		Deggs.GetCaboose()->SetNumber(0);
@@ -2184,7 +2184,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	Wlarv.Update((CEgg*)Weggs.GetCaboose());
 
 	// At the begining of cold storage no larvae become brood
-	if (coldStorage.IsActive() && coldStorage.IsStarting())
+	if (coldStorage.IsStarting())
 	{
 		Wlarv.GetCaboose()->SetNumber(0);
 		Dlarv.GetCaboose()->SetNumber(0);

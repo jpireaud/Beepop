@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "ColdStorageSimulator.h"
+#include "Colony.h"
 #include "Egg.h"
 #include "Queen.h"
 #include "WeatherEvents.h"
@@ -54,18 +55,22 @@ void CColdStorageSimulator::SetEndDate(const COleDateTime& endDate)
 	m_EndDate = endDate;
 	m_EndDateStr = m_EndDate.Format("%m%d");
 }
-void CColdStorageSimulator::Update(CEvent& p_Event, CQueen& p_Queen)
+void CColdStorageSimulator::Update(CEvent& p_Event, CColony& p_Colony)
 {
 	bool isActive = IsEnabled() && (IsOn() || IsColdStoragePeriod(p_Event));
 	if (!m_IsActive && isActive)
 	{
 		m_IsStarting = true;
 	}
-	if (m_IsStarting && p_Queen.GetTeggs() == 0)
+	// Starting phase is when the bees are placed in cold storage 
+	// and there are still brood that needs to become Adult
+	if (m_IsStarting)
 	{
-		m_IsStarting = false;
+		const bool starting = p_Colony.queen.GetTeggs() > 0 || p_Colony.CapDrn.GetQuantity() > 0 || p_Colony.CapWkr.GetQuantity() > 0;
+		m_IsStarting = starting;
 	}
-	if (isActive && !m_IsStarting && p_Queen.GetTeggs() > 0)
+	// Ending phase is when the queen starts to lay eggs again while in cold storage
+	if (isActive && !m_IsStarting && p_Colony.queen.GetTeggs() > 0)
 	{
 		m_IsEnding = true;
 	}
@@ -95,11 +100,11 @@ bool CColdStorageSimulator::IsActive() const
 }
 bool CColdStorageSimulator::IsStarting() const
 {
-	return m_IsStarting;
+	return IsActive() && m_IsStarting;
 }
 bool CColdStorageSimulator::IsEnding() const
 {
-	return m_IsEnding;
+	return IsActive() && m_IsEnding;
 }
 bool CColdStorageSimulator::IsColdStoragePeriod(CEvent& p_Event) const
 {
