@@ -51,6 +51,10 @@ def simulation_error(error):
     utilities.safe_print(error)
 
 
+def to_normalize_path(path):
+    return r'"%s"' % path
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Cold storage simulation.')
     parser.add_argument('--exe', type=str, help='Path of the VarroaPop command line application', required=True)
@@ -63,6 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--weather_directory', type=str, help='Get weather files from WEATHER_DIRECTORY',
                         metavar='WEATHER_DIRECTORY', required=True)
     arguments = parser.parse_args()
+
+    print('Working directory: ' + os.getcwd())
 
     if not os.path.isfile(arguments.exe):
         print('Cannot find VarroaPop executable at: ' + arguments.exe)
@@ -102,7 +108,7 @@ if __name__ == '__main__':
 
     exec_configurations = []
 
-    default_command = arguments.exe + ' -f -v ' + arguments.vrp + \
+    default_command = arguments.exe + ' -f -v ' + to_normalize_path(arguments.vrp) + \
                       ' --forageDayNoTemp --hourlyTemperaturesEstimation --foragersAlwaysAgeBasedOnForageInc' + \
                       ' --adultAgingBasedOnLaidEggs  --inOutEvents'
 
@@ -122,14 +128,14 @@ if __name__ == '__main__':
             print('Missing input file ' + input_file)
             exit(-1)
 
-        command = default_command + ' -i ' + input_file
-        command += ' -w ' + os.path.join(arguments.weather_directory, weather_file)
+        command = default_command + ' -i ' + to_normalize_path(input_file)
+        command += ' -w ' + to_normalize_path(os.path.join(arguments.weather_directory, weather_file))
         command += ' --binaryWeatherFileFormat ' + utilities.get_valid_binary_format_identifier(info.scenario)
 
         # add configuration without cold storage
         output_filename = info.model + '_default'
         output_file = os.path.join(output_directory, output_filename + '.txt')
-        exec_command = command + ' -o ' + output_file
+        exec_command = command + ' -o ' + to_normalize_path(output_file)
         exec_configurations.append(exec_command)
 
         # add configurations for cold storage
@@ -137,7 +143,7 @@ if __name__ == '__main__':
             for end_date in end_dates:
                 output_filename = info.model + '_cold_storage_' + start_date.hyphen() + '_' + end_date.hyphen()
                 output_file = os.path.join(output_directory, output_filename + '.txt')
-                exec_command = command + ' -o ' + output_file
+                exec_command = command + ' -o ' + to_normalize_path(output_file)
                 exec_command += ' --coldStorage --coldStorageStartDate %s --coldStorageEndDate %s' \
                                 % (start_date.slash(), end_date.slash())
                 exec_configurations.append(exec_command)
