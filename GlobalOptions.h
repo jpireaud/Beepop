@@ -1,12 +1,7 @@
 #pragma once
 
 #include <string>
-
-#ifndef SINGLETON_CSTR_VISIBILITY_PUBLIC
-#define SINGLETON_CSTR_VISIBILITY private:
-#else
-#define SINGLETON_CSTR_VISIBILITY public:
-#endif
+#include <stdexcept>
 
 // Singleton class to easily add conditional block statements
 // and select them by either:
@@ -18,7 +13,8 @@ public:
 	// Returns the single instance of GlobalOptions class
 	static GlobalOptions& Get();
 
-SINGLETON_CSTR_VISIBILITY
+public:
+	// The use of this constructor is restricted for testing
 	GlobalOptions();
 
 public:
@@ -40,12 +36,12 @@ public:
 	class AggregateOption : Option<OptionType>
 	{
 	public:
-		AggregateOption(GlobalOptions& options) : Option(), m_options(options) {}
+		AggregateOption(GlobalOptions& options) : Option<OptionType>(), m_options(options) {}
 		virtual void Set(const OptionType& value);
 		virtual const OptionType& operator()() const 
 		{
-			throw std::exception("GlobalOptions::AggregateOption::operator()() should not be called directly");
-			return m_value;
+			throw std::runtime_error("GlobalOptions::AggregateOption::operator()() should not be called directly");
+			return Option<OptionType>::m_value;
 		}
 
 	private:

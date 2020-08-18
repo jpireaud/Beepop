@@ -23,8 +23,7 @@ set(SOURCES main.cpp
 
 
 add_executable(VarroaPopTests ${SOURCES})
-target_compile_definitions(VarroaPopDataModel PRIVATE SINGLETON_CSTR_VISIBILITY_PUBLIC)
 target_link_libraries(VarroaPopTests PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
 target_link_libraries(VarroaPopTests PRIVATE Catch2::Catch2)
 target_link_libraries(VarroaPopTests PRIVATE Boost::system Boost::filesystem)
-target_precompile_headers(VarroaPopTests REUSE_FROM VarroaPopDataModel)
+target_precompile_headers(VarroaPopTests REUSE_FROM VarroaPopLinuxPort)

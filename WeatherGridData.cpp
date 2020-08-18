@@ -9,6 +9,7 @@
 #include <cmath>
 #include <fstream>
 #include <numeric>
+#include <regex>
 
 /**
  * Define accessors for Binary data structures access
@@ -210,14 +211,13 @@ namespace WeatherGridDataNs
 
     double GetLatitudeFromFilename(const std::string& filename)
     {
-        const size_t firstUnderscore = filename.find_first_of('_');
-        if (firstUnderscore != std::string::npos)
+        const std::regex latitudeSearch("_([+-]?[0-9]*[.][0-9]+)_[+-]?[0-9]*[.][0-9]+");
+        std::smatch latutudeMatch;
+        if (std::regex_search(filename, latutudeMatch, latitudeSearch))
         {
-            const size_t secondUnderscore = filename.find_first_of('_', firstUnderscore + 1);
-            if (secondUnderscore != std::string::npos)
+            if (latutudeMatch.size() == 2)
             {
-                const double latitude = std::atof(filename.substr(firstUnderscore + 1, secondUnderscore - firstUnderscore).c_str());
-                return latitude;
+                return std::atof(latutudeMatch[1].str().c_str());
             }
             else
             {

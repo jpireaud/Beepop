@@ -24,4 +24,4 @@ set(SOURCES carchive.cpp
 add_library(VarroaPopLinuxPort ${SOURCES})
 target_link_libraries(VarroaPopLinuxPort PRIVATE fmt::fmt)
 target_link_libraries(VarroaPopLinuxPort PRIVATE Boost::system Boost::filesystem)
-target_precompile_headers(VarroaPopLinuxPort REUSE_FROM VarroaPopDataModel)
+target_precompile_headers(VarroaPopLinuxPort PRIVATE "${VarroaPopPCH}")
