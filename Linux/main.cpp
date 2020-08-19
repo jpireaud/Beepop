@@ -119,8 +119,13 @@ int main(int argc, char** argv)
 				{
 					if (!bfs::create_directories(outputDirectory))
 					{
-						std::cerr << "cannot create output directory " << outputDirectory.string() << std::endl;
-						error = true;
+						// it is possible that the given directory was created by another processus so
+						// let's check if the directory is created in which case no need to set the error
+						if (!bfs::exists(outputDirectory))
+						{
+							std::cerr << "cannot create output directory " << outputDirectory.string() << std::endl;
+							error = true;
+						}
 					}
 				}
 			}
