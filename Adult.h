@@ -2,12 +2,9 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_ADULT_H__8C6C41B6_7899_11D2_8D9A_0020AF233A70__INCLUDED_)
-#define AFX_ADULT_H__8C6C41B6_7899_11D2_8D9A_0020AF233A70__INCLUDED_
-
-#if _MSC_VER >= 1000
+// For some reason the guard in Adult.h AFX_ADULT_H__8C6C41B6_7899_11D2_8D9A_0020AF233A70__INCLUDED_ 
+// was conflicting on some Linux machines so let's get rid of it
 #pragma once
-#endif // _MSC_VER >= 1000
 
 #include "Bee.h"
 #include "Mite.h"
@@ -42,5 +39,3 @@ class CAdult : public CBee  {
 	CMite GetMites() {return m_Mites;}
 
 };
-
-#endif // !defined(AFX_ADULT_H__8C6C41B6_7899_11D2_8D9A_0020AF233A70__INCLUDED_)
