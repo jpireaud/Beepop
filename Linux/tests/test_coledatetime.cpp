@@ -88,8 +88,9 @@ TEST_CASE("COleDateTime operations", "[port]") {
         dt.ParseDateTime("toto");
         CHECK(dt.GetStatus() == COleDateTime::error);
         
-        dt.ParseDateTime("1/1/2001", VAR_DATEVALUEONLY);
-        CHECK(dt.GetStatus() == COleDateTime::error);
+        dt.ParseDateTime("1/01/2001", VAR_DATEVALUEONLY);
+        INFO("This test fails on Linux due to a bug in gnu compiler https://gcc.gnu.org/bugzilla/show_bug.cgi?id=45896")
+        CHECK(dt.GetStatus() == COleDateTime::valid);
         
         dt.ParseDateTime("01/01/2001", VAR_DATEVALUEONLY);
         CHECK(dt.GetStatus() == COleDateTime::valid);

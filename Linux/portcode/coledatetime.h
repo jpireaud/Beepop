@@ -67,7 +67,8 @@ public:
 	CString Format(const char* format) const;
 	bool ParseDateTime(const CString& dateTimeStr, DWORD dwFlags = 0);
 
-	bool SetDate(int32_t year, int32_t month, int32_t day);
+	// returns 0 if successful, 1 otherwise
+	int SetDate(int32_t year, int32_t month, int32_t day);
 
 	bool GetAsSystemTime(SYSTEMTIME& time) const;
 	bool GetAsUDATE(UDATE& date) const;

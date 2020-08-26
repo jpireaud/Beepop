@@ -35,6 +35,16 @@ bool CString::operator==(const char* str) const
 	return m_data == str;
 }
 
+bool CString::operator!=(const CString& str) const
+{
+	return m_data != str.m_data;
+}
+
+bool CString::operator!=(const char* str) const
+{
+	return m_data != str;
+}
+
 char& CString::operator[](const size_t& index)
 {
 	return m_data[index];

@@ -200,7 +200,7 @@ bool COleDateTime::ParseDateTime(const CString& dateTimeStr, DWORD dwFlags)
     return m_status == valid;
 }
 
-bool COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
+int COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
 {
     const char* dateFormat = "%Y-%m-%d";
     std::string dateStr = fmt::format("{:0>4}-{:0>2}-{:0>2}", year, month, day);
@@ -217,7 +217,7 @@ bool COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
     {
         m_status = error;
     }
-    return m_status == valid;
+    return !(m_status == valid);
 }
 
 bool COleDateTime::GetAsSystemTime(SYSTEMTIME& time) const

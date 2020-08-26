@@ -18,6 +18,9 @@ public:
 	bool operator==(const CString& str) const;
 	bool operator==(const char* str) const;
 
+	bool operator!=(const CString& str) const;
+	bool operator!=(const char* str) const;
+
 	char& operator[](const size_t& index);
 	const char& operator[](const size_t& index) const;
 

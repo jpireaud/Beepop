@@ -19,7 +19,8 @@ set(SOURCES main.cpp
             test_ctime.cpp 
             test_cuintarray.cpp
             test_globaloptions.cpp
-            test_temperaturedata.cpp )
+            test_temperaturedata.cpp
+            test_varroapop.cpp )
 
 
 add_executable(VarroaPopTests ${SOURCES})

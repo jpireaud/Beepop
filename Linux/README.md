@@ -87,3 +87,11 @@ The options that we keep for now are:
 - Richland: 46.28125, -119.34375
 - Wenatchee: 47.40625, -120.34375
 - Omak: 48.40625, -119.53125
+
+
+## Roadmap
+
+- Change the POSITION wrapper which makes allocations and I think there is a better way to do
+- Change the Implementation of the COleDateTime which is not portable on Windows (not using Windows SDK) by using Boost::DateTime library
+- Enhance Binary serialization feedback to reject invalid files (check if eof is reached in >> operators)
+- Add a logger to have several logging levels INFO/WARNING/ERROR so that it can be easily disabled

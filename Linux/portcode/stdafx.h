@@ -30,6 +30,10 @@
 #include <memory>
 #define DEBUG_NEW new
 
+#include <cstdio> // stderr
+#include <cstdlib> // stderr
+#include <iostream> // std::cerr
+
 /**
  * Make the TRACE method to work using the fmt dependency
  */
@@ -147,7 +151,7 @@ std::ostream &operator<<(std::ostream &stream, const CString& string);
 #define strtok_s(_In, _Delim, _SafeToken) strtok(_In, _Delim)
 #endif
 
-#define NOT_IMPLEMENTED() assert("Not implemented!")
+#define NOT_IMPLEMENTED() std::cerr << __FUNCTION__  << ": NOT IMPLEMENTED in " << __FILE__ << "(" << __LINE__ << ")" << std::endl;
 
 #endif // STDAFX_CUSTOM_H
 
