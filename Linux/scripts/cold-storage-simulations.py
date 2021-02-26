@@ -66,6 +66,8 @@ if __name__ == '__main__':
                         metavar='IN_DIR', required=True)
     parser.add_argument('--weather_directory', type=str, help='Get weather files from WEATHER_DIRECTORY',
                         metavar='WEATHER_DIRECTORY', required=True)
+    parser.add_argument('--skip_default', type=bool, help='Skip the simulation without cold storage',
+                        metavar='SKIP_DEFAULT', default=False)
     arguments = parser.parse_args()
 
     print('Working directory: ' + os.getcwd())
@@ -90,21 +92,24 @@ if __name__ == '__main__':
         print('Cannot find weather directory at: ' + arguments.weather_directory)
         exit(-1)
 
-    start_dates = [
-        DateConfig('09/15'),
-        DateConfig('09/22'),
-        DateConfig('09/29'),
-        DateConfig('10/06'),
-        DateConfig('10/13'),
-        DateConfig('10/20')]
+    start_dates = [DateConfig('10/06')]
+    end_dates = [DateConfig('04/05')]
 
-    end_dates = [
-        DateConfig('02/15'),
-        DateConfig('02/22'),
-        DateConfig('02/29'),
-        DateConfig('03/01'),
-        DateConfig('03/08'),
-        DateConfig('03/15')]
+    # start_dates = [
+    #     DateConfig('09/15'),
+    #     DateConfig('09/22'),
+    #     DateConfig('09/29'),
+    #     DateConfig('10/06'),
+    #     DateConfig('10/13'),
+    #     DateConfig('10/20')]
+    #
+    # end_dates = [
+    #     DateConfig('02/15'),
+    #     DateConfig('02/22'),
+    #     DateConfig('02/29'),
+    #     DateConfig('03/01'),
+    #     DateConfig('03/08'),
+    #     DateConfig('03/15')]
 
     exec_configurations = []
 
@@ -133,10 +138,12 @@ if __name__ == '__main__':
         command += ' --binaryWeatherFileFormat ' + utilities.get_valid_binary_format_identifier(info.scenario)
 
         # add configuration without cold storage
-        output_filename = info.model + '_default'
-        output_file = os.path.join(output_directory, output_filename + '.txt')
-        exec_command = command + ' -o ' + to_normalize_path(output_file)
-        exec_configurations.append(exec_command)
+        if arguments.skip_default == False:
+            output_filename = info.model + '_default'
+            output_file = os.path.join(output_directory, output_filename + '.txt')
+            exec_command = command + ' -o ' + to_normalize_path(output_file)
+            print(exec_command)
+            exec_configurations.append(exec_command)
 
         # add configurations for cold storage
         for start_date in start_dates:
