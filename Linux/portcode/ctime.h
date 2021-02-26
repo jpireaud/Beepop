@@ -4,7 +4,7 @@
 
 #include "coledatetime.h"
 
-#include <chrono>
+#include "Poco/Timestamp.h"
 
 /**
  * Only supports the necessary interface for the good behavior of VarroaPop
@@ -23,7 +23,7 @@ public:
 protected:
 
 	// here we use a time point to get milliseconds precision
-	std::chrono::system_clock::time_point m_time_point;
+	Poco::Timestamp m_timestamp;
 };
 
 #endif // CTIME_CUSTOM_H

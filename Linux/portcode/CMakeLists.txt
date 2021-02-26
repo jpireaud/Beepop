@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(Boost CONFIG REQUIRED system filesystem)
+find_package(Poco REQUIRED Foundation CONFIG)
 
 set(SOURCES carchive.cpp
             carray.cpp
@@ -24,4 +25,5 @@ set(SOURCES carchive.cpp
 add_library(VarroaPopLinuxPort ${SOURCES})
 target_link_libraries(VarroaPopLinuxPort PRIVATE fmt::fmt)
 target_link_libraries(VarroaPopLinuxPort PRIVATE Boost::system Boost::filesystem)
+target_link_libraries(VarroaPopLinuxPort PRIVATE Poco::Foundation)
 target_precompile_headers(VarroaPopLinuxPort PRIVATE "${VarroaPopPCH}")

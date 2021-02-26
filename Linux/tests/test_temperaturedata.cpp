@@ -133,9 +133,11 @@ TEST_CASE("Temperature Data", "[input]") {
 
     SECTION("JDay") {
 
+        COleDateTime nonExistingDate(2019, 2, 29, 0, 0, 0);
+        CHECK(nonExistingDate.GetStatus() == COleDateTime::invalid);
+
         CHECK(ComputeJDay(COleDateTime(2019, 1, 1, 0, 0, 0)) == 1);
         CHECK(ComputeJDay(COleDateTime(2019, 2, 28, 0, 0, 0)) == 59);
-        CHECK(ComputeJDay(COleDateTime(2019, 2, 29, 0, 0, 0)) == 60);
         CHECK(ComputeJDay(COleDateTime(2019, 3, 1, 0, 0, 0)) == 60);
         CHECK(ComputeJDay(COleDateTime(2019, 12, 31, 0, 0, 0)) == 365);
         CHECK(ComputeJDay(COleDateTime(2020, 1, 1, 0, 0, 0)) == 1);
@@ -310,7 +312,7 @@ TEST_CASE("Temperature Data", "[input]") {
 
         // cold storage period on year transition
         simulator.SetStartDate(COleDateTime(2021, 11, 1, 0, 0, 0));
-        simulator.SetEndDate(COleDateTime(2022, 2, 29, 0, 0, 0));
+        simulator.SetEndDate(COleDateTime(2022, 3, 1, 0, 0, 0));
 
         // event date is before cold storage period
         event.SetTime(COleDateTime(2021, 7, 1, 0, 0, 0));

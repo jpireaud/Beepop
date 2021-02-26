@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost CONFIG REQUIRED system filesystem)
+find_package(Poco REQUIRED Foundation CONFIG)
 
 set(SOURCES main.cpp
             helpers/common.cpp
@@ -27,4 +28,5 @@ add_executable(VarroaPopTests ${SOURCES})
 target_link_libraries(VarroaPopTests PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
 target_link_libraries(VarroaPopTests PRIVATE Catch2::Catch2)
 target_link_libraries(VarroaPopTests PRIVATE Boost::system Boost::filesystem)
+target_link_libraries(VarroaPopTests PRIVATE Poco::Foundation)
 target_precompile_headers(VarroaPopTests REUSE_FROM VarroaPopLinuxPort)

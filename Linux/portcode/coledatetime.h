@@ -6,6 +6,8 @@
 
 #include <chrono>
 
+#include "Poco/DateTime.h"
+
 #define GetCurrentTime() GetTickCount()
 
 class COleDateTimeSpan;
@@ -34,6 +36,12 @@ public:
 
 	COleDateTime();
 	
+protected:
+	
+	COleDateTime(const Poco::DateTime& span);
+
+public:
+
 	COleDateTime(DATE dateSrc);
 
 	COleDateTime(int32_t nYear,
@@ -42,10 +50,6 @@ public:
 		int32_t nHour,
 		int32_t nMin,
 		int32_t nSec);
-
-protected:
-
-	COleDateTime(const std::chrono::system_clock::time_point& timePoint);
 
 public:
 
@@ -56,6 +60,9 @@ public:
 	int32_t GetMinute() const;
 
 	int32_t GetDayOfYear() const;
+
+	//! Added since available directly with Poco API
+	int32_t GetJulianDay() const;
 
 	DateTimeStatus GetStatus() const;
 
@@ -82,10 +89,12 @@ public:
 
 	COleDateTimeSpan operator-(const COleDateTime& date) const;
 
+	Poco::Timestamp Timestamp() const { return m_date.timestamp(); }
+
 protected:
 
 	// here we use a time point to get milliseconds precision
-	std::chrono::system_clock::time_point m_time_point;
+	Poco::DateTime m_date;
 	DateTimeStatus m_status;
 };
 
@@ -99,16 +108,18 @@ public:
 
 	COleDateTimeSpan();
 
+protected:
+	
+	COleDateTimeSpan(const Poco::Timespan& span);
+
+public:
+
 	COleDateTimeSpan(double dblSpanSrc);
 
 	COleDateTimeSpan(size_t lDays,
 		int32_t nHours,
 		int32_t nMins,
 		int32_t nSecs);
-
-protected:
-
-	COleDateTimeSpan(const std::chrono::seconds& span);
 
 public:
 
@@ -118,7 +129,7 @@ public:
 
 protected:
 
-	std::chrono::seconds m_span;
+	Poco::Timespan m_span;
 };
 
 #endif // COLEDATETIME_CUSTOM_H

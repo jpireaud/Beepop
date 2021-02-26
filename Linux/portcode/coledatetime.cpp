@@ -4,38 +4,45 @@
 #include <iomanip>
 #include <sstream>
 
+#include "Poco/Exception.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeParser.h"
+
 /**
  * COleDateTime
  */
 
 /*static*/ COleDateTime COleDateTime::GetTickCount()
 {
-    COleDateTime time (std::chrono::system_clock::now());
-    return time;
+    Poco::DateTime dateTime;
+    COleDateTime date (dateTime);
+    return date;
 }
 
 COleDateTime::COleDateTime(DATE dateSrc)
 {
+    // the integer part of dateSrc is the day offset
     double daysShift;
     double dayShift = std::modf(dateSrc, &daysShift);
-    std::chrono::duration<double, std::ratio<24*3600>> spanInDays (daysShift);
-    std::chrono::duration<double, std::ratio<24*3600>> spanInDay (std::abs(dayShift));
-    COleDateTimeSpan delta (std::chrono::duration_cast<std::chrono::seconds>(spanInDays+spanInDay));
-    COleDateTime origin(1899, 12, 30, 0, 0, 0);
-    COleDateTime date = origin + delta;
-    if (date.GetStatus() == valid)
-    {
-        *this = date;
-    }
-    else
-    {
-        m_status = error;
-    }
+    COleDateTimeSpan days (daysShift);
+    COleDateTimeSpan day (std::abs(dayShift));
+    // debug
+    // std::cout << "days: " << daysShift << " and hours: " << dayShift << std::endl;
+    COleDateTime origin;
+    m_date = origin.m_date + days.m_span + day.m_span;
+    m_status = valid;
 }
 
 COleDateTime::COleDateTime()
-: COleDateTime(1899, 12, 30, 0, 0, 0)
+: m_date(1899, 12, 30, 0, 0, 0)
 {
+    m_status = valid;
+}
+
+COleDateTime::COleDateTime(const Poco::DateTime& date)
+: m_date(date)
+{
+    m_status = valid;
 }
 
 COleDateTime::COleDateTime(int32_t nYear,
@@ -45,63 +52,51 @@ COleDateTime::COleDateTime(int32_t nYear,
     int32_t nMin,
     int32_t nSec)
 {
-    const char* dateTimeFormat = "%Y-%m-%d %H:%M:%S";
-    std::string dateTime = fmt::format("{:0>4}-{:0>2}-{:0>2} {:0>2}:{:0>2}:{:0>2}", nYear, nMonth, nDay, nHour, nMin, nSec);
-    std::istringstream stream (dateTime);
-	std::tm dt = {0};
-    dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
-    stream >> std::get_time(&dt, dateTimeFormat);
-    if (!stream.fail())
+    try
     {
-        m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
-        m_status = valid;
+       m_date = Poco::DateTime(nYear, nMonth, nDay, nHour, nMin, nSec);
+       m_status = valid;
     }
-    else
+    catch(std::exception& exception)
     {
-        m_status = error;
+        std::cerr << exception.what() << std::endl; 
+        m_status = invalid;
     }
-}
-
-COleDateTime::COleDateTime(const std::chrono::system_clock::time_point& timePoint)
-: m_time_point(timePoint)
-, m_status(valid)
-{
 }
 
 int32_t COleDateTime::GetYear() const
 {
-    SYSTEMTIME st = {0};
-    return GetAsSystemTime(st)? st.wYear : error;
+    return m_date.year();
 }
 
 int32_t COleDateTime::GetMonth() const
 {
-    SYSTEMTIME st = {0};
-    return GetAsSystemTime(st)? st.wMonth : error;
+    return m_date.month();
 }
 
 int32_t COleDateTime::GetDay() const
 {
-    SYSTEMTIME st = {0};
-    return GetAsSystemTime(st)? st.wDay : error;
+    return m_date.day();
 }
 
 int32_t COleDateTime::GetHour() const
 {
-    SYSTEMTIME st = {0};
-    return GetAsSystemTime(st)? st.wHour : error;
+    return m_date.hour();
 }
 
 int32_t COleDateTime::GetMinute() const
 {
-    SYSTEMTIME st = {0};
-    return GetAsSystemTime(st)? st.wMinute : error;
+    return m_date.minute();
 }
 
 int32_t COleDateTime::GetDayOfYear() const
 {
-    UDATE date = {0};
-    return GetAsUDATE(date)? date.wDayOfYear : error;
+    return m_date.dayOfYear();
+}
+
+int32_t COleDateTime::GetJulianDay() const
+{
+    return GetDayOfYear();
 }
 
 COleDateTime::DateTimeStatus COleDateTime::GetStatus() const
@@ -111,90 +106,73 @@ COleDateTime::DateTimeStatus COleDateTime::GetStatus() const
 
 bool COleDateTime::operator < (const COleDateTime& other) const
 {
-    return m_time_point < other.m_time_point;
+    return m_date < other.m_date;
 }
 
 bool COleDateTime::operator > (const COleDateTime& other) const
 {
-    return m_time_point > other.m_time_point;
+    return m_date > other.m_date;
 }
 
 bool COleDateTime::operator >= (const COleDateTime& other) const
 {
-    return m_time_point >= other.m_time_point;
+    return m_date >= other.m_date;
 }
 
 bool COleDateTime::operator <= (const COleDateTime& other) const
 {
-    return m_time_point <= other.m_time_point;
+    return m_date <= other.m_date;
 }
 
 CString COleDateTime::Format(const char* format) const
 {
-    CString string;
-    std::time_t l_time = std::chrono::system_clock::to_time_t(m_time_point);
-    auto tm = std::localtime(&l_time);
-    if (tm != nullptr)
-    {
-        std::stringstream ss;
-        ss << std::put_time(tm, format);
-        string = ss.str();
-    }
-    return string;
+    return Poco::DateTimeFormatter::format(m_date, format);
 }
 
 bool COleDateTime::ParseDateTime(const CString& dateTimeStr, DWORD dwFlags)
 {
-    std::istringstream stream(dateTimeStr.ToString());
-    std::tm dt = {0};
-
-    dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
-
-    // Handles the 3 supported formats if the dwFlags is not specified
-    const std::map<size_t, std::string> supportedDateTimeFormatsLengths = {
-        {strlen("00/00/0000 00:00:00"), "%m/%d/%Y %H:%M:%S"},
-        {strlen("00/00/0000"), "%m/%d/%Y"},
-        {strlen("00:00:00"), "%H:%M:%S"}
-    };
-
-    // Status will be set to error if stream isn't valid after get_time or the dateTimeStr is not in the right format
-    m_status = valid;
-    
-    // Paser 
-    if (dwFlags == VAR_DATEVALUEONLY)
+    try
     {
-        // let's try to parse only a date
-        const char* dateFormat = "%m/%d/%Y";
-        stream >> std::get_time(&dt, dateFormat);
-    }
-    else if (dwFlags == VAR_TIMEVALUEONLY)
-    {
-        // let's try to parse only a time
-        const char* timeFormat = "%H:%M:%S";
-        stream >> std::get_time(&dt, timeFormat);
-    }
-    else 
-    {
-        auto dtIndex = supportedDateTimeFormatsLengths.find(dateTimeStr.GetLength());
-        if (dtIndex != supportedDateTimeFormatsLengths.end())
+        bool success = false;
+        int timeZoneDifferential = 0;
+        if (dwFlags == VAR_DATEVALUEONLY)
         {
-            // let's try to parse using the expected length of the given input
-            auto& dateTimeFormat = dtIndex->second;
-            stream >> std::get_time(&dt, dateTimeFormat.c_str());
+            // let's try to parse only a date
+            const char* dateFormat = "%m/%d/%Y";
+            m_date = Poco::DateTimeParser::parse(dateFormat, dateTimeStr.ToString(), timeZoneDifferential);
+            success = true;
         }
-        else
+        else if (dwFlags == VAR_TIMEVALUEONLY)
         {
-            m_status = error;
+            // let's try to parse only a time
+            const char* timeFormat = "%H:%M:%S";
+            m_date = Poco::DateTimeParser::parse(timeFormat, dateTimeStr.ToString(), timeZoneDifferential);
+            success = true;
         }
+        else 
+        {
+            // Handles the 3 supported formats if the dwFlags is not specified
+            const std::map<size_t, std::string> supportedDateTimeFormatsLengths = {
+                {strlen("00/00/0000 00:00:00"), "%m/%d/%Y %H:%M:%S"},
+                {strlen("00/00/0000"), "%m/%d/%Y"},
+                {strlen("00:00:00"), "%H:%M:%S"}
+            };
+            for(auto formatIt=supportedDateTimeFormatsLengths.begin(); !success && formatIt!=supportedDateTimeFormatsLengths.end(); formatIt++) 
+            {
+                if (formatIt->first == dateTimeStr.GetLength()) 
+                {
+                    success = Poco::DateTimeParser::tryParse(formatIt->second, dateTimeStr.ToString(), m_date, timeZoneDifferential);
+                }
+            }
+        }
+        // debug 
+        // std::cout << "parsing: " << dateTimeStr << " resulted in " << Poco::DateTimeFormatter::format(m_date, "%m/%d/%Y %H:%M:%S") << " with success set to " << std::boolalpha << success << std::endl;
+        m_date.makeUTC(timeZoneDifferential);
+        m_status = success? valid : error;
     }
-
-    // Convert the given date to a time_point 
-    if (!stream.fail())
+    catch(std::exception& exception)
     {
-        m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
-    }
-    else
-    {
+        std::cerr << exception.what() << std::endl;
         m_status = error;
     }
     return m_status == valid;
@@ -202,19 +180,14 @@ bool COleDateTime::ParseDateTime(const CString& dateTimeStr, DWORD dwFlags)
 
 int COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
 {
-    const char* dateFormat = "%Y-%m-%d";
-    std::string dateStr = fmt::format("{:0>4}-{:0>2}-{:0>2}", year, month, day);
-    std::istringstream stream (dateStr);
-    std::tm dt = {0};
-    dt.tm_isdst = -1; // needs to be set to unspecified otherwise random value is set
-    stream >> std::get_time(&dt, dateFormat);
-    if (!stream.fail())
+    try
     {
-        m_time_point = std::chrono::system_clock::from_time_t(std::mktime(&dt));
+        m_date.assign(year, month, day);
         m_status = valid;
     }
-    else
+    catch(std::exception& exception)
     {
+        std::cerr << exception.what() << std::endl;
         m_status = error;
     }
     return !(m_status == valid);
@@ -222,87 +195,78 @@ int COleDateTime::SetDate(int32_t year, int32_t month, int32_t day)
 
 bool COleDateTime::GetAsSystemTime(SYSTEMTIME& time) const
 {
-    std::time_t l_time = std::chrono::system_clock::to_time_t(m_time_point);
-    auto tm = std::localtime(&l_time);
-    bool success = tm != nullptr;
-    if(success)
-    {
-        time.wYear = tm->tm_year + 1900;
-        time.wMonth = tm->tm_mon + 1;
-        time.wDayOfWeek = tm->tm_wday;
-        time.wDay = tm->tm_mday;
-        time.wHour = tm->tm_hour;
-        time.wMinute = tm->tm_min;
-        time.wSecond = tm->tm_sec;
-        auto tp_no_milliseconds = std::chrono::system_clock::from_time_t(l_time);
-        time.wMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(m_time_point-tp_no_milliseconds).count();
-    }
-    return success;
+    time.wYear = m_date.year();
+    time.wMonth = m_date.month();
+    time.wDayOfWeek = m_date.dayOfWeek();
+    time.wDay = m_date.day();
+    time.wHour = m_date.hour();
+    time.wMinute = m_date.minute();
+    time.wSecond = m_date.second();
+    time.wMilliseconds = m_date.millisecond();
+    return true;
 }
 
 bool COleDateTime::GetAsUDATE(UDATE& date) const
 {
-    std::time_t l_time = std::chrono::system_clock::to_time_t(m_time_point);
-    auto tm = std::localtime(&l_time);
-    bool success = tm != nullptr;
-    if(success)
-    {
-        date.st.wYear = tm->tm_year + 1900;
-        date.st.wMonth = tm->tm_mon + 1;
-        date.st.wDayOfWeek = tm->tm_wday;
-        date.wDayOfYear = tm->tm_yday + 1;
-        date.st.wDay = tm->tm_mday;
-        date.st.wHour = tm->tm_hour;
-        date.st.wMinute = tm->tm_min;
-        date.st.wSecond = tm->tm_sec;
-        auto tp_no_milliseconds = std::chrono::system_clock::from_time_t(l_time);
-        date.st.wMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(m_time_point-tp_no_milliseconds).count();
-    }
-    return success;
+    date.st.wYear = m_date.year();
+    date.st.wMonth = m_date.month();
+    date.st.wDayOfWeek = m_date.dayOfWeek();
+    date.wDayOfYear = m_date.dayOfYear();
+    date.st.wDay = m_date.day();
+    date.st.wHour = m_date.hour();
+    date.st.wMinute = m_date.minute();
+    date.st.wSecond = m_date.second();
+    date.st.wMilliseconds = m_date.millisecond();
+    return true;
 }
 
 bool COleDateTime::GetAsDATE(DATE& date) const
 {
-    COleDateTime origin(1899, 12, 30, 0, 0, 0);
-    COleDateTimeSpan timeSpan = *this - origin;
-    date = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<24*3600>>>(timeSpan.m_span).count();
+    COleDateTime origin;
+    COleDateTimeSpan timespan = m_date - origin.m_date;
+    double days = (double)timespan.m_span.days();
+    double daySpan = (timespan.m_span.hours() + timespan.m_span.minutes() / 60.0 + timespan.m_span.seconds() / 3600.0) / 24.0;
+    date = days + daySpan;
+    // debug
+    // std::cout << "as DATE with days " << timespan.m_span.days() << " hours " << timespan.m_span.hours() << " minutes " << timespan.m_span.minutes() << " seconds " << timespan.m_span.seconds() << std::endl;
+    // std::cout << "as DATE result " << date << " days " << days << " daySpan " << daySpan << std::endl;
     if (date < 0.0)
     {
-        double daysShift;
-        double dayShift = std::modf(date, &daysShift);
-        date = (daysShift<0.0)? daysShift:-1.0 - (1.0 + dayShift);
+        daySpan = std::modf(date, &days);
+        date = (days<0.0)? days:-1.0 - (1.0 + daySpan);
+        // std::cout << "adjusted result " << date << " days " << days << " daySpan " << daySpan << std::endl;
     }
     return true;
 }
 
 COleDateTime COleDateTime::operator+(const COleDateTimeSpan& span) const
 {
-    auto time_point = m_time_point + span.m_span;
-    return COleDateTime(time_point);
+    auto date = m_date + span.m_span;
+    return COleDateTime(date);
 }
 
 COleDateTime COleDateTime::operator-(const COleDateTimeSpan& span) const
 {
-    auto time_point = m_time_point - span.m_span;
-    return COleDateTime(time_point);
+    auto date = m_date - span.m_span;
+    return COleDateTime(date);
 }
 
 COleDateTime& COleDateTime::operator+=(const COleDateTimeSpan& span)
 {
-    m_time_point += span.m_span;
+    m_date += span.m_span;
     return *this;
 }
 
 COleDateTime& COleDateTime::operator-=(const COleDateTimeSpan& span)
 {
-    m_time_point -= span.m_span;
+    m_date -= span.m_span;
     return *this;
 }
 
 COleDateTimeSpan COleDateTime::operator-(const COleDateTime& date) const
 {
-    auto time_diff = m_time_point - date.m_time_point;    
-    return COleDateTimeSpan(std::chrono::duration_cast<std::chrono::seconds>(time_diff));
+    auto span = m_date - date.m_date;
+    return COleDateTimeSpan(span);
 }
 
 /**
@@ -310,14 +274,24 @@ COleDateTimeSpan COleDateTime::operator-(const COleDateTime& date) const
  */
 
 COleDateTimeSpan::COleDateTimeSpan()
-: m_span(0)
+: m_span()
+{
+}
+
+COleDateTimeSpan::COleDateTimeSpan(const Poco::Timespan& span)
+: m_span(span)
 {
 }
 
 COleDateTimeSpan::COleDateTimeSpan(double dblSpanSrc)
 {
-    std::chrono::duration<double, std::ratio<24*3600>> spanInDays (dblSpanSrc);
-    m_span = std::chrono::duration_cast<std::chrono::seconds>(spanInDays);
+    // convert dblSpanSrc from days to seconds and extract microseconds
+    double dblSeconds = dblSpanSrc * 24 * 60 * 60;
+    double seconds, microseconds;
+    microseconds = modf(dblSeconds, &seconds) * 1000;
+    // debug
+    // std::cout << dblSpanSrc << " in secs " << dblSeconds << " seconds: " << seconds << " micro: " << microseconds << std::endl;
+    m_span.assign(long(seconds), long(microseconds));
 }
 
 COleDateTimeSpan::COleDateTimeSpan(size_t lDays,
@@ -325,21 +299,12 @@ COleDateTimeSpan::COleDateTimeSpan(size_t lDays,
     int32_t nMins,
     int32_t nSecs)
 {
-    std::chrono::duration<int, std::ratio<24*3600>> spanInDays (lDays);
-    std::chrono::hours spanInHours (nHours);
-    std::chrono::minutes spanInMin (nMins);
-    std::chrono::seconds spanInSecs (lDays);
-    m_span = spanInDays+spanInHours+spanInMin+spanInSecs;
-}
-
-COleDateTimeSpan::COleDateTimeSpan(const std::chrono::seconds& span)
-: m_span(span)
-{
+    m_span.assign(lDays, nHours, nMins, nSecs, 0);
 }
 
 int32_t COleDateTimeSpan::GetDays()
 {
-    return std::chrono::duration_cast<std::chrono::duration<int, std::ratio<24*3600>>>(m_span).count();
+    return m_span.days();
 }
 
 bool COleDateTimeSpan::operator!=(const COleDateTimeSpan& other) const
