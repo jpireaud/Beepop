@@ -175,11 +175,7 @@ namespace WeatherGridDataNs
 
     int ComputeJDay(const COleDateTime& date)
     {
-        const bool leapYear = (date.GetYear() % 4) == 0;
-        std::vector<int> months = { 31, (!leapYear)?28:29, 31, 30, 31 , 30, 31 , 31, 30 , 31, 30, 31 };
-        const int month = date.GetMonth();
-        const int jDay = std::accumulate(months.begin(), months.begin() + month - 1, date.GetDay());
-        return jDay;
+        return date.GetJulianDay();
     }
 
     double ComputeDaylightHours(const std::string& filename, const COleDateTime& date)

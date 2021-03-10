@@ -26,7 +26,7 @@ TEST_CASE("CTime operations", "[port]") {
 
         CTime time;
         auto now = std::time(nullptr);
-        auto tm = std::localtime(&now);
+        auto tm = std::gmtime(&now);
 
         auto oleTime = time.GetTime();
         CHECK(oleTime.GetYear() == tm->tm_year + 1900);

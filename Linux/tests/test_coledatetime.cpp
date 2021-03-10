@@ -19,6 +19,17 @@ TEST_CASE("COleDateTime operations", "[port]") {
         CHECK(dateTime.GetDay() == 30);
     }
 
+    SECTION("old date") {
+
+        COleDateTime dateTime (1950, 1, 1, 0, 0, 0);
+
+        CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+        CHECK(dateTime.GetYear() == 1950);
+        CHECK(dateTime.GetMonth() == 1);
+        CHECK(dateTime.GetDay() == 1);
+    }
+
     SECTION("custom date") {
 
         COleDateTime dateTime (1982, 1, 11, 13, 3, 0);
@@ -263,6 +274,18 @@ TEST_CASE("COleDateTime operations", "[port]") {
             CHECK(dateTime.GetDay() == 29);
             
             CHECK(dateTime.GetHour() == 18);
+            CHECK(dateTime.GetMinute() == 0);
+        }
+        {
+            COleDateTime dateTime(-3.0);
+
+            CHECK(dateTime.GetStatus() == COleDateTime::valid);
+
+            CHECK(dateTime.GetYear() == 1899);
+            CHECK(dateTime.GetMonth() == 12);
+            CHECK(dateTime.GetDay() == 27);
+            
+            CHECK(dateTime.GetHour() == 0);
             CHECK(dateTime.GetMinute() == 0);
         }
     }

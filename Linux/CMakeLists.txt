@@ -15,6 +15,9 @@ project(VarroaPop)
 
 ## download dependencies
 
+# Add PocoCPP for DateTime class
+hunter_add_package(PocoCpp)
+
 # fmt library is included from the vcpck install of it 
 # follow instructions https://github.com/microsoft/vcpkg/
 hunter_add_package(fmt)
@@ -48,6 +51,7 @@ add_subdirectory(tests)
 
 find_package(Boost CONFIG REQUIRED system filesystem)
 find_package(cxxopts CONFIG REQUIRED)
+find_package(Poco REQUIRED Foundation CONFIG)
 
 set (SOURCES main.cpp varroapopcmdbridge.cpp)
 
@@ -57,4 +61,5 @@ add_executable(VarroaPop ${SOURCES})
 target_link_libraries(VarroaPop PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
 target_link_libraries(VarroaPop PRIVATE Boost::system Boost::filesystem)
 target_link_libraries(VarroaPop PRIVATE cxxopts::cxxopts)
+target_link_libraries(VarroaPop PRIVATE Poco::Foundation)
 target_precompile_headers(VarroaPop REUSE_FROM VarroaPopLinuxPort)
