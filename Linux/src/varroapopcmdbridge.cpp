@@ -2,15 +2,14 @@
 
 #include <iostream>
 
-VarroaPopCmdBridge::VarroaPopCmdBridge(CVarroaPopSession& session)
-: m_Session(session)
+VarroaPopCmdBridge::VarroaPopCmdBridge(CVarroaPopSession& session) : m_Session(session)
 {
 }
 
 VarroaPopCmdBridge::~VarroaPopCmdBridge()
 {
 }
-	
+
 void VarroaPopCmdBridge::SimulationStartUpdated()
 {
 	// do nothing
@@ -18,7 +17,7 @@ void VarroaPopCmdBridge::SimulationStartUpdated()
 
 void VarroaPopCmdBridge::SimulationEndUpdated()
 {
-	m_Session.StoreResultsFile(m_ResultsFileName);
+	// TODO: replace by our own output formatter implementation
 }
 
 void VarroaPopCmdBridge::StartSimulation(CVarroaPopSession& session)
@@ -29,7 +28,6 @@ void VarroaPopCmdBridge::StartSimulation(CVarroaPopSession& session)
 void VarroaPopCmdBridge::EndSimulation(CVarroaPopSession& session)
 {
 	// TODO: end timer
-	m_Session.StoreResultsFile(m_ResultsFileName);
 }
 
 void VarroaPopCmdBridge::ImmigrationEnabled(bool enabled)
@@ -39,7 +37,6 @@ void VarroaPopCmdBridge::ImmigrationEnabled(bool enabled)
 
 void VarroaPopCmdBridge::WeatherFileMissing()
 {
-	std::cerr << "Weather file missing" << std::endl;
 }
 
 void VarroaPopCmdBridge::WeatherFileLoaded(bool loaded, const CString& filename)
@@ -48,7 +45,7 @@ void VarroaPopCmdBridge::WeatherFileLoaded(bool loaded, const CString& filename)
 	{
 		std::cout << "Weather file: " << filename.ToString() << " loaded" << std::endl;
 	}
-	else 
+	else
 	{
 		std::cerr << "Weather file: [ERROR] when loading " << filename.ToString() << std::endl;
 	}
@@ -56,7 +53,6 @@ void VarroaPopCmdBridge::WeatherFileLoaded(bool loaded, const CString& filename)
 
 void VarroaPopCmdBridge::SessionFileLoaded(CArchive& ar)
 {
-
 }
 
 CString VarroaPopCmdBridge::GetDefaultPathName(CArchive& ar)

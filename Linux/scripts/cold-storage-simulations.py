@@ -92,8 +92,8 @@ if __name__ == '__main__':
         print('Cannot find weather directory at: ' + arguments.weather_directory)
         exit(-1)
 
-    start_dates = [DateConfig('10/06')]
-    end_dates = [DateConfig('04/05')]
+    start_dates = []
+    end_dates = []
 
     # start_dates = [
     #     DateConfig('09/15'),
@@ -122,6 +122,9 @@ if __name__ == '__main__':
     # gather configurations for simulations
     weather_files = os.listdir(arguments.weather_directory)
     for weather_file in weather_files:
+        if weather_file.startswith('.'):
+            continue
+
         info = utilities.parse_weather_filename(weather_file)
         output_directory = os.path.join(arguments.output_directory, os.path.join(info.location, info.scenario))
 
@@ -137,26 +140,31 @@ if __name__ == '__main__':
         command += ' -w ' + to_normalize_path(os.path.join(arguments.weather_directory, weather_file))
         command += ' --binaryWeatherFileFormat ' + utilities.get_valid_binary_format_identifier(info.scenario)
 
+        # output only colony size
+        # command += ' --outputFormat colony'
+
+        # compress output into a GZ file
+        # command += ' --compress'
+
         # add configuration without cold storage
-        if arguments.skip_default == False:
+        if not arguments.skip_default:
             output_filename = info.model + '_default'
-            output_file = os.path.join(output_directory, output_filename + '.txt')
+            output_file = os.path.join(output_directory, output_filename + '.csv')
             exec_command = command + ' -o ' + to_normalize_path(output_file)
-            print(exec_command)
             exec_configurations.append(exec_command)
 
         # add configurations for cold storage
         for start_date in start_dates:
             for end_date in end_dates:
                 output_filename = info.model + '_cold_storage_' + start_date.hyphen() + '_' + end_date.hyphen()
-                output_file = os.path.join(output_directory, output_filename + '.txt')
+                output_file = os.path.join(output_directory, output_filename + '.csv')
                 exec_command = command + ' -o ' + to_normalize_path(output_file)
                 exec_command += ' --coldStorage --coldStorageStartDate %s --coldStorageEndDate %s' \
                                 % (start_date.slash(), end_date.slash())
                 exec_configurations.append(exec_command)
 
     # run simulations
-    print('Executing Cold Storage Simulations: ')
+    print('Executing Simulations: ')
     simulation_time = datetime.datetime.now()
 
     # Step 1: Init multiprocessing.Pool()

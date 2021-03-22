@@ -7,11 +7,8 @@
 class VarroaPopCmdBridge : public CVarroaPopSessionBridge
 {
 public:
-
 	VarroaPopCmdBridge(CVarroaPopSession& session);
 	~VarroaPopCmdBridge();
-
-	void SetResultsFileName(const CString& resultsFileName) { m_ResultsFileName = resultsFileName; }
 
 	//! method called when Simulation start time is present in the input file
 	virtual void SimulationStartUpdated();
@@ -52,13 +49,11 @@ public:
 	virtual CString GetVersion();
 
 	//! method called is the ShowWarning option is on and dates are incompatible
-	//! if the method returns True the simulation will proceed 
+	//! if the method returns True the simulation will proceed
 	virtual BOOL CheckDateConsistencyFailed(const CString& warning);
 
 protected:
-
 	CVarroaPopSession& m_Session;
-	CString m_ResultsFileName;
 };
 
 #endif // VARROAPOPCMD_H
