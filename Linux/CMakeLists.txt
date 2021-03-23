@@ -60,7 +60,7 @@ find_package(cxxopts CONFIG REQUIRED)
 find_package(Poco REQUIRED Foundation CONFIG)
 find_package(ZLIB CONFIG REQUIRED)
 
-set (SOURCES src/main.cpp src/csv.cpp src/varroapopcmdbridge.cpp src/customoutputformatter.cpp src/colonysizeoutputformatter.cpp)
+set (SOURCES src/main.cpp src/csv.cpp src/varroapopcmdbridge.cpp src/customoutputformatter.cpp src/colonysizeoutputformatter.cpp src/agestructureoutputformatter.cpp)
 
 # add_executable(VarroaPop WIN32 ${SOURCES})
 add_executable(VarroaPop ${SOURCES})

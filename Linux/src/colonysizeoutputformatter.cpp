@@ -4,20 +4,20 @@
 #include "colony.h"
 #include "weatherevents.h"
 
-CColonySizeOutputFormatter::CColonySizeOutputFormatter(CVarroaPopSession& session) : CustomOutputFormatter(session)
+ColonySizeOutputFormatter::ColonySizeOutputFormatter(CVarroaPopSession& session) : CustomOutputFormatter(session)
 {
 }
 
-CColonySizeOutputFormatter::~CColonySizeOutputFormatter()
+ColonySizeOutputFormatter::~ColonySizeOutputFormatter()
 {
 }
 
-void CColonySizeOutputFormatter::Init(CColony& colony)
+void ColonySizeOutputFormatter::Init(CColony& colony)
 {
-	m_writer.write("Date", "Colony Size");
+	m_writer.write("Date", "Colony Size", "Min Temp", "Max Temp");
 }
 
-void CColonySizeOutputFormatter::Record(CColony& colony, CEvent& event)
+void ColonySizeOutputFormatter::Record(CColony& colony, CEvent& event)
 {
-	m_writer.write(event.GetDateStg("%m/%d/%Y"), colony.GetColonySize());
+	m_writer.write(event.GetDateStg("%m/%d/%Y"), colony.GetColonySize(), event.GetMinTemp(), event.GetMaxTemp());
 }

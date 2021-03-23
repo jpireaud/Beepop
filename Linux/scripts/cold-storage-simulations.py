@@ -143,8 +143,11 @@ if __name__ == '__main__':
         # output only colony size
         # command += ' --outputFormat colony'
 
+        # output age structure
+        command += ' --outputFormat age_structure'
+
         # compress output into a GZ file
-        # command += ' --compress'
+        command += ' --compress'
 
         # add configuration without cold storage
         if not arguments.skip_default:

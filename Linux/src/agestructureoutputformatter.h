@@ -7,12 +7,12 @@
 /**
  * Output formatter that will only output the colony size
  */
-class ColonySizeOutputFormatter : public CustomOutputFormatter
+class AgeStructureOutputFormatter : public CustomOutputFormatter
 {
 public:
-	ColonySizeOutputFormatter(CVarroaPopSession& session);
+	AgeStructureOutputFormatter(CVarroaPopSession& session);
 
-	virtual ~ColonySizeOutputFormatter();
+	virtual ~AgeStructureOutputFormatter();
 
 	virtual void Init(CColony& colony);
 

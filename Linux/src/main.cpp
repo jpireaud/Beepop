@@ -2,6 +2,7 @@
 #include "globaloptions.h"
 #include "varroapopcmdbridge.h"
 
+#include "agestructureoutputformatter.h"
 #include "colonysizeoutputformatter.h"
 #include "customoutputformatter.h"
 
@@ -333,7 +334,11 @@ int main(int argc, char** argv)
 		{
 			if (outputFormat == "colony")
 			{
-				outputFormatter.reset(new CColonySizeOutputFormatter(session));
+				outputFormatter.reset(new ColonySizeOutputFormatter(session));
+			}
+			else if (outputFormat == "age_structure")
+			{
+				outputFormatter.reset(new AgeStructureOutputFormatter(session));
 			}
 
 			if (outputFormatter)
@@ -360,7 +365,6 @@ int main(int argc, char** argv)
 		// Run simulation
 		session.Simulate();
 
-		std::cout << "Simulation done" << std::endl;
 		if (outputFormatter)
 		{
 			outputFormatter->WriteToFile(outputFile.string(), compressOutput);
