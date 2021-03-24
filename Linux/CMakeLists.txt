@@ -9,6 +9,7 @@ include("cmake/HunterGate.cmake")
 HunterGate(
     URL "https://github.com/cpp-pm/hunter/archive/v0.23.296.tar.gz"
     SHA1 "232f5022ee1d45955a7e8d3e1720f31bac1bb534"
+    LOCAL
 )
 
 project(VarroaPop)
