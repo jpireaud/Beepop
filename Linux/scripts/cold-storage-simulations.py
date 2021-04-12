@@ -96,20 +96,11 @@ if __name__ == '__main__':
     end_dates = []
 
     # start_dates = [
-    #     DateConfig('09/15'),
-    #     DateConfig('09/22'),
-    #     DateConfig('09/29'),
-    #     DateConfig('10/06'),
-    #     DateConfig('10/13'),
-    #     DateConfig('10/20')]
+    #     DateConfig('10/15')]
     #
     # end_dates = [
-    #     DateConfig('02/15'),
-    #     DateConfig('02/22'),
-    #     DateConfig('02/29'),
-    #     DateConfig('03/01'),
-    #     DateConfig('03/08'),
-    #     DateConfig('03/15')]
+    #     DateConfig('01/31'),
+    #     DateConfig('04/01')]
 
     exec_configurations = []
 

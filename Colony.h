@@ -56,7 +56,6 @@ public:
 	void         KillAll();
 	void         SetColony(CColony* pCol) { m_pColony = pCol; }
 	CColony*     GetColony() { return m_pColony; }
-	void         AddMember(CBee* element);
 	virtual void Serialize(CArchive& ar) = 0;
 	CString      Status();
 	void         FactorQuantity(double factor);
@@ -67,6 +66,44 @@ public:
 	static int DroneCount;
 	static int ForagerCount;
 	static int WorkerCount;
+};
+
+//! Adults age based on foraging weather.
+//! - if it is too windy, adults will not age
+//! - if it is too rainy, adults will not age
+//! - if weather is not compatible with foragers flying time, adults will not age
+class CForageBasedAgingBeeList : public CBeelist
+{
+protected:
+	std::deque<CAdult*> m_Caboose;
+
+public:
+	CForageBasedAgingBeeList() {}
+
+	std::deque<CAdult*>& GetCaboose() { return m_Caboose; }
+	int                  GetCabooseQuantity() const;
+	void                 ClearCaboose();
+};
+
+//! Adults age based on foraging weather.
+//! - if it is too windy, adults will not age
+//! - if it is too rainy, adults will not age
+//! - if weather is not compatible with foragers flying time, adults will not age
+class CForageBasedAgingAdultList : public CForageBasedAgingBeeList
+{
+public:
+	CForageBasedAgingAdultList() {}
+
+	//! Add method simply add theBrood txo the Adults without making the adults age
+	void Add(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	void Serialize(CArchive& ar);
+	void KillAll();
+	void UpdateLength(int len, bool bWorker = true);
+	int  MoveToEnd(int QuantityToMove, int MinAge);
+
+protected:
+	void UpdateCaboose(bool bWorker, CColony* colony = nullptr);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -309,12 +346,13 @@ public:
 	CForagerlistA foragers;
 	CAdultlist    Dadl;
 	CAdultlist    Wadl;
-	CBroodlist    CapWkr;
-	CBroodlist    CapDrn;
-	CLarvalist    Wlarv;
-	CLarvalist    Dlarv;
-	CEgglist      Weggs;
-	CEgglist      Deggs;
+
+	CBroodlist CapWkr;
+	CBroodlist CapDrn;
+	CLarvalist Wlarv;
+	CLarvalist Dlarv;
+	CEgglist   Weggs;
+	CEgglist   Deggs;
 
 	// Mite Attributes
 	CMite   WMites;        // # of mites under capped worker cells

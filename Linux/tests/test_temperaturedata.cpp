@@ -105,7 +105,7 @@ CompareMatcher<Container, C> Compare(const Container& comparator, const C& compa
 
 template <typename Type> auto EqualsApprox(const std::array<Type, 24>& comparator)
 {
-	return Compare(comparator, [=](Type actual, Type expected) { return actual == Approx(expected); });
+	return Compare(comparator, [=](Type actual, Type expected) { return actual == Approx(expected).epsilon(1.0); });
 }
 
 TEST_CASE("Temperature Data", "[input]")
@@ -487,6 +487,212 @@ TEST_CASE("Temperature Data Failing", "[hide]")
 			CHECK_THAT(input.hourly_temperatures, EqualsApprox(expectedResult));
 		}
 	}
+
+	SECTION("Check hourly temperature algorithm")
+	{
+		struct csv_data
+		{
+			int   month;
+			int   day;
+			int   year;
+			float tmin;
+			float tmax;
+			int   jday;
+			float sunrise;
+			float sunset;
+			float daylength;
+			float prev_sunset;
+			float next_sunrise;
+			float prev_max;
+			float next_min;
+			float prev_min;
+			float tsunset;
+			float prev_tsunset;
+			float hour_0;
+			float hour_1;
+			float hour_2;
+			float hour_3;
+			float hour_4;
+			float hour_5;
+			float hour_6;
+			float hour_7;
+			float hour_8;
+			float hour_9;
+			float hour_10;
+			float hour_11;
+			float hour_12;
+			float hour_13;
+			float hour_14;
+			float hour_15;
+			float hour_16;
+			float hour_17;
+			float hour_18;
+			float hour_19;
+			float hour_20;
+			float hour_21;
+			float hour_22;
+			float hour_23;
+
+			csv_data() { clear(); }
+
+			void parse(const std::string& line)
+			{
+				std::vector<std::string> elements;
+				ba::split(elements, line, [](const char& c) { return c == ','; });
+				if (elements.size() == 40)
+				{
+					size_t index = 0;
+					month = std::atoi(elements[index++].c_str());
+					day = std::atoi(elements[index++].c_str());
+					year = std::atoi(elements[index++].c_str());
+					tmin = std::atof(elements[index++].c_str());
+					tmax = std::atof(elements[index++].c_str());
+					jday = std::atoi(elements[index++].c_str());
+					sunrise = std::atof(elements[index++].c_str());
+					sunset = std::atof(elements[index++].c_str());
+					daylength = std::atof(elements[index++].c_str());
+					prev_sunset = std::atof(elements[index++].c_str());
+					next_sunrise = std::atof(elements[index++].c_str());
+					prev_max = std::atof(elements[index++].c_str());
+					next_min = std::atof(elements[index++].c_str());
+					prev_min = std::atof(elements[index++].c_str());
+					tsunset = std::atof(elements[index++].c_str());
+					prev_tsunset = std::atof(elements[index++].c_str());
+					hour_0 = std::atof(elements[index++].c_str());
+					hour_1 = std::atof(elements[index++].c_str());
+					hour_2 = std::atof(elements[index++].c_str());
+					hour_3 = std::atof(elements[index++].c_str());
+					hour_4 = std::atof(elements[index++].c_str());
+					hour_5 = std::atof(elements[index++].c_str());
+					hour_6 = std::atof(elements[index++].c_str());
+					hour_7 = std::atof(elements[index++].c_str());
+					hour_8 = std::atof(elements[index++].c_str());
+					hour_9 = std::atof(elements[index++].c_str());
+					hour_10 = std::atof(elements[index++].c_str());
+					hour_11 = std::atof(elements[index++].c_str());
+					hour_12 = std::atof(elements[index++].c_str());
+					hour_13 = std::atof(elements[index++].c_str());
+					hour_14 = std::atof(elements[index++].c_str());
+					hour_15 = std::atof(elements[index++].c_str());
+					hour_16 = std::atof(elements[index++].c_str());
+					hour_17 = std::atof(elements[index++].c_str());
+					hour_18 = std::atof(elements[index++].c_str());
+					hour_19 = std::atof(elements[index++].c_str());
+					hour_20 = std::atof(elements[index++].c_str());
+					hour_21 = std::atof(elements[index++].c_str());
+					hour_22 = std::atof(elements[index++].c_str());
+					hour_23 = std::atof(elements[index++].c_str());
+				}
+			}
+
+			static csv_data Invalid()
+			{
+				csv_data invalid;
+				invalid.clear();
+				return invalid;
+			}
+
+			bool isValid() const
+			{
+				static csv_data sInvalid = Invalid();
+				return !(*this == sInvalid);
+			}
+
+			void clear() { memset(this, 0, sizeof(csv_data)); }
+
+			bool operator==(const csv_data& other) const { return memcmp(this, &other, sizeof(csv_data)) == 0; }
+		};
+
+		bfs::path     omakFilePath = "/Users/julien/Downloads/data/make_hourly_temps_output.csv";
+		std::ifstream omakFile(omakFilePath.string(), std::ios_base::in);
+		REQUIRE(omakFile.good());
+
+		std::vector<csv_data> data;
+
+		std::string line;
+
+		std::getline(omakFile, line); // first line is column headers
+
+		while (omakFile.good() && !omakFile.eof())
+		{
+			std::getline(omakFile, line);
+			try
+			{
+				csv_data item;
+				item.parse(line);
+				if (item.isValid())
+				{
+					data.push_back(item);
+				}
+			}
+			catch (...)
+			{
+				std::cerr << "Line: " << line << " cannot be parsed to CSVData" << std::endl;
+			}
+		}
+
+		REQUIRE(data.size() == 20454);
+
+		const float latitude = 42.03125;
+
+		std::ofstream output("/Users/julien/Downloads/data/cpp.csv", std::ios_base::out);
+		output << "cpp" << std::endl;
+
+		size_t dayIndex = 0;
+		for (const auto& item : data)
+		{
+			INFO(dayIndex);
+
+			COleDateTime date(item.year, item.month, item.day, 0, 0, 0);
+
+			const int jday = ComputeJDay(date);
+			REQUIRE(jday == item.jday);
+
+			auto daylengthResult = DayLength(latitude, jday);
+			REQUIRE(daylengthResult.sunrise == Approx(item.sunrise));
+			REQUIRE(daylengthResult.sunset == Approx(item.sunset));
+			REQUIRE(daylengthResult.daylength == Approx(item.daylength));
+
+			HourlyTempraturesEstimator estimator;
+			estimator.tmin = item.tmin;
+			estimator.tmax = item.tmax;
+			estimator.sunrise = item.sunrise;
+			estimator.sunset = item.sunset;
+			estimator.daylength = item.daylength;
+			if (dayIndex > 0)
+			{
+				estimator.prev_tmin = item.prev_min;
+				estimator.prev_tmax = item.prev_max;
+				estimator.prev_sunset = item.prev_sunset;
+			}
+			if (dayIndex < data.size())
+			{
+				estimator.next_tmin = item.next_min;
+				estimator.next_sunrise = item.next_sunrise;
+			}
+			estimator.compute();
+
+			REQUIRE(estimator.tsunset == Approx(item.tsunset).epsilon(1e-3));
+			REQUIRE(estimator.prev_tsunset == Approx(item.prev_tsunset).epsilon(1e-3));
+
+			std::array<float, 24> expectedResult = {
+			    item.hour_0,  item.hour_1,  item.hour_2,  item.hour_3,  item.hour_4,  item.hour_5,
+			    item.hour_6,  item.hour_7,  item.hour_8,  item.hour_9,  item.hour_10, item.hour_11,
+			    item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17,
+			    item.hour_18, item.hour_19, item.hour_20, item.hour_21, item.hour_22, item.hour_23};
+			CHECK_THAT(estimator.hourly_temperatures, EqualsApprox(expectedResult));
+
+			{
+				for (size_t hourIndex = 0; hourIndex < 24; hourIndex++)
+				{
+					output << estimator.hourly_temperatures[hourIndex] << std::endl;
+				}
+			}
+			dayIndex++;
+		}
+		output.close();
+	}
+
 	SECTION("Hourly temperature from file")
 	{
 
@@ -635,244 +841,250 @@ TEST_CASE("Temperature Data Failing", "[hide]")
 
 		CSVHourlyTemperatureDataItem expected;
 
-		expected = {1979,
-		            2,
-		            6,
-		            1.83,
-		            -6.25,
-		            0.0028,
-		            55.4,
-		            100,
-		            61.23,
-		            48.40625,
-		            -119.53125,
-		            7.17144570027357,
-		            16.8285542997264,
-		            9.65710859945285,
-		            -4.76008948755474,
-		            -5.02424441646498,
-		            -5.26110578322043,
-		            -5.47578928902288,
-		            -5.67209480159138,
-		            -5.85292220253554,
-		            -6.02053491933582,
-		            -6.1767335438027,
-		            -4.71929728940465,
-		            -2.95065729767772,
-		            -1.35583489818696,
-		            -0.0188493076474865,
-		            0.989863742593826,
-		            1.61716273634142,
-		            1.83,
-		            1.61716273634142,
-		            0.989863742593828,
-		            -0.253972510197426,
-		            -1.94308776995746,
-		            -2.97982543578956,
-		            -3.72995274949267,
-		            -4.31809284307809,
-		            -4.80193148440331,
-		            -5.21294918358566};
+		expected = {
+		    1979,
+		    2,
+		    6,
+		    1.83,
+		    -6.25,
+		    0.0028,
+		    55.4,
+		    100,
+		    61.23,
+		    48.40625,
+		    -119.53125,
+		    7.17144570027357,
+		    16.8285542997264,
+		    9.65710859945285,
+		    -4.76008948755474,
+		    -5.02424441646498,
+		    -5.26110578322043,
+		    -5.47578928902288,
+		    -5.67209480159138,
+		    -5.85292220253554,
+		    -6.02053491933582,
+		    -6.1767335438027,
+		    -4.71929728940465,
+		    -2.95065729767772,
+		    -1.35583489818696,
+		    -0.0188493076474865,
+		    0.989863742593826,
+		    1.61716273634142,
+		    1.83,
+		    1.61716273634142,
+		    0.989863742593828,
+		    -0.253972510197426,
+		    -1.94308776995746,
+		    -2.97982543578956,
+		    -3.72995274949267,
+		    -4.31809284307809,
+		    -4.80193148440331,
+		    -5.21294918358566};
 		CHECK(data[36] == expected);
 
-		expected = {1979,
-		            7,
-		            6,
-		            33.07,
-		            15.2,
-		            0.0085,
-		            252.625,
-		            89.1,
-		            21.58,
-		            48.40625,
-		            -119.53125,
-		            3.93431561602807,
-		            20.0656843839719,
-		            16.1313687679439,
-		            19.7303742452638,
-		            19.0075824387806,
-		            18.3978010149415,
-		            17.8704229878499,
-		            15.3831705488828,
-		            18.1581893499511,
-		            20.861313337576,
-		            23.4268467188875,
-		            25.7924376556453,
-		            27.9005936418054,
-		            29.7000787815529,
-		            31.1471590088389,
-		            32.2066649850338,
-		            32.8528468424013,
-		            33.07,
-		            32.8528468424013,
-		            32.2066649850338,
-		            31.1471590088389,
-		            29.7000787815529,
-		            27.9005936418054,
-		            25.7924376556453,
-		            22.44660797383,
-		            20.4268105805484,
-		            19.0053998401906};
+		expected = {
+		    1979,
+		    7,
+		    6,
+		    33.07,
+		    15.2,
+		    0.0085,
+		    252.625,
+		    89.1,
+		    21.58,
+		    48.40625,
+		    -119.53125,
+		    3.93431561602807,
+		    20.0656843839719,
+		    16.1313687679439,
+		    19.7303742452638,
+		    19.0075824387806,
+		    18.3978010149415,
+		    17.8704229878499,
+		    15.3831705488828,
+		    18.1581893499511,
+		    20.861313337576,
+		    23.4268467188875,
+		    25.7924376556453,
+		    27.9005936418054,
+		    29.7000787815529,
+		    31.1471590088389,
+		    32.2066649850338,
+		    32.8528468424013,
+		    33.07,
+		    32.8528468424013,
+		    32.2066649850338,
+		    31.1471590088389,
+		    29.7000787815529,
+		    27.9005936418054,
+		    25.7924376556453,
+		    22.44660797383,
+		    20.4268105805484,
+		    19.0053998401906};
 		CHECK(data[186] == expected);
 
-		expected = {1982,
-		            12,
-		            21,
-		            1.84,
-		            -4.3,
-		            0.0036,
-		            40.4,
-		            100,
-		            88,
-		            48.40625,
-		            -119.53125,
-		            7.84458317615193,
-		            16.1554168238481,
-		            8.31083364769614,
-		            -3.48986802737647,
-		            -3.64124919147136,
-		            -3.77797088437726,
-		            -3.90262330827026,
-		            -4.01716554711344,
-		            -4.12311528772586,
-		            -4.22167220701657,
-		            -4.31380104697031,
-		            -4.05654710188955,
-		            -2.51573869605991,
-		            -1.09049498277154,
-		            0.126872530037326,
-		            1.05751625316166,
-		            1.64115938998495,
-		            1.84,
-		            1.64115938998495,
-		            1.05751625316166,
-		            -0.441263630377153,
-		            -1.41451416488852,
-		            -2.09137312798071,
-		            -2.61083471192319,
-		            -3.03246429026715,
-		            -3.38733609358046,
-		            -3.69372864101575};
+		expected = {
+		    1982,
+		    12,
+		    21,
+		    1.84,
+		    -4.3,
+		    0.0036,
+		    40.4,
+		    100,
+		    88,
+		    48.40625,
+		    -119.53125,
+		    7.84458317615193,
+		    16.1554168238481,
+		    8.31083364769614,
+		    -3.48986802737647,
+		    -3.64124919147136,
+		    -3.77797088437726,
+		    -3.90262330827026,
+		    -4.01716554711344,
+		    -4.12311528772586,
+		    -4.22167220701657,
+		    -4.31380104697031,
+		    -4.05654710188955,
+		    -2.51573869605991,
+		    -1.09049498277154,
+		    0.126872530037326,
+		    1.05751625316166,
+		    1.64115938998495,
+		    1.84,
+		    1.64115938998495,
+		    1.05751625316166,
+		    -0.441263630377153,
+		    -1.41451416488852,
+		    -2.09137312798071,
+		    -2.61083471192319,
+		    -3.03246429026715,
+		    -3.38733609358046,
+		    -3.69372864101575};
 		CHECK(data[1450] == expected);
 
-		expected = {1999,
-		            7,
-		            5,
-		            27.37,
-		            7.29,
-		            0.007,
-		            325.4,
-		            98.69,
-		            34.37,
-		            48.40625,
-		            -119.53125,
-		            3.92417750718255,
-		            20.0758224928175,
-		            16.1516449856349,
-		            11.2404514331275,
-		            10.6101214416003,
-		            10.0784910479075,
-		            9.61879479539915,
-		            7.52735097636718,
-		            10.6420131492972,
-		            13.6753726760999,
-		            16.5538558131174,
-		            19.2076453235285,
-		            21.572373885413,
-		            23.590685312834,
-		            25.2136257227221,
-		            26.401830904988,
-		            27.1264810963558,
-		            27.37,
-		            27.1264810963558,
-		            26.401830904988,
-		            25.2136257227221,
-		            23.590685312834,
-		            21.572373885413,
-		            19.2076453235285,
-		            16.4457140770673,
-		            14.8022992089702,
-		            13.6472623123843};
+		expected = {
+		    1999,
+		    7,
+		    5,
+		    27.37,
+		    7.29,
+		    0.007,
+		    325.4,
+		    98.69,
+		    34.37,
+		    48.40625,
+		    -119.53125,
+		    3.92417750718255,
+		    20.0758224928175,
+		    16.1516449856349,
+		    11.2404514331275,
+		    10.6101214416003,
+		    10.0784910479075,
+		    9.61879479539915,
+		    7.52735097636718,
+		    10.6420131492972,
+		    13.6753726760999,
+		    16.5538558131174,
+		    19.2076453235285,
+		    21.572373885413,
+		    23.590685312834,
+		    25.2136257227221,
+		    26.401830904988,
+		    27.1264810963558,
+		    27.37,
+		    27.1264810963558,
+		    26.401830904988,
+		    25.2136257227221,
+		    23.590685312834,
+		    21.572373885413,
+		    19.2076453235285,
+		    16.4457140770673,
+		    14.8022992089702,
+		    13.6472623123843};
 		CHECK(data[7490] == expected);
 
-		expected = {2011,
-		            9,
-		            20,
-		            26.26,
-		            5.72,
-		            0.0048,
-		            203.375,
-		            89.59,
-		            21.7,
-		            48.40625,
-		            -119.53125,
-		            5.83629680945432,
-		            18.1637031905457,
-		            12.3274063810914,
-		            9.85516016703379,
-		            9.17640378273531,
-		            8.57957434533616,
-		            8.04700749581804,
-		            7.56619991043564,
-		            7.12797599524873,
-		            6.36687212441886,
-		            10.2807921975313,
-		            14.0263807973456,
-		            17.4653942986169,
-		            20.4709042677994,
-		            22.93198218651,
-		            24.7577936439678,
-		            25.880950888377,
-		            26.26,
-		            25.880950888377,
-		            24.7577936439678,
-		            22.93198218651,
-		            20.4709042677994,
-		            17.4350924662465,
-		            15.5906984388493,
-		            14.3094462326179,
-		            13.3267196995101,
-		            12.5293649012352};
+		expected = {
+		    2011,
+		    9,
+		    20,
+		    26.26,
+		    5.72,
+		    0.0048,
+		    203.375,
+		    89.59,
+		    21.7,
+		    48.40625,
+		    -119.53125,
+		    5.83629680945432,
+		    18.1637031905457,
+		    12.3274063810914,
+		    9.85516016703379,
+		    9.17640378273531,
+		    8.57957434533616,
+		    8.04700749581804,
+		    7.56619991043564,
+		    7.12797599524873,
+		    6.36687212441886,
+		    10.2807921975313,
+		    14.0263807973456,
+		    17.4653942986169,
+		    20.4709042677994,
+		    22.93198218651,
+		    24.7577936439678,
+		    25.880950888377,
+		    26.26,
+		    25.880950888377,
+		    24.7577936439678,
+		    22.93198218651,
+		    20.4709042677994,
+		    17.4350924662465,
+		    15.5906984388493,
+		    14.3094462326179,
+		    13.3267196995101,
+		    12.5293649012352};
 		CHECK(data[11950] == expected);
 
-		expected = {2016,
-		            12,
-		            31,
-		            -4.98,
-		            -10.23,
-		            0.0021,
-		            57.7,
-		            100,
-		            88.06,
-		            48.40625,
-		            -119.53125,
-		            7.80756225656321,
-		            16.1924377434368,
-		            8.38487548687358,
-		            -8.27525538655417,
-		            -8.63957376828067,
-		            -8.96851300939355,
-		            -9.26834034497371,
-		            -9.5437923561646,
-		            -9.79853610690149,
-		            -10.035468721517,
-		            -10.2569189005201,
-		            -9.97382585417202,
-		            -8.66609472026456,
-		            -7.4584550222929,
-		            -6.42819685770049,
-		            -5.64125773588436,
-		            -5.14800251443357,
-		            -4.98,
-		            -5.14800251443357,
-		            -5.64125773588436,
-		            -10.23,
-		            -10.23,
-		            -10.23,
-		            -10.23,
-		            -10.23,
-		            -10.23,
-		            -10.23};
+		expected = {
+		    2016,
+		    12,
+		    31,
+		    -4.98,
+		    -10.23,
+		    0.0021,
+		    57.7,
+		    100,
+		    88.06,
+		    48.40625,
+		    -119.53125,
+		    7.80756225656321,
+		    16.1924377434368,
+		    8.38487548687358,
+		    -8.27525538655417,
+		    -8.63957376828067,
+		    -8.96851300939355,
+		    -9.26834034497371,
+		    -9.5437923561646,
+		    -9.79853610690149,
+		    -10.035468721517,
+		    -10.2569189005201,
+		    -9.97382585417202,
+		    -8.66609472026456,
+		    -7.4584550222929,
+		    -6.42819685770049,
+		    -5.64125773588436,
+		    -5.14800251443357,
+		    -4.98,
+		    -5.14800251443357,
+		    -5.64125773588436,
+		    -10.23,
+		    -10.23,
+		    -10.23,
+		    -10.23,
+		    -10.23,
+		    -10.23,
+		    -10.23};
 		CHECK(data[13879] == expected);
 
 		const size_t sTmaxIndex = 3;

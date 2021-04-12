@@ -7,6 +7,7 @@ find_package(Poco REQUIRED Foundation CONFIG)
 set(SOURCES main.cpp
             helpers/common.cpp
             helpers/myobject.cpp
+            test_aging.cpp
             test_carchive.cpp
             test_carray.cpp
             test_cfile.cpp

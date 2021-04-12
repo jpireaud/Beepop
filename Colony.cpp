@@ -165,6 +165,236 @@ CString CBeelist::Status()
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// CForageBasedAgingBeeList
+//
+int CForageBasedAgingBeeList::GetCabooseQuantity() const
+{
+	int quantity = 0;
+	std::for_each(m_Caboose.begin(), m_Caboose.end(), [&quantity](CAdult* adult) { quantity += adult->GetNumber(); });
+	return quantity;
+}
+
+void CForageBasedAgingBeeList::ClearCaboose()
+{
+	CAdult* adult = nullptr;
+	while (!m_Caboose.empty())
+	{
+		auto adult = m_Caboose.back();
+		m_Caboose.pop_back();
+		delete adult;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// CForageBasedAgingAdultList
+//
+
+void CForageBasedAgingAdultList::Add(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorker)
+{
+	ASSERT(theBrood);
+	{
+		CAdult* theAdult = new CAdult(theBrood->GetNumber());
+		if (bWorker) WorkerCount++;
+		else
+			DroneCount++;
+		theAdult->SetMites(theBrood->m_Mites);
+		theAdult->SetPropVirgins(theBrood->m_PropVirgins);
+		theAdult->SetLifespan(WADLLIFE);
+		theAdult->age = 0.0;
+		delete theBrood; // These brood are now  gone
+
+		AddHead(theAdult);
+	}
+}
+void CForageBasedAgingAdultList::Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorker)
+// The Capped Brood coming in are converted to Adults and pushed onto the list.
+// If the list is now greater than the specified number of days, the
+// bottom of the list is removed and assigned to the Caboose for Workers or the
+// bottom of the list is deleted for drones.  We retain the number of mites from
+// the Brood so they can be retrieved and released back into the colony.  We also
+// establish the maximum lifetime for the new adult worker and see if any other
+// workers in the list have extended beyone their lifetime as reduced by varroa infestation
+//
+// TODO:
+//
+// When the following are all true (non-foraging day, no brood, no larvae), do not age the adults
+{
+	// int NumberOfNonAdults = theColony->Wlarv.GetQuantity() +  theColony->Dlarv.GetQuantity() +
+	//	theColony->CapDrn.GetQuantity() + theColony->CapWkr.GetQuantity() + theBrood->GetNumber();
+	// if (Caboose != NULL) Caboose->SetNumber(0); // Initialize the Caboose to zero - will pass 0 Adults to foragers
+	// unless aging occurs if (( theBrood->GetNumber() > 0) || (NumberOfNonAdults > 0) || (theEvent->IsForageDay())) //
+	// Age if any of these are true
+	{
+		// Age all adults
+		POSITION pos = GetHeadPosition();
+		CAdult*  adult = nullptr;
+		while (pos != nullptr)
+		{
+			adult = (CAdult*)GetNext(pos);
+			adult->age += theEvent->GetForageInc();
+		}
+
+		// Update adults that will become foragers and those that will die
+		UpdateCaboose(bWorker, theColony);
+
+		// Add freshly breed new adults
+		if (theBrood)
+		{
+			CAdult* theAdult = new CAdult(theBrood->GetNumber());
+			if (bWorker) WorkerCount++;
+			else
+				DroneCount++;
+			theAdult->SetMites(theBrood->m_Mites);
+			theAdult->SetPropVirgins(theBrood->m_PropVirgins);
+			theAdult->SetLifespan(WADLLIFE);
+			theAdult->age = 0.0;
+			delete theBrood; // These brood are now  gone
+
+			AddHead(theAdult);
+		}
+
+		// Check for age beyond reduced lifespan in workers
+		if ((true) && bWorker) // Turn on or off
+		{
+			double   PropRedux;
+			int      day = 1;
+			int      index;
+			int      NumMites;
+			POSITION pos = GetHeadPosition();
+			while (pos != nullptr)
+			{
+				auto theAdult = (CAdult*)GetNext(pos);
+				NumMites = theAdult->GetMites();
+				if ((theAdult->IsAlive()) && (NumMites > 0) && (theAdult->GetNumber() > 0))
+				// If already killed, don't kill again, if no mites, ignore
+				{
+					index = NumMites / theAdult->GetNumber();
+					PropRedux = m_pColony->LongRedux[int(index)];
+					if (day > (1 - PropRedux) * (theAdult->GetLifespan() + GetColony()->m_CurrentForagerLifespan))
+						theAdult->Kill();
+				}
+				day++;
+			}
+		}
+	}
+}
+
+void CForageBasedAgingAdultList::KillAll()
+{
+	CBeelist::KillAll();
+	// NOTE: this was commented and I think the reason is that if there is a need to kill the adults
+	// NOTE: it should not necessarely involve the Foragers to be.
+	// Caboose->SetNumber(0);
+}
+
+void CForageBasedAgingAdultList::UpdateLength(int len, bool bWorker)
+{
+	// Because adult house bee lifespan can change as a function of Date/Time spans, SetLength is different than the
+	// other life stages If the desired length is greater than the current length, new, empty boxcars are added to the
+	// list.  If the desired length is shorter than the current length, the excess bees are added to the caboose so they
+	// will become foragers at the next update.
+	//
+	// SetLength should be called before Update in order to properly move the caboose bees.
+	m_ListLength = len;
+	if (bWorker)
+	{
+		UpdateCaboose(bWorker);
+	}
+}
+
+// MoveToEnd
+// Moves the oldest QuantityToMove bees to the last boxcar.  Does not move any adults younger than MinAge
+int CForageBasedAgingAdultList::MoveToEnd(int QuantityToMove, int MinAge)
+{
+	if ((MinAge < 0) || (QuantityToMove <= 0)) return 0;
+	int TotalMoved = 0;
+	int CurrentlyMoving = 0;
+	int EndIndex = GetLength() - 1; // The last boxcar in the list
+	int index = GetLength() - 2;    // Initially points to first boxcar to move - the one just before the last one
+	if (QuantityToMove > 0)
+	{
+		int i = 0;
+	}
+	while ((TotalMoved < QuantityToMove) && (index >= MinAge))
+	{
+		CurrentlyMoving = GetQuantityAt(index);
+		if (CurrentlyMoving > QuantityToMove - TotalMoved) // In this case, don't move all bees in this boxcar
+		{
+			CurrentlyMoving = QuantityToMove - TotalMoved;
+		}
+		SetQuantityAt(EndIndex, CurrentlyMoving + GetQuantityAt(EndIndex)); // Add CurrentlyMoving to the end boxcar
+		SetQuantityAt(index, GetQuantityAt(index) - CurrentlyMoving);       // Remove them from the current boxcar
+		if (CurrentlyMoving > 0) TRACE("Moving Adults to End: %d\n", CurrentlyMoving);
+		TotalMoved += CurrentlyMoving;
+		index--;
+	}
+	TRACE("In MoveToEnd %s\n", Status());
+	return TotalMoved;
+}
+
+void CForageBasedAgingAdultList::Serialize(CArchive& ar)
+{
+	int      count, i;
+	POSITION pos;
+	if (ar.IsStoring())
+	{ // storing code
+		count = GetCount();
+		ar << count;
+		pos = GetHeadPosition();
+		CAdult* pAdult;
+		while (pos != NULL)
+		{
+			pAdult = (CAdult*)GetNext(pos);
+			pAdult->Serialize(ar);
+		}
+	}
+	else
+	{ // loading code
+		ar >> count;
+		for (i = 0; i < count; i++)
+		{
+			CAdult* temp = new CAdult;
+			temp->Serialize(ar);
+			pos = AddTail(temp);
+		}
+	}
+}
+
+void CForageBasedAgingAdultList::UpdateCaboose(bool bWorker, CColony* colony)
+{
+	// now we use the m_ListLength as the maximum age for adults
+	POSITION pos = GetTailPosition();
+	while (pos != nullptr)
+	{
+		auto adult = (CAdult*)GetPrev(pos);
+
+		if (adult->age < m_ListLength) break;
+
+		CAdult* caboose = adult;
+		caboose->number *= GetPropTransition();
+		//! reduce the age by m_ListLength which is here the lifespan of adults
+		//! the difference will be the age of the new box of foragers
+		caboose->age -= m_ListLength;
+		if (!bWorker)
+		{
+			// Update stats for dead drones
+			if (colony) colony->m_InOutEvent.m_DeadDAdults += caboose->GetNumber();
+
+			delete caboose;
+			caboose = nullptr;
+			DroneCount--;
+		}
+		else
+		{
+			m_Caboose.push_front(caboose);
+		}
+		RemoveTail();
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // CForagerlist - this is a type of CAdultList implementing Forager behaviors
 //
 CForagerlist::CForagerlist() : CAdultlist::CAdultlist()
