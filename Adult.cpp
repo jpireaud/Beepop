@@ -2,13 +2,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "VarroaPop.h"
 #include "Adult.h"
+#include "VarroaPop.h"
+#include "stdafx.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -36,21 +36,26 @@ CAdult::CAdult(int theNumber)
 	number = theNumber;
 }
 
-
 CAdult::~CAdult()
 {
 }
 
-void CAdult::Serialize(CArchive& ar) 
+void CAdult::Serialize(CArchive& ar)
 {
 	CBee::Serialize(ar);
 	if (ar.IsStoring())
-	{	// storing code
+	{ // storing code
 		ar << m_Lifespan;
+		ar << m_CurrentAge;
+		ar << m_Virgins;
+		ar << m_ForageInc;
 	}
 	else
-	{	// loading code
+	{ // loading code
 		ar >> m_Lifespan;
+		ar >> m_CurrentAge;
+		ar >> m_Virgins;
+		ar >> m_ForageInc;
 	}
 	CBee::Serialize(ar);
 }

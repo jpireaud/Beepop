@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "GlobalOptions.h"
+#include "stdafx.h"
 
 GlobalOptions& GlobalOptions::Get()
 {
@@ -7,17 +7,16 @@ GlobalOptions& GlobalOptions::Get()
 	return sGlobalOptions;
 }
 
-GlobalOptions::GlobalOptions()
-	: ShouldForagerAgingBasedOnHourlyTemperatureEstimate(*this)
+GlobalOptions::GlobalOptions() : ShouldForagerAgingBasedOnHourlyTemperatureEstimate(*this)
 {
 }
 
-template<>
-void GlobalOptions::AggregateOption<GlobalOptions::ForagerAgingBasedHourlyTemperatureEstimate>::Set(const GlobalOptions::ForagerAgingBasedHourlyTemperatureEstimate& value)
+template <>
+void GlobalOptions::AggregateOption<GlobalOptions::ForagerAgingBasedHourlyTemperatureEstimate>::Set(
+    const GlobalOptions::ForagerAgingBasedHourlyTemperatureEstimate& value)
 {
 	m_value = value;
 	m_options.ShouldForageDayElectionBasedOnTemperatures.Set(!m_value);
 	m_options.ShouldComputeHourlyTemperatureEstimation.Set(m_value);
 	m_options.ShouldForagersAlwaysAgeBasedOnForageInc.Set(m_value);
 }
-

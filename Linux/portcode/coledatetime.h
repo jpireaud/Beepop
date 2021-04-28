@@ -14,7 +14,7 @@ class COleDateTimeSpan;
 
 /**
  * Only supports the necessary interface for the good behavior of VarroaPop
- * 
+ *
  * TODO: Current implemenation uses std::chrono which has the desavantage of not supporting
  * dates before January 1st 1970 which is not the case with the COleDateTime of MFC. We should
  * refactor to another library that does.
@@ -26,8 +26,8 @@ public:
 	{
 		error = -1,
 		valid = 0,
-		invalid = 1,    // Invalid date (out of range, etc.)
-		null = 2,       // Literally has no value
+		invalid = 1, // Invalid date (out of range, etc.)
+		null = 2,    // Literally has no value
 	};
 
 	static COleDateTime GetTickCount();
@@ -35,24 +35,18 @@ public:
 	friend class CTime;
 
 	COleDateTime();
-	
+
 protected:
-	
 	COleDateTime(const Poco::DateTime& span);
 
 public:
-
 	COleDateTime(DATE dateSrc);
 
-	COleDateTime(int32_t nYear,
-		int32_t nMonth,
-		int32_t nDay,
-		int32_t nHour,
-		int32_t nMin,
-		int32_t nSec);
+	COleDateTime(int32_t nYear, int32_t nMonth, int32_t nDay, int32_t nHour, int32_t nMin, int32_t nSec);
+
+	bool operator==(const COleDateTime& other) const;
 
 public:
-
 	int32_t GetYear() const;
 	int32_t GetMonth() const;
 	int32_t GetDay() const;
@@ -66,13 +60,13 @@ public:
 
 	DateTimeStatus GetStatus() const;
 
-	bool operator < (const COleDateTime& other) const;
-	bool operator > (const COleDateTime& other) const;
-	bool operator >= (const COleDateTime& other) const;
-	bool operator <= (const COleDateTime& other) const;
+	bool operator<(const COleDateTime& other) const;
+	bool operator>(const COleDateTime& other) const;
+	bool operator>=(const COleDateTime& other) const;
+	bool operator<=(const COleDateTime& other) const;
 
 	CString Format(const char* format) const;
-	bool ParseDateTime(const CString& dateTimeStr, DWORD dwFlags = 0);
+	bool    ParseDateTime(const CString& dateTimeStr, DWORD dwFlags = 0);
 
 	// returns 0 if successful, 1 otherwise
 	int SetDate(int32_t year, int32_t month, int32_t day);
@@ -92,7 +86,6 @@ public:
 	Poco::Timestamp Timestamp() const { return m_date.timestamp(); }
 
 protected:
-
 	// here we use a time point to get milliseconds precision
 	Poco::DateTime m_date;
 	DateTimeStatus m_status;
@@ -109,26 +102,19 @@ public:
 	COleDateTimeSpan();
 
 protected:
-	
 	COleDateTimeSpan(const Poco::Timespan& span);
 
 public:
-
 	COleDateTimeSpan(double dblSpanSrc);
 
-	COleDateTimeSpan(size_t lDays,
-		int32_t nHours,
-		int32_t nMins,
-		int32_t nSecs);
+	COleDateTimeSpan(size_t lDays, int32_t nHours, int32_t nMins, int32_t nSecs);
 
 public:
-
 	int32_t GetDays();
 
 	bool operator!=(const COleDateTimeSpan& other) const;
 
 protected:
-
 	Poco::Timespan m_span;
 };
 

@@ -207,8 +207,18 @@ public:
 	                    // change the session file format
 	BOOL m_IEDEnable;
 
+	// Snapshots
+	BOOL    m_SnapshotsEnabled;
+	CObList m_SnapshotsDates;
+
+	// Snapshots
+	BOOL    m_SnapshotsResetEnabled;
+	CObList m_SnapshotsResets;
+
 protected:
 	CVarroaPopSessionBridge* m_Bridge;
+
+	CString m_SnapshotsDirectory;
 
 	// Operations
 public:
@@ -286,6 +296,14 @@ public:
 	void InitializeSimulation();
 
 	void Serialize(CArchive& ar);
+
+	int GetFileVersion() const;
+
+	void           SetSnapshotsDirectory(CString DirectoryName);
+	const CString& GetSnapshotsDirectory() const;
+
+	void SaveSnapshotIfNeeded(CEvent* pEvent);
+	void LoadSnapshotIfNeeded(CEvent* pEvent);
 };
 
 /////////////////////////////////////////////////////////////////////////////

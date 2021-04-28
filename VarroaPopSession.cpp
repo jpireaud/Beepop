@@ -1,5 +1,6 @@
 #include "VarroaPopSession.h"
 #include "GlobalOptions.h"
+#include "SnapshotInfo.h"
 #include "VarroaPop.h"
 #include "VarroaPopOutputFormatter.h"
 #include "stdafx.h"
@@ -648,9 +649,12 @@ void CVarroaPopSession::Simulate()
 		//
 		while ((pEvent != NULL) && (DayCount <= TotSimDays))
 		{
+			theColony.ReQueenIfNeeded(
+			    DayCount, pEvent, m_RQEggLayingDelay, m_RQWkrDrnRatio, m_RQEnableReQueen, m_RQScheduled,
+			    m_RQQueenStrength, m_RQOnce, m_RQReQueenDate);
 
-			theColony.ReQueenIfNeeded(DayCount, pEvent, m_RQEggLayingDelay, m_RQWkrDrnRatio, m_RQEnableReQueen,
-			                          m_RQScheduled, m_RQQueenStrength, m_RQOnce, m_RQReQueenDate);
+			// we load the snapshots just before recording the results in the output
+			LoadSnapshotIfNeeded(pEvent);
 
 			// Determine if there is feed available and call theColony.SetFeedingDay(t/f);
 			// Alternate approach is to pass the feed dates and quantities to the colony and
@@ -678,6 +682,9 @@ void CVarroaPopSession::Simulate()
 			}
 
 			theColony.DoPendingEvents(pEvent, DayCount); // Sets colony based on discrete events
+
+			// we save snapshots before/after recording the results it does not matter
+			SaveSnapshotIfNeeded(pEvent);
 
 			if ((DayCount % ResFreq) == 0) // Print once every ResFreq times thru the loop
 			{
@@ -724,10 +731,11 @@ void CVarroaPopSession::Serialize(CArchive& ar)
 	//          mite treatment dates.
 	//      VarroaPop Version 2.3.1 created file Version 5.  This causes weather file path + filename
 	//          to be stored
-	//      VarroaPop Version 3.0.1 created file Version 6.  This added the DateRangeValues for life stage transitions
+	//      VarroaPop Version 3.0.1 created file Version 6.  This added the DateRangeValues for life stage
+	//      transitions
 	//
-	//      VarroaPop Version 3.1.2 created file Version 7.  This added a single IEDItem to identify EPA IED Method of
-	//      pesticide impact
+	//      VarroaPop Version 3.1.2 created file Version 7.  This added a single IEDItem to identify EPA IED Method
+	//      of pesticide impact
 	//
 	//		VarroaPop Version 3.1.2 also created file version 8.  This adds EPA user data.
 	//
@@ -745,16 +753,20 @@ void CVarroaPopSession::Serialize(CArchive& ar)
 	//
 	//		VarroaPop Version 3.2.6.9 added version 16.  Added supplemental feeding data
 	//
-	//		VarroaPop Version 3.2.7.2 added version 17.  Added some overwintering and foraging data.  Also added some
+	//		VarroaPop Version 3.2.7.2 added version 17.  Added some overwintering and foraging data.  Also added
+	// some
 	// spare variables 													 to make it easier to add variables in the
-	// future without changing file format VarroaPop Version 3.2.8.0 added version 18.  Allows user to select whether to
-	// have notifications or not - selected from view menu.
+	// future without changing file format VarroaPop Version 3.2.8.0 added version 18.  Allows user to select
+	// whether to have notifications or not - selected from view menu.
 	//
-	//		VarroaPop Version 3.2.8.2 added version 19.  Serializes user selection of whether lack of resources causes
+	//		VarroaPop Version 3.2.8.2 added version 19.  Serializes user selection of whether lack of resources
+	// causes
 	// colony to die.  Serialized in CColony
+	//
+	//		VarroaPop Version X.X.X.X added version 20.  Serialize broods correctly
 
 #define VERSIONING_VALID "**********"
-#define THIS_VERSION 19
+#define THIS_VERSION 20
 
 	// TRACE("Entering VarroaPopDoc::Serialize\n");
 	int     bval;
@@ -1058,6 +1070,85 @@ void CVarroaPopSession::Serialize(CArchive& ar)
 	// TRACE("***Leaving VarroaPopDoc::Serialize\n");
 }
 
+int CVarroaPopSession::GetFileVersion() const
+{
+	return THIS_VERSION;
+}
+
+void CVarroaPopSession::SetSnapshotsDirectory(CString DirectoryName)
+{
+	m_SnapshotsDirectory = DirectoryName;
+}
+
+const CString& CVarroaPopSession::GetSnapshotsDirectory() const
+{
+	return m_SnapshotsDirectory;
+}
+
+void CVarroaPopSession::SaveSnapshotIfNeeded(CEvent* pEvent)
+{
+	if (m_SnapshotsEnabled)
+	{
+		if (m_SnapshotsDates.GetCount() > 0)
+		{
+			auto info = (CSnapshotInfo*)m_SnapshotsDates.GetHead();
+			if (pEvent->GetTime() == info->GetDate())
+			{
+				CString    snapshotFilepath = GetSnapshotsDirectory() + "/" + info->GetName();
+				CStdioFile snapshot(snapshotFilepath, CFile::modeWrite | CFile::typeBinary);
+				CArchive   snapshotArchive(&snapshot, CArchive::store);
+				theColony.Serialize(snapshotArchive, GetFileVersion());
+				snapshot.Close();
+				m_SnapshotsDates.RemoveHead();
+			}
+		}
+	}
+}
+
+void CVarroaPopSession::LoadSnapshotIfNeeded(CEvent* pEvent)
+{
+	if (m_SnapshotsResetEnabled)
+	{
+		POSITION snapshotInfoPosition = m_SnapshotsResets.GetHeadPosition();
+		while (snapshotInfoPosition != nullptr)
+		{
+			bool     resetColony = false;
+			bool     removeReset = false;
+			POSITION currentPosition = snapshotInfoPosition;
+			auto     snapshotInfo = (CSnapshotInfo*)m_SnapshotsResets.GetNext(snapshotInfoPosition);
+			if (snapshotInfo->IsScheduled())
+			{
+				if (pEvent->GetTime().GetMonth() == snapshotInfo->GetDate().GetMonth() &&
+				    pEvent->GetTime().GetDay() == snapshotInfo->GetDate().GetDay())
+				{
+					resetColony = true;
+				}
+			}
+			else
+			{
+				if (pEvent->GetTime() == snapshotInfo->GetDate())
+				{
+					resetColony = true;
+					removeReset = true;
+				}
+			}
+			if (resetColony)
+			{
+				CString    snapshotFilepath = GetSnapshotsDirectory() + "/" + snapshotInfo->GetName();
+				CStdioFile snapshot(snapshotFilepath, CFile::modeRead | CFile::typeBinary);
+				CArchive   snapshotArchive(&snapshot, CArchive::load);
+
+				theColony.Clear();
+				theColony.Serialize(snapshotArchive, GetFileVersion());
+			}
+			if (removeReset)
+			{
+				m_SnapshotsResets.RemoveAt(currentPosition);
+			}
+		}
+	}
+}
+
 bool CVarroaPopSession::LoadWeatherFile(CString WeatherFileName)
 {
 
@@ -1081,14 +1172,104 @@ bool CVarroaPopSession::LoadWeatherFile(CString WeatherFileName)
 	return success;
 }
 
+struct CSnapshotParsing
+{
+	enum SnapshotOptions
+	{
+		date,
+		name,
+		scheduled,
+		count
+	};
+
+	CVarroaPopSession& m_session;
+	CSnapshotInfo      m_snapshotInfo;
+	bool               m_snapshotReady[SnapshotOptions::count] = {false, false, false};
+
+	CSnapshotParsing(CVarroaPopSession& session) : m_session(session) {}
+
+	void Reset()
+	{
+		for (size_t i = SnapshotOptions::date; i < SnapshotOptions::count; i++)
+			m_snapshotReady[i] = false;
+	}
+
+	void ParseDate(const CString& value)
+	{
+		if (!m_snapshotReady[SnapshotOptions::date])
+		{
+			COleDateTime temp;
+			temp.ParseDateTime(value, VAR_DATEVALUEONLY);
+			if (temp.GetStatus() == COleDateTime::valid)
+			{
+				m_snapshotInfo.SetDate(temp);
+				m_snapshotReady[SnapshotOptions::date] = true;
+			}
+			else
+			{
+				throw std::runtime_error(std::string("bad date format: ") + value);
+			}
+		}
+		else
+		{
+			throw std::runtime_error(std::string("invalid option specification for snapshot at date: ") + value);
+		}
+	}
+
+	void ParseName(const CString& value)
+	{
+		if (!m_snapshotReady[SnapshotOptions::name])
+		{
+			m_snapshotInfo.SetName(value);
+			m_snapshotReady[SnapshotOptions::name] = true;
+		}
+		else
+		{
+			throw std::runtime_error(std::string("invalid option specification for snapshot at name: ") + value);
+		}
+	}
+
+	void ParseScheduled(const CString& value)
+	{
+		if (!m_snapshotReady[SnapshotOptions::scheduled])
+		{
+			m_snapshotInfo.SetScheduled(value == "true");
+			m_snapshotReady[SnapshotOptions::scheduled] = true;
+		}
+		else
+		{
+			throw std::runtime_error(std::string("invalid option specification for snapshot at scheduled: ") + value);
+		}
+	}
+
+	void RecordIfSnapshotInfoComplete()
+	{
+		if (m_snapshotReady[SnapshotOptions::date] && m_snapshotReady[SnapshotOptions::name])
+		{
+			m_session.m_SnapshotsDates.AddTail(new CSnapshotInfo(m_snapshotInfo));
+			Reset();
+		}
+	}
+
+	void RecordIfSnapshotResetInfoComplete()
+	{
+		if (m_snapshotReady[SnapshotOptions::date] && m_snapshotReady[SnapshotOptions::name] &&
+		    m_snapshotReady[SnapshotOptions::scheduled])
+		{
+			m_session.m_SnapshotsResets.AddTail(new CSnapshotInfo(m_snapshotInfo));
+			Reset();
+		}
+	}
+};
+
 //  ProcessInputFile reads the lines in the command line input file and makes the appropriate
 //  changes to internal variables based on the name and the value contained in the line.  The function is called
 //  after the .vrp file is loaded.
 //
 //  Purists would not like the use of so many if statements because it requires evaluation of a lot of invalid
 //  ifs until a valid if is found.  This seemed the most clear to me since it is only used once per execution of VP
-//  and because we are selecting on a string, we can't use a switch statement.  Also, it's pretty clear how to read and
-//  add.
+//  and because we are selecting on a string, we can't use a switch statement.  Also, it's pretty clear how to read
+//  and add.
 //
 //  To expose a new variable to the input file, add a new if clause with the lower case version of the name string
 //  and update the appropriate internal variables.
@@ -1097,6 +1278,10 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 	try
 	{
 		theColony.m_RQQueenStrengthArray.RemoveAll();
+
+		// specific variables for snapshot reset parsing
+		CSnapshotParsing snapshotParsing(*this);
+
 		CString    Line;
 		CString    Name;
 		CString    Value;
@@ -1133,7 +1318,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 				COleDateTime tempDate(theDate.GetYear(), theDate.GetMonth(), theDate.GetDay(), 0, 0, 0);
 				m_SimStartTime = tempDate;
 				SetSimStart(m_SimStartTime);
-				// theColony.m_InitCond.m_SimStart = m_SimStartTime.Format("%m/%d/%Y");  // Have sim start in two places
+				// theColony.m_InitCond.m_SimStart = m_SimStartTime.Format("%m/%d/%Y");  // Have sim start in two
+				// places
 				// - refactor to just VPDoc
 
 				m_Bridge->SimulationStartUpdated();
@@ -1456,8 +1642,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 			}
 			if (Name == "rqqueenstrength")
 			// This value is placed into an array which is used in Colony::RequeenIfNeeded.  Each occurance of this
-			// parameter name in the input file will result in another requeen strength value being added to the end of
-			// the array. Thus rqqueenstrength doesn't overwrite the previous value if supplied more than once
+			// parameter name in the input file will result in another requeen strength value being added to the end
+			// of the array. Thus rqqueenstrength doesn't overwrite the previous value if supplied more than once
 			{
 				m_RQQueenStrength = atof(Value);
 				theColony.m_RQQueenStrengthArray.Add(m_RQQueenStrength);
@@ -1923,8 +2109,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 			AToFXition=
 			ALifeSpan=
 			FLifeSpan=
-			The Value string for the next several items is in the format StartDate, EndDate, number where commmas are
-			separators in the string
+			The Value string for the next several items is in the format StartDate, EndDate, number where commmas
+			are separators in the string
 			*/
 			if (Name == "etolxition")
 			{
@@ -1945,8 +2131,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 							CString NumValStg = Value.Tokenize(",", curpos);
 							if (NumValStg.GetLength() > 0) // Was the % of survivors found?
 							{
-								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal will be
-								                          //  set to 0.0
+								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal
+								                          //  will be set to 0.0
 								theColony.m_InitCond.m_EggTransitionDRV.AddItem(StartDateStg, EndDateStg, NumVal);
 							}
 						}
@@ -1973,8 +2159,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 							CString NumValStg = Value.Tokenize(",", curpos);
 							if (NumValStg.GetLength() > 0) // Was the % of survivors found?
 							{
-								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal will be
-								                          //  set to 0.0
+								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal
+								                          //  will be set to 0.0
 								theColony.m_InitCond.m_LarvaeTransitionDRV.AddItem(StartDateStg, EndDateStg, NumVal);
 							}
 						}
@@ -2001,8 +2187,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 							CString NumValStg = Value.Tokenize(",", curpos);
 							if (NumValStg.GetLength() > 0) // Was the % of survivors found?
 							{
-								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal will be
-								                          //  set to 0.0
+								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal
+								                          //  will be set to 0.0
 								theColony.m_InitCond.m_BroodTransitionDRV.AddItem(StartDateStg, EndDateStg, NumVal);
 							}
 						}
@@ -2029,8 +2215,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 							CString NumValStg = Value.Tokenize(",", curpos);
 							if (NumValStg.GetLength() > 0) // Was the % of survivors found?
 							{
-								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal will be
-								                          //  set to 0.0
+								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal
+								                          //  will be set to 0.0
 								theColony.m_InitCond.m_AdultTransitionDRV.AddItem(StartDateStg, EndDateStg, NumVal);
 							}
 						}
@@ -2057,8 +2243,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 							CString NumValStg = Value.Tokenize(",", curpos);
 							if (NumValStg.GetLength() > 0) // Was the % of survivors found?
 							{
-								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal will be
-								                          //  set to 0.0
+								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal
+								                          //  will be set to 0.0
 								if ((NumVal >= 7) && (NumVal <= 21)) // Adult bee age constraint
 								{
 									theColony.m_InitCond.m_AdultLifespanDRV.AddItem(StartDateStg, EndDateStg, NumVal);
@@ -2088,8 +2274,8 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 							CString NumValStg = Value.Tokenize(",", curpos);
 							if (NumValStg.GetLength() > 0) // Was the % of survivors found?
 							{
-								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal will be
-								                          //  set to 0.0
+								NumVal = atof(NumValStg); //  Note that if NumValStg cannot be converted, NumVal
+								                          //  will be set to 0.0
 								if ((NumVal >= 0) && (NumVal <= 20)) // Constraint on forager lifespan
 								{
 									theColony.m_InitCond.m_ForagerLifespanDRV.AddItem(StartDateStg, EndDateStg, NumVal);
@@ -2137,6 +2323,53 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 				continue;
 			}
 
+			if (Name == "csenabled")
+			{
+				m_SnapshotsEnabled = (Value == "true");
+				continue;
+			}
+
+			if (Name == "cssnapshotname")
+			{
+				snapshotParsing.ParseName(Value);
+				snapshotParsing.RecordIfSnapshotInfoComplete();
+				continue;
+			}
+
+			if (Name == "cssnapshotdate")
+			{
+				snapshotParsing.ParseDate(Value);
+				snapshotParsing.RecordIfSnapshotInfoComplete();
+				continue;
+			}
+
+			if (Name == "crenabled")
+			{
+				m_SnapshotsResetEnabled = (Value == "true");
+				continue;
+			}
+
+			if (Name == "crresetdate")
+			{
+				snapshotParsing.ParseDate(Value);
+				snapshotParsing.RecordIfSnapshotResetInfoComplete();
+				continue;
+			}
+
+			if (Name == "crresetname")
+			{
+				snapshotParsing.ParseName(Value);
+				snapshotParsing.RecordIfSnapshotResetInfoComplete();
+				continue;
+			}
+
+			if (Name == "crresetscheduled")
+			{
+				snapshotParsing.ParseScheduled(Value);
+				snapshotParsing.RecordIfSnapshotResetInfoComplete();
+				continue;
+			}
+
 			// Fall through - no match
 			{
 				m_Bridge->InputFileUnknownVariable(Name);
@@ -2163,8 +2396,8 @@ void CVarroaPopSession::StoreResultsFile(CString PathName)
 		if (m_Version)
 		{
 			CString titlestg;
-			titlestg.Format("Varroa Population Simulation - %s\n",
-			                COleDateTime::GetCurrentTime().Format("%b %d,%Y  %I:%M:%S %p"));
+			titlestg.Format(
+			    "Varroa Population Simulation - %s\n", COleDateTime::GetCurrentTime().Format("%b %d,%Y  %I:%M:%S %p"));
 			theFile.WriteString(titlestg);
 			theFile.WriteString(m_Bridge->GetVersion() + "\n\n");
 		}
@@ -2302,11 +2535,12 @@ bool CVarroaPopSession::CheckDateConsistency(bool ShowWarning)
 	if (ShowWarning)
 	{
 		CString      WarnString = "";
-		COleDateTime ImStart(m_ImmigrationStartDate.GetYear(), m_ImmigrationStartDate.GetMonth(),
-		                     m_ImmigrationStartDate.GetDay(), 0, 0, 0);
+		COleDateTime ImStart(
+		    m_ImmigrationStartDate.GetYear(), m_ImmigrationStartDate.GetMonth(), m_ImmigrationStartDate.GetDay(), 0, 0,
+		    0);
 
-		COleDateTime ImEnd(m_ImmigrationEndDate.GetYear(), m_ImmigrationEndDate.GetMonth(),
-		                   m_ImmigrationEndDate.GetDay(), 0, 0, 0);
+		COleDateTime ImEnd(
+		    m_ImmigrationEndDate.GetYear(), m_ImmigrationEndDate.GetMonth(), m_ImmigrationEndDate.GetDay(), 0, 0, 0);
 
 		//  Check all dates of interest.  Flag only if operation enabled
 

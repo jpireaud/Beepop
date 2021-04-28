@@ -84,6 +84,8 @@ def get_data_model_files():
         "OutputFormatter.cpp",
         "Queen.h",
         "Queen.cpp",
+        "SnapshotInfo.h",
+        "SnapshotInfo.cpp",
         "Spores.h",
         "Spores.cpp",
         "VarroaPopOutputFormatter.h",
@@ -153,11 +155,14 @@ def make_data_model_cmakelists():
     # extract source files from the files to be added to datamodel
     source_files = [file for file in get_data_model_files() if is_source_file(file)]
     source_files = [s.lower() for s in source_files] # set all source file name lowercase
+    # extract header files from the files to be added to datamodel
+    header_files = [file for file in get_data_model_files() if is_header_file(file)]
+    header_files = [s.lower() for s in header_files] # set all header file name lowercase
     # load the template CMakeLists.txt.template
     cmake_template = os.path.join(get_data_model_root(), cmake_template_filename)
     with open(cmake_template) as cmake_template_file:
         cmake_template_content = Template(cmake_template_file.read())
-        cmake_template_content = cmake_template_content.substitute(VarroaPopDataModelSourceFiles=str(' '.join(source_files)))
+        cmake_template_content = cmake_template_content.substitute(VarroaPopDataModelSourceFiles=str(' '.join(source_files)), VarroaPopDataModelHeaderFiles=str(' '.join(header_files)))
     # keep track weither or not we should replace the content of the cmake file
     write_cmake_target_file = True
     cmake_target = os.path.join(get_data_model_root(), cmake_filename)

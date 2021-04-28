@@ -50,7 +50,7 @@ void AgeStructureOutputFormatter::Init(CColony& colony)
 	m_stream << std::endl;
 #endif // AGE_STRUCTURE_ONE_COLUMN_FOR_EACH_BOX_CARD
 #if AGE_STRUCTURE_AGGREGATED_COLUMNS
-	m_stream << "Date, Eggs, Larvae, Broods, Adults 0-7, Adults 8-20, Foragers";
+	m_stream << "Date, Eggs, Larvae, Broods, Adults 0-7, Adults 8-13, Adults 14-21, Foragers, Colony Size";
 	m_stream << std::endl;
 #endif
 }
@@ -91,9 +91,33 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 	m_stream << "," << colony.Wlarv.GetQuantity();
 	m_stream << "," << colony.CapWkr.GetQuantity();
 	int  adultsAged0To7Days = 0;
-	int  adultsAged7To20Days = 0;
-	auto adultList = dynamic_cast<CAdultlist*>(&colony.Wadl);
+	int  adultsAged8To13Days = 0;
+	int  adultsAged14To21Days = 0;
+	auto adultList = dynamic_cast<CForageBasedAgingAdultList*>(&colony.Wadl);
 	if (adultList)
+	{
+		POSITION pos = adultList->GetHeadPosition();
+		while (pos != nullptr)
+		{
+			auto adult = (CAdult*)adultList->GetNext(pos);
+			if (adult->IsAlive())
+			{
+				if (adult->GetCurrentAge() < 8.0)
+				{
+					adultsAged0To7Days += adult->GetNumber();
+				}
+				else if (adult->GetCurrentAge() < 14.0)
+				{
+					adultsAged8To13Days += adult->GetNumber();
+				}
+				else
+				{
+					adultsAged14To21Days += adult->GetNumber();
+				}
+			}
+		}
+	}
+	else
 	{
 		int      index = 0;
 		POSITION pos = adultList->GetHeadPosition();
@@ -103,43 +127,26 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 			auto adult = (CAdult*)adultList->GetNext(pos);
 			if (adult->IsAlive())
 			{
-				if (index <= 7)
+				if (index < 8)
 				{
 					adultsAged0To7Days += adult->GetNumber();
 				}
+				else if (index < 14)
+				{
+					adultsAged8To13Days += adult->GetNumber();
+				}
 				else
 				{
-					adultsAged7To20Days += adult->GetNumber();
-				}
-			}
-		}
-	}
-	else
-	{
-		auto adultList = dynamic_cast<CForageBasedAgingAdultList*>(&colony.Wadl);
-		if (adultList)
-		{
-			POSITION pos = adultList->GetHeadPosition();
-			while (pos != nullptr)
-			{
-				auto adult = (CAdult*)adultList->GetNext(pos);
-				if (adult->IsAlive())
-				{
-					if (adult->age <= 7.0)
-					{
-						adultsAged0To7Days += adult->GetNumber();
-					}
-					else
-					{
-						adultsAged7To20Days += adult->GetNumber();
-					}
+					adultsAged14To21Days += adult->GetNumber();
 				}
 			}
 		}
 	}
 	m_stream << "," << adultsAged0To7Days;
-	m_stream << "," << adultsAged7To20Days;
+	m_stream << "," << adultsAged8To13Days;
+	m_stream << "," << adultsAged14To21Days;
 	m_stream << "," << colony.foragers.GetQuantity();
+	m_stream << "," << colony.GetColonySize();
 	m_stream << std::endl;
 }
 #endif // AGE_STRUCTURE_AGGREGATED_COLUMNS

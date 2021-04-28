@@ -1,5 +1,5 @@
-SimStart=01/01/1979
-SimEnd=12/31/2016
+SimStart=01/01/2006
+SimEnd=12/31/2099
 ICDroneAdults=0
 ICWorkerAdults=20000
 ICDroneBrood=0
@@ -22,7 +22,15 @@ RQEggLayDelay=5
 RQEnableReQueen=True
 RQScheduled=True
 RQQueenStrength=3.0
-RQReQueenDate=08/01/1979
+RQReQueenDate=08/01/2010
 RQOnce=False
 ForagerMaxProp=0.3
 NeedResourcesToLive=False
+CREnabled=True
+CRResetScheduled=False
+CRResetDate=01/01/2006
+CRResetName=snapshot-initial
+CRResetScheduled=True
+CRResetDate=04/15/2010
+CRResetName=snapshot-2020-04-15
+

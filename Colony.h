@@ -44,15 +44,15 @@ protected:
 
 public:
 	CBeelist() {}
-	~CBeelist();
+	virtual ~CBeelist();
 	void         SetLength(int len) { m_ListLength = len; }
 	int          GetLength() { return m_ListLength; }
 	int          GetQuantity();
-	int          GetQuantityAt(int index);
-	int          GetQuantityAt(int from, int to);
-	void         SetQuantityAt(int index, int Quan);
-	void         SetQuantityAt(int from, int to, int Quan);
-	void         SetQuantityAtProportional(int from, int to, double Proportion);
+	virtual int  GetQuantityAt(int index);
+	virtual int  GetQuantityAt(int from, int to);
+	virtual void SetQuantityAt(int index, int Quan);
+	virtual void SetQuantityAt(int from, int to, int Quan);
+	virtual void SetQuantityAtProportional(int from, int to, double Proportion);
 	void         KillAll();
 	void         SetColony(CColony* pCol) { m_pColony = pCol; }
 	CColony*     GetColony() { return m_pColony; }
@@ -68,44 +68,6 @@ public:
 	static int WorkerCount;
 };
 
-//! Adults age based on foraging weather.
-//! - if it is too windy, adults will not age
-//! - if it is too rainy, adults will not age
-//! - if weather is not compatible with foragers flying time, adults will not age
-class CForageBasedAgingBeeList : public CBeelist
-{
-protected:
-	std::deque<CAdult*> m_Caboose;
-
-public:
-	CForageBasedAgingBeeList() {}
-
-	std::deque<CAdult*>& GetCaboose() { return m_Caboose; }
-	int                  GetCabooseQuantity() const;
-	void                 ClearCaboose();
-};
-
-//! Adults age based on foraging weather.
-//! - if it is too windy, adults will not age
-//! - if it is too rainy, adults will not age
-//! - if weather is not compatible with foragers flying time, adults will not age
-class CForageBasedAgingAdultList : public CForageBasedAgingBeeList
-{
-public:
-	CForageBasedAgingAdultList() {}
-
-	//! Add method simply add theBrood txo the Adults without making the adults age
-	void Add(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
-	void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
-	void Serialize(CArchive& ar);
-	void KillAll();
-	void UpdateLength(int len, bool bWorker = true);
-	int  MoveToEnd(int QuantityToMove, int MinAge);
-
-protected:
-	void UpdateCaboose(bool bWorker, CColony* colony = nullptr);
-};
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // CAdultlist - Drones and Workers
@@ -117,15 +79,57 @@ protected:
 
 public:
 	CAdultlist() { Caboose = NULL; }
-	CAdult* GetCaboose() { return Caboose; }
-	void    ClearCaboose() { Caboose = NULL; }
+	virtual ~CAdultlist();
+
 	//! Add method simply add theBrood to the Adults without making the adults age
-	void Add(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
-	void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void Add(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void UpdateLength(int len, bool bWorker = true);
+	virtual int  MoveToEnd(int QuantityToMove, int MinAge);
+
+	CAdult*      GetCaboose() { return Caboose; }
+	virtual int  GetCabooseQuantity() const;
+	virtual int  GetCabooseBoxCardsCount() const { return Caboose != NULL ? 1 : 0; }
+	virtual void ClearCaboose();
+
 	void Serialize(CArchive& ar);
 	void KillAll();
-	void UpdateLength(int len, bool bWorker = true);
-	int  MoveToEnd(int QuantityToMove, int MinAge);
+};
+
+//! Adults age based on foraging weather.
+//! - if it is too windy, adults will not age
+//! - if it is too rainy, adults will not age
+//! - if weather is not compatible with foragers flying time, adults will not age
+class CForageBasedAgingAdultList : public CAdultlist
+{
+public:
+	typedef std::deque<CAdult*> CabooseQueue;
+
+	CForageBasedAgingAdultList() {}
+
+	// Revisit Get/Set quantities since boxcards do not correspond to ages anymore
+	virtual int  GetQuantityAt(int index);
+	virtual int  GetQuantityAt(int from, int to);
+	virtual void SetQuantityAt(int index, int Quan);
+	virtual void SetQuantityAt(int from, int to, int Quan);
+	virtual void SetQuantityAtProportional(int from, int to, double Proportion);
+
+	//! Add method simply add theBrood txo the Adults without making the adults age
+	virtual void Add(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void Update(CBrood* theBrood, CColony* theColony, CEvent* theEvent, bool bWorkder = true);
+	virtual void UpdateLength(int len, bool bWorker = true);
+	virtual int  MoveToEnd(int QuantityToMove, int MinAge);
+
+	CabooseQueue& GetCabooseQueue() { return m_Caboose; }
+	virtual int   GetCabooseQuantity() const;
+	virtual int   GetCabooseBoxCardsCount() const;
+	virtual void  ClearCaboose();
+
+protected:
+	void UpdateCaboose(bool bWorker, CColony* colony = nullptr);
+
+protected:
+	CabooseQueue m_Caboose;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -141,7 +145,7 @@ private:
 
 public:
 	CForagerlist();
-	~CForagerlist();
+	virtual ~CForagerlist();
 	void   Update(CAdult* theAdult, CEvent* theEvent);
 	void   ClearPendingForagers();
 	void   KillAll();
@@ -168,18 +172,38 @@ private:
 
 public:
 	CForagerlistA();
-	~CForagerlistA();
-	void Update(CAdult* theAdult, CColony* theColony, CEvent* theEvent);
+	virtual ~CForagerlistA();
+
+	virtual void Update(CAdult* theAdult, CColony* theColony, CEvent* theEvent);
+	virtual void SetLength(int len);
+
 	void ClearPendingForagers();
 	void KillAll();
 	int  GetQuantity();        // Total Forarger Quantity including UnemployedForagers
 	int  GetActiveQuantity();  // Total Forager Quantity minus UnemployedForagers
 	int  GetPendingQuantity(); // Total Pending Foragers
 	int  GetUnemployedQuantity();
+
 	// void SetUnemployedForagerQuantity(int Quan) { m_UnemployedForagers.SetNumber(Quan); }
-	void   SetLength(int len);
 	void   SetPropActualForagers(double proportion) { m_PropActualForagers = proportion; }
 	double GetPropActualForagers() { return m_PropActualForagers; }
+};
+
+//! Foragers age based on foraging weather.
+//! - if it is too windy, adults will not age
+//! - if it is too rainy, adults will not age
+//! - if weather is not compatible with foragers flying time, adults will not age
+class CForageBasedAgingForagersList : public CForagerlistA
+{
+public:
+	CForageBasedAgingForagersList() : CForagerlistA() {}
+
+	//! Add method simply add theBrood txo the Adults without making the adults age
+	virtual void Update(CForageBasedAgingAdultList::CabooseQueue& theAdult, CColony* theColony, CEvent* theEvent);
+	virtual void SetLength(int len);
+
+protected:
+	void KillOldForagers();
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -343,9 +367,9 @@ public:
 	// Bee Attributes
 	CQueen queen;
 	// CForagerlist foragers;
-	CForagerlistA foragers;
-	CAdultlist    Dadl;
-	CAdultlist    Wadl;
+	CAdultlist                    Dadl;
+	CForageBasedAgingAdultList    Wadl;
+	CForageBasedAgingForagersList foragers;
 
 	CBroodlist CapWkr;
 	CBroodlist CapDrn;

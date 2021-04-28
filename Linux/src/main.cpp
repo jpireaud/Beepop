@@ -28,8 +28,10 @@ int main(int argc, char** argv)
 	    cxxopts::value<std::string>())(
 	    "o,output_file", "Output File: Simulation results will be saved at this location",
 	    cxxopts::value<std::string>())(
-	    "v,vrp_file",
-	    "[optional] VRP File: If specified the VRP file will be parsed to initialize default simulation values",
+	    "v,vrp_file", "VRP File: If specified the VRP file will be parsed to initialize default simulation values",
+	    cxxopts::value<std::string>())(
+	    "s,snapshots_dir",
+	    "[optional] Snapshots dir: folder to store/load snapshots generated or imported during simulation",
 	    cxxopts::value<std::string>())(
 	    "w,weather_file",
 	    "[optional] Weather File: Simulation will use this weather file instead of the one in the input file",
@@ -73,6 +75,14 @@ int main(int argc, char** argv)
 
 	bfs::path inputFile, outputFile, vrpFile, weatherFile;
 
+	boost::system::error_code currentPathError;
+	bfs::path                 snapshotsDir = bfs::current_path(currentPathError);
+	if (currentPathError != boost::system::errc::success)
+	{
+		snapshotsDir = "./";
+	}
+	std::cout << "working directory is " << snapshotsDir << std::endl;
+
 	std::unique_ptr<CustomOutputFormatter> outputFormatter;
 
 	try
@@ -91,6 +101,25 @@ int main(int argc, char** argv)
 			if (arguments.count("v") == 1)
 			{
 				vrpFile = bfs::path(arguments["v"].as<std::string>());
+			}
+
+			// store vrpFile if present for working directory handling
+			if (arguments.count("v") == 1)
+			{
+				vrpFile = bfs::path(arguments["v"].as<std::string>());
+			}
+
+			// store snapshotsDir if present
+			if (arguments.count("s") == 1)
+			{
+				snapshotsDir = bfs::path(arguments["s"].as<std::string>());
+				if (!bfs::exists(snapshotsDir))
+				{
+					if (!bfs::create_directories(snapshotsDir))
+					{
+						std::cout << "cannot create directory " << snapshotsDir << std::endl;
+					}
+				}
 			}
 
 			// store weatherFile if present for working directory handling
@@ -348,6 +377,8 @@ int main(int argc, char** argv)
 		}
 
 		session.SetBridge(&bridge);
+
+		session.SetSnapshotsDirectory(snapshotsDir.string().c_str());
 
 		if (!vrpFile.empty())
 		{

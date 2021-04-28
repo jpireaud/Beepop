@@ -23,9 +23,6 @@ hunter_add_package(PocoCpp)
 # follow instructions https://github.com/microsoft/vcpkg/
 hunter_add_package(fmt)
 
-# unit tests framework
-hunter_add_package(Catch)
-
 # Boost framework
 hunter_add_package(Boost COMPONENTS system filesystem)
 
@@ -36,6 +33,9 @@ hunter_add_package(cxxopts)
 hunter_add_package(ZLIB)
 
 # Include 3rd include directories
+include_directories(BEFORE 3rd)
+
+# Include 3rd gzip include directories
 include_directories(BEFORE 3rd/gzip-hpp/include)
 
 ## precompiled header
@@ -44,7 +44,7 @@ set(VarroaPopPCH "${CMAKE_SOURCE_DIR}/portcode/stdafx.h")
 
 ## include directories
 
-include_directories(BEFORE . src portcode datamodel)
+include_directories(BEFORE . src lib portcode datamodel)
 
 ## specific definitions
 
@@ -52,6 +52,7 @@ include_directories(BEFORE . src portcode datamodel)
 
 add_subdirectory(portcode)
 add_subdirectory(datamodel)
+add_subdirectory(lib)
 add_subdirectory(tests)
 
 ## build application
@@ -61,12 +62,12 @@ find_package(cxxopts CONFIG REQUIRED)
 find_package(Poco REQUIRED Foundation CONFIG)
 find_package(ZLIB CONFIG REQUIRED)
 
-set (SOURCES src/main.cpp src/csv.cpp src/varroapopcmdbridge.cpp src/customoutputformatter.cpp src/colonysizeoutputformatter.cpp src/agestructureoutputformatter.cpp)
+set (SOURCES src/main.cpp)
 
 # add_executable(VarroaPop WIN32 ${SOURCES})
 add_executable(VarroaPop ${SOURCES})
 
-target_link_libraries(VarroaPop PRIVATE VarroaPopDataModel VarroaPopLinuxPort)
+target_link_libraries(VarroaPop PRIVATE VarroaPopCmdLib VarroaPopDataModel VarroaPopLinuxPort)
 target_link_libraries(VarroaPop PRIVATE Boost::system Boost::filesystem)
 target_link_libraries(VarroaPop PRIVATE cxxopts::cxxopts)
 target_link_libraries(VarroaPop PRIVATE Poco::Foundation)

@@ -27,6 +27,7 @@ def run_simulation(command_str):
     start_simulation = datetime.datetime.now()
     # Call simulation
     process = os.popen(command_str)
+    print(process.read())
     process.close()
     # Compute elapsed time and update total simulation time
     end_simulation = datetime.datetime.now()
@@ -92,15 +93,15 @@ if __name__ == '__main__':
         print('Cannot find weather directory at: ' + arguments.weather_directory)
         exit(-1)
 
-    start_dates = []
-    end_dates = []
+    # start_dates = []
+    # end_dates = []
 
-    # start_dates = [
-    #     DateConfig('10/15')]
-    #
-    # end_dates = [
-    #     DateConfig('01/31'),
-    #     DateConfig('04/01')]
+    start_dates = [
+        DateConfig('10/15')]
+
+    end_dates = [
+        DateConfig('01/31'),
+        DateConfig('04/01')]
 
     exec_configurations = []
 

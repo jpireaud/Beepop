@@ -22,7 +22,25 @@ set(SOURCES carchive.cpp
             stdafx.cpp
             varroapop.cpp )
 
-add_library(VarroaPopLinuxPort ${SOURCES})
+set(INCLUDES    carchive.h
+                carray.h
+                ccmdtarget.h
+                cdialog.h
+                cfile.h
+                cmapstringtoob.h
+                cobject.h
+                coblist.h
+                coledatetime.h
+                cptrlist.h
+                cstring.h
+                cstringarray.h
+                ctime.h
+                cuintarray.h
+                position.h
+                stdafx.h
+                varroapop.h )
+
+add_library(VarroaPopLinuxPort ${SOURCES} ${INCLUDES})
 target_link_libraries(VarroaPopLinuxPort PRIVATE fmt::fmt)
 target_link_libraries(VarroaPopLinuxPort PRIVATE Boost::system Boost::filesystem)
 target_link_libraries(VarroaPopLinuxPort PRIVATE Poco::Foundation)

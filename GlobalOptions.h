@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 // Singleton class to easily add conditional block statements
 // and select them by either:
@@ -18,27 +18,25 @@ public:
 	GlobalOptions();
 
 public:
-	template<typename OptionType>
-	class Option
+	template <typename OptionType> class Option
 	{
 	public:
 		Option() {}
 		Option(const OptionType& value) { Set(value); }
 		virtual ~Option() {}
 		virtual const OptionType& operator()() const { return m_value; }
-		virtual void Set(const OptionType& value) { m_value = value; }
+		virtual void              Set(const OptionType& value) { m_value = value; }
 
 	protected:
 		OptionType m_value;
 	};
 
-	template<typename OptionType>
-	class AggregateOption : Option<OptionType>
+	template <typename OptionType> class AggregateOption : Option<OptionType>
 	{
 	public:
 		AggregateOption(GlobalOptions& options) : Option<OptionType>(), m_options(options) {}
-		virtual void Set(const OptionType& value);
-		virtual const OptionType& operator()() const 
+		virtual void              Set(const OptionType& value);
+		virtual const OptionType& operator()() const
 		{
 			throw std::runtime_error("GlobalOptions::AggregateOption::operator()() should not be called directly");
 			return Option<OptionType>::m_value;
@@ -50,9 +48,8 @@ public:
 
 	// Options
 public:
-
 	// Egg laying options
-	
+
 	// This option affect Egg laying. When bellow threshold no egg will be laid.
 	Option<double> DaylightHoursThreshold = 9.5;
 
@@ -87,17 +84,18 @@ public:
 	// of ForageInc on the next Foraging day instead of aging 1 full day.
 	Option<bool> ShouldForagersAlwaysAgeBasedOnForageInc = false;
 
-	// This options controls ShouldForageDayElectionBasedOnTemperatures, ShouldComputeHourlyTemperatureEstimation and 
+	// This options controls ShouldForageDayElectionBasedOnTemperatures, ShouldComputeHourlyTemperatureEstimation and
 	// ShouldForagersAlwaysAgeBasedOnForageInc when it is set
-	typedef bool ForagerAgingBasedHourlyTemperatureEstimate;
+	typedef bool                                                ForagerAgingBasedHourlyTemperatureEstimate;
 	AggregateOption<ForagerAgingBasedHourlyTemperatureEstimate> ShouldForagerAgingBasedOnHourlyTemperatureEstimate;
-	
+
 	// Weather file options
 
 	// If the weather file to be loaded is in bynary format, this specify which format to use
 	// Valid options are:
 	// - Observed
 	// - Modeled
+	// - Rcp45
 	// - Rcp85
 	Option<std::string> BinaryWeatherFileFormatIdentifier;
 
