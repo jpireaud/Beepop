@@ -1,3 +1,5 @@
+#! /usr/local/bin/python3
+
 import filecmp, os, re, shutil, stat
 from string import Template
 

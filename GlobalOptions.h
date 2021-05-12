@@ -101,4 +101,10 @@ public:
 
 	// Additional Output Data
 	Option<bool> ShouldOutputInOutCounts = false;
+
+	// Apply winter mortality to colony
+	//
+	// Right now winter mortality is only applied to foragers.
+	// This would need to evolve to be apply to all bees, with different impact of different age of adult bees.
+	Option<bool> ShouldApplyWinterMortality = true;
 };
