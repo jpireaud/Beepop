@@ -124,6 +124,9 @@ CVarroaPopSession::CVarroaPopSession()
 	m_SessionLoaded = false;
 	m_WeatherLoaded = false;
 	SetShowWarnings(true);
+
+	m_SnapshotsEnabled = false;
+	m_SnapshotsResetEnabled = false;
 }
 
 CVarroaPopSession::~CVarroaPopSession()
