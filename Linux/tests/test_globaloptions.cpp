@@ -2,26 +2,26 @@
 
 //! include explicitely since we are not using the pre-compiled header for tests
 //! may change this in the future
-#include "stdafx.h" 
+#include "stdafx.h"
 
 #include "globaloptions.h"
 
-TEST_CASE("GlobalOptions operations", "[settings]") 
-{    
-    SECTION("Foragers aging behavior") 
-    {
-        GlobalOptions options;
+TEST_CASE("GlobalOptions operations", "[settings]")
+{
+	SECTION("Foragers aging behavior")
+	{
+		GlobalOptions options;
 
-        CHECK(options.ShouldForageDayElectionBasedOnTemperatures());
-        CHECK_FALSE(options.ShouldComputeHourlyTemperatureEstimation());
-        CHECK_FALSE(options.ShouldForagersAlwaysAgeBasedOnForageInc());
+		CHECK(options.ShouldForageDayElectionBasedOnTemperatures());
+		CHECK_FALSE(options.ShouldComputeHourlyTemperatureEstimation());
+		CHECK_FALSE(options.ShouldAdultsAgeBasedOnForageInc());
 
-        CHECK_THROWS(options.ShouldForagerAgingBasedOnHourlyTemperatureEstimate());
+		CHECK_THROWS(options.ShouldAgingBasedOnHourlyTemperatureEstimate());
 
-        options.ShouldForagerAgingBasedOnHourlyTemperatureEstimate.Set(true);
+		options.ShouldAgingBasedOnHourlyTemperatureEstimate.Set(true);
 
-        CHECK_FALSE(options.ShouldForageDayElectionBasedOnTemperatures());
-        CHECK(options.ShouldComputeHourlyTemperatureEstimation());
-        CHECK(options.ShouldForagersAlwaysAgeBasedOnForageInc());
-    }
+		CHECK_FALSE(options.ShouldForageDayElectionBasedOnTemperatures());
+		CHECK(options.ShouldComputeHourlyTemperatureEstimation());
+		CHECK(options.ShouldAdultsAgeBasedOnForageInc());
+	}
 }

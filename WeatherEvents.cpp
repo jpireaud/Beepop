@@ -2,21 +2,21 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "VarroaPop.h"
 #include "WeatherEvents.h"
-#include "WeatherGridData.h"
 #include "ColdStorageSimulator.h"
 #include "CreateWeatherHdr.h"
 #include "GlobalOptions.h"
+#include "VarroaPop.h"
+#include "WeatherGridData.h"
 #include "math.h"
+#include "stdafx.h"
 
 #include <algorithm>
 #include <functional>
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -42,7 +42,7 @@ struct call_if_not_calling
 		if (!calling)
 		{
 			calling = true;
-			function();	
+			function();
 			calling = false;
 		}
 	}
@@ -56,7 +56,8 @@ int CountChars(CString instg, TCHAR testchar)
 	int count = 0;
 	int len = instg.GetLength();
 
-	for (int index=0; index < len; index++) if (instg[index]==testchar) count++;
+	for (int index = 0; index < len; index++)
+		if (instg[index] == testchar) count++;
 	return count;
 }
 
@@ -73,8 +74,9 @@ void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
 		//    Rainfall <= .197 inches
 		//
 		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
-		event->SetForage((event->GetMaxTemp() > 12.0) && (windSpeed <= GlobalOptions::Get().WindspeedThreshold()) &&
-			(event->GetMaxTemp() <= 43.33) && (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
+		event->SetForage(
+		    (event->GetMaxTemp() > 12.0) && (windSpeed <= GlobalOptions::Get().WindspeedThreshold()) &&
+		    (event->GetMaxTemp() <= 43.33) && (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
 	}
 	else
 	{
@@ -84,12 +86,13 @@ void UpdateForageAttributeForEvent(CEvent* event, double windSpeed)
 		//    Rainfall <= .197 inches
 		//
 		// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
-		event->SetForage((windSpeed <= GlobalOptions::Get().WindspeedThreshold()) && (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
+		event->SetForage(
+		    (windSpeed <= GlobalOptions::Get().WindspeedThreshold()) &&
+		    (event->GetRainfall() <= GlobalOptions::Get().RainfallThreshold()));
 	}
 	// Here we set the Forage Increment using the default method, may be change later depending on execution options
 	event->SetForageInc(12.0, event->GetMaxTemp(), event->GetTemp());
 }
-
 
 //////////////////////////////////////////////////////////////////////
 // CEvents Member Functions
@@ -109,13 +112,13 @@ CEvent::~CEvent()
 {
 }
 
-
 CString CEvent::ToText()
 {
 	CString EventText;
 	CString theDate = m_Time.Format("%m/%d/%Y");
-	EventText.Format("Date: %s\n Temp: %4.2f\n MaxTemp: %4.2f\n MinTemp: %4.2f\n Rainfall: %4.2f\n DaylightHours: %4.2f\n", 
-		theDate, m_Temp, m_MaxTemp, m_MinTemp, m_Rainfall, m_DaylightHours);
+	EventText.Format(
+	    "Date: %s\n Temp: %4.2f\n MaxTemp: %4.2f\n MinTemp: %4.2f\n Rainfall: %4.2f\n DaylightHours: %4.2f\n", theDate,
+	    m_Temp, m_MaxTemp, m_MinTemp, m_Rainfall, m_DaylightHours);
 	return EventText;
 }
 
@@ -130,7 +133,7 @@ void CEvent::Serialize(CArchive& ar)
 		ar << m_MaxTemp;
 		ar << m_MinTemp;
 		ar << m_Rainfall;
-		ar << (m_ForageDay?1:0);
+		ar << (m_ForageDay ? 1 : 0);
 		ar << m_DaylightHours;
 	}
 	else
@@ -142,13 +145,12 @@ void CEvent::Serialize(CArchive& ar)
 		ar >> m_MinTemp;
 		ar >> m_Rainfall;
 		ar >> iforage;
-		m_ForageDay = (iforage==1);
+		m_ForageDay = (iforage == 1);
 		ar >> m_DaylightHours;
 	}
 }
 
-
-CEvent::CEvent(CEvent& event)  // Copy Constructor
+CEvent::CEvent(CEvent& event) // Copy Constructor
 {
 	m_Time = event.m_Time;
 	m_MaxTemp = event.m_MaxTemp;
@@ -161,50 +163,22 @@ CEvent::CEvent(CEvent& event)  // Copy Constructor
 
 double CEvent::GetTemp()
 {
-	double pEventTemp = m_Temp;
-	static call_if_not_calling caller; 
-	caller.call([this, &pEventTemp] {
-		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
-		if (coldStorage.IsEnabled())
-			pEventTemp = coldStorage.GetTemp(*this);
-	});
-	return pEventTemp;
+	return GetTemp(CColdStorageSimulator::Get());
 }
 
 double CEvent::GetMaxTemp()
 {
-	double pEventTemp = m_MaxTemp;
-	static call_if_not_calling caller;
-	caller.call([this, &pEventTemp] {
-		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
-		if (coldStorage.IsEnabled())
-			pEventTemp = coldStorage.GetMaxTemp(*this);
-	});
-	return pEventTemp;
+	return GetMaxTemp(CColdStorageSimulator::Get());
 }
 
 double CEvent::GetMinTemp()
 {
-	double pEventTemp = m_MinTemp;
-	static call_if_not_calling caller;
-	caller.call([this, &pEventTemp] {
-		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
-		if (coldStorage.IsEnabled())
-			pEventTemp = coldStorage.GetMinTemp(*this);
-		});
-	return pEventTemp;
+	return GetMinTemp(CColdStorageSimulator::Get());
 }
 
 bool CEvent::IsForageDay()
 {
-	bool forageDay = m_ForageDay;
-	static call_if_not_calling caller;
-	caller.call([this, &forageDay] {
-		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
-		if (coldStorage.IsEnabled())
-			forageDay = coldStorage.IsForageDay(*this);
-		});
-	return forageDay;
+	return IsForageDay(CColdStorageSimulator::Get());
 }
 
 double CEvent::GetDaylightHours()
@@ -214,17 +188,70 @@ double CEvent::GetDaylightHours()
 
 double CEvent::GetForageInc()
 {
-	double forageInc = m_ForageInc;
+	return GetForageInc(CColdStorageSimulator::Get());
+}
+
+double CEvent::GetTemp(const CColdStorageSimulator& coldStorage)
+{
+	double pEventTemp = m_Temp;
+
 	static call_if_not_calling caller;
-	caller.call([this, &forageInc] {
-		const CColdStorageSimulator& coldStorage = CColdStorageSimulator::Get();
-		if (coldStorage.IsEnabled())
-			forageInc = coldStorage.GetForageInc(*this);
-		});
+	caller.call([this, &pEventTemp, &coldStorage] {
+		if (coldStorage.IsEnabled()) pEventTemp = coldStorage.GetTemp(*this);
+	});
+
+	return pEventTemp;
+}
+
+double CEvent::GetMaxTemp(const CColdStorageSimulator& coldStorage)
+{
+	double pEventTemp = m_MaxTemp;
+
+	static call_if_not_calling caller;
+	caller.call([this, &pEventTemp, &coldStorage] {
+		if (coldStorage.IsEnabled()) pEventTemp = coldStorage.GetMaxTemp(*this);
+	});
+
+	return pEventTemp;
+}
+
+double CEvent::GetMinTemp(const CColdStorageSimulator& coldStorage)
+{
+	double pEventTemp = m_MinTemp;
+
+	static call_if_not_calling caller;
+	caller.call([this, &pEventTemp, &coldStorage] {
+		if (coldStorage.IsEnabled()) pEventTemp = coldStorage.GetMinTemp(*this);
+	});
+
+	return pEventTemp;
+}
+
+bool CEvent::IsForageDay(const CColdStorageSimulator& coldStorage)
+{
+	bool forageDay = m_ForageDay;
+
+	static call_if_not_calling caller;
+	caller.call([this, &forageDay, &coldStorage] {
+		if (coldStorage.IsEnabled()) forageDay = coldStorage.IsForageDay(*this);
+	});
+
+	return forageDay;
+}
+
+double CEvent::GetForageInc(const CColdStorageSimulator& coldStorage)
+{
+	double forageInc = m_ForageInc;
+
+	static call_if_not_calling caller;
+	caller.call([this, &forageInc, &coldStorage] {
+		if (coldStorage.IsEnabled()) forageInc = coldStorage.GetForageInc(*this);
+	});
+
 	return forageInc;
 }
 
-CEvent CEvent:: operator = (CEvent& event)
+CEvent CEvent::operator=(CEvent& event)
 {
 	CEvent temp;
 	m_Time = event.m_Time;
@@ -237,12 +264,11 @@ CEvent CEvent:: operator = (CEvent& event)
 	return temp;
 }
 
-
-CEvent CEvent::operator + (CEvent event)
+CEvent CEvent::operator+(CEvent event)
 {
-	/*  
-	When adding events, increment rainfall, daylight hours; reset min and 
-	max temp if necessary;  If the either event is not a forage day, the sum is not a 
+	/*
+	When adding events, increment rainfall, daylight hours; reset min and
+	max temp if necessary;  If the either event is not a forage day, the sum is not a
 	forage day.  Otherwise, if for either event daylight and wind>25 or temp<50 or temp > 110 or rain, the
 	sum is not a foraging day.  Keep time as it is since this corresponds the the beginning of the
 	event.
@@ -252,24 +278,22 @@ CEvent CEvent::operator + (CEvent event)
 	temp.m_Time = m_Time;
 	temp.m_Rainfall = m_Rainfall + event.m_Rainfall;
 	temp.m_DaylightHours = m_DaylightHours + event.m_DaylightHours;
-	temp.m_MaxTemp = (m_MaxTemp > event.m_MaxTemp)?m_MaxTemp:event.m_MaxTemp;
-	temp.m_MinTemp = (m_MinTemp < event.m_MinTemp)?m_MinTemp:event.m_MinTemp;
+	temp.m_MaxTemp = (m_MaxTemp > event.m_MaxTemp) ? m_MaxTemp : event.m_MaxTemp;
+	temp.m_MinTemp = (m_MinTemp < event.m_MinTemp) ? m_MinTemp : event.m_MinTemp;
 	temp.m_ForageDay = (m_ForageDay && event.m_ForageDay);
 	temp.m_ForageInc = m_ForageInc + event.m_ForageInc;
 	return temp;
 }
-	
 
-void CEvent::operator += (CEvent event)
+void CEvent::operator+=(CEvent event)
 {
 	m_Rainfall += event.m_Rainfall;
 	m_DaylightHours += event.m_DaylightHours;
-	m_MaxTemp = (m_MaxTemp > event.m_MaxTemp)?m_MaxTemp:event.m_MaxTemp;
-	m_MinTemp = (m_MinTemp < event.m_MinTemp)?m_MinTemp:event.m_MinTemp;
+	m_MaxTemp = (m_MaxTemp > event.m_MaxTemp) ? m_MaxTemp : event.m_MaxTemp;
+	m_MinTemp = (m_MinTemp < event.m_MinTemp) ? m_MinTemp : event.m_MinTemp;
 	m_ForageDay = (m_ForageDay && event.m_ForageDay);
 	m_ForageInc += event.m_ForageInc;
 }
-
 
 CString CEvent::GetDateStg(CString formatstg)
 {
@@ -281,7 +305,7 @@ CString CEvent::GetDateStg(CString formatstg)
 bool CEvent::IsWinterDay()
 {
 	bool WD;
-	WD = m_Temp < 18.0;  //Try this out for now
+	WD = m_Temp < 18.0; // Try this out for now
 	return WD;
 }
 
@@ -289,9 +313,7 @@ bool CEvent::IsWinterDay()
 // CWeatherFile Member Functions
 //////////////////////////////////////////////////////////////////////
 
-BOOL CWeatherFile::Open(LPCTSTR lpszFileName, 
-						UINT nOpenFlags, 
-						CFileException* pError)
+BOOL CWeatherFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, CFileException* pError)
 {
 	try
 	{
@@ -305,14 +327,11 @@ BOOL CWeatherFile::Open(LPCTSTR lpszFileName,
 	catch (CFileException* e)
 	{
 		TCHAR stg[255];
-		e->GetErrorMessage(stg,255);
+		e->GetErrorMessage(stg, 255);
 		m_ErrorStg = CString("Error Opening File: ") + CString(stg);
 		return false;
 	}
-
-
-} 
-
+}
 
 CWeatherFile::CWeatherFile()
 {
@@ -322,20 +341,17 @@ CWeatherFile::CWeatherFile()
 	m_BytesRead = 0;
 }
 
-
 CWeatherFile::~CWeatherFile()
 {
 }
-
 
 BOOL CWeatherFile::GetLine(CString& stg)
 {
 	m_CurrentLine++;
 	BOOL pf = ReadString(stg);
 	if (pf) m_BytesRead += stg.GetLength() + 1;
-	return(pf);
+	return (pf);
 }
-
 
 bool CWeatherFile::IsHeaderPresent()
 {
@@ -348,27 +364,27 @@ void CWeatherFile::SeekToBegin()
 {
 	CStdioFile::SeekToBegin();
 	m_CurrentLine = 0;
-
 }
 
 CEvent* CWeatherFile::GetNextEvent()
 {
 	if (m_HeaderFormat == "MINMAX") return LineToEvent();
-	else return LinesToEvent();
+	else
+		return LinesToEvent();
 }
 
 bool CWeatherFile::CreateHeader()
 {
-	/*  
-	Prompts the operator for some header information.  When this is read from the dialog 
-	box, the old file is renamed to ~<filename>, the header data is written to a new 
-	file with the proper file name, the old file contents are appended to the header, 
+	/*
+	Prompts the operator for some header information.  When this is read from the dialog
+	box, the old file is renamed to ~<filename>, the header data is written to a new
+	file with the proper file name, the old file contents are appended to the header,
 	and the file is reopened.
 	*/
 #define TEMPFILENAME "Temp.wth"
 	CCreateWeatherHdr MyHeader;
 
-	if (MyHeader.DoModal()!=IDOK) return false;
+	if (MyHeader.DoModal() != IDOK) return false;
 	else
 	{
 		try
@@ -377,15 +393,15 @@ bool CWeatherFile::CreateHeader()
 			MyHeader.GetHeaderStrings(HeaderString, this);
 
 			// Create temporary file and archive to build file with header
-			CStdioFile *tempFile = new CStdioFile(TEMPFILENAME,
-				CFile::modeWrite|CFile::modeCreate|CFile::shareDenyNone);
+			CStdioFile* tempFile =
+			    new CStdioFile(TEMPFILENAME, CFile::modeWrite | CFile::modeCreate | CFile::shareDenyNone);
 
 			// Write header strings into new file
 			CString tempString1;
-			for (int i=0;i<HeaderString.GetSize();i++)
+			for (int i = 0; i < HeaderString.GetSize(); i++)
 			{
 				tempString1 = HeaderString.GetAt(i);
-				tempFile->WriteString(tempString1+"\n");
+				tempFile->WriteString(tempString1 + "\n");
 			}
 
 			// Position the original file and archive to the beginning
@@ -394,7 +410,7 @@ bool CWeatherFile::CreateHeader()
 			//  Read each line of the original file and write to temp
 			while (GetLine(tempString1))
 			{
-				tempFile->WriteString(tempString1+"\n");
+				tempFile->WriteString(tempString1 + "\n");
 			}
 			ASSERT(tempFile);
 			delete tempFile;
@@ -404,28 +420,26 @@ bool CWeatherFile::CreateHeader()
 			tempString1 = this->GetFileName();
 			tempString2 = CString("~") + tempString1;
 			this->Close();
-			CStdioFile::Rename(tempString1,tempString2);
+			CStdioFile::Rename(tempString1, tempString2);
 
 			// Rename new file to "filename"
-			CStdioFile::Rename(TEMPFILENAME,tempString1);
+			CStdioFile::Rename(TEMPFILENAME, tempString1);
 
 			// Close and reopen new file and archive
-			this->Open(tempString1,CFile::modeRead|CFile::shareDenyNone);
+			this->Open(tempString1, CFile::modeRead | CFile::shareDenyNone);
 			SeekToBegin();
-			GetLine(tempString1);  // Position to second line - ready to go
+			GetLine(tempString1); // Position to second line - ready to go
 		}
 		catch (CFileException* e)
 		{
 			TCHAR stg[255];
-			e->GetErrorMessage(stg,255);
+			e->GetErrorMessage(stg, 255);
 			m_ErrorStg = CString("Error Creating Header: ") + CString(stg);
 			return false;
 		}
 		return true;
 	}
 }
-
-
 
 bool CWeatherFile::DigestHeader()
 {
@@ -474,35 +488,28 @@ bool CWeatherFile::DigestHeader()
 		}
 
 		GetLine(theLine);
-		m_HeaderTempCol = 
-			atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
+		m_HeaderTempCol = atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
 
 		if (m_HeaderFormat == "MINMAX")
 		{
 			GetLine(theLine);
-			m_HeaderMaxTempCol = 
-				atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
+			m_HeaderMaxTempCol = atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
 
 			GetLine(theLine);
-			m_HeaderMinTempCol = 
-				atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
+			m_HeaderMinTempCol = atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
 		}
-			
-		GetLine(theLine);
-		m_HeaderSolarRadCol = 
-				atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
 
 		GetLine(theLine);
-		m_HeaderWindspeedCol = 
-				atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
+		m_HeaderSolarRadCol = atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
 
 		GetLine(theLine);
-		m_HeaderRainCol = 
-			atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
+		m_HeaderWindspeedCol = atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
 
 		GetLine(theLine);
-		m_HeaderInterval = 
-			atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
+		m_HeaderRainCol = atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
+
+		GetLine(theLine);
+		m_HeaderInterval = atoi(LPCTSTR(theLine.Right(theLine.GetLength() - theLine.ReverseFind('=') - 1)));
 
 		//  Now scan until the end of the header block is found
 		int end;
@@ -514,14 +521,13 @@ bool CWeatherFile::DigestHeader()
 				return false;
 			}
 			end = theLine.Find(END_HEADER);
-		}
-		while (end == -1);
+		} while (end == -1);
 		return true;
 	}
 	catch (CFileException* e)
 	{
 		TCHAR stg[255];
-		e->GetErrorMessage(stg,255);
+		e->GetErrorMessage(stg, 255);
 		m_ErrorStg = CString("Error Reading Header: ") + CString(stg);
 		return false;
 	}
@@ -529,7 +535,7 @@ bool CWeatherFile::DigestHeader()
 
 bool CWeatherFile::GetValidLine(COleDateTime& theTime, CString& theLine)
 {
-	//  Reads the file past any invalid lines.  Parses the first valid line, removing the 
+	//  Reads the file past any invalid lines.  Parses the first valid line, removing the
 	//  date and time info and putting it in theTime.  Removes the date/time substring
 	//  from theLine and returns theLine.  This function also sets the member variable
 	//  m_PrevValidLinePos for use in backing up one line when processing HOURLY files.
@@ -540,58 +546,51 @@ bool CWeatherFile::GetValidLine(COleDateTime& theTime, CString& theLine)
 	while (!ValidLine)
 	{
 		DWORD filepos = (DWORD)GetPosition();
-		if (!GetLine(theLine)) return false;  //  End of File Reached
-	
+		if (!GetLine(theLine)) return false; //  End of File Reached
+
 		//  See if there are more than 15 blanks at the beginning of the line, if so
 		//  this is not a valid data line
 		int len = theLine.GetLength();
 		theLine.TrimLeft();
-		if (len - theLine.GetLength() > 15) continue;  // Invalid - Get Next Line
+		if (len - theLine.GetLength() > 15) continue; // Invalid - Get Next Line
 
 		//  Assume date time format "ddddd tttttt" so find the position of the second
 		//  space character and extract the left to theDateTime
 		int spacecount = 0, index = 0;
-		while ((spacecount<2) && (index<theLine.GetLength()))
+		while ((spacecount < 2) && (index < theLine.GetLength()))
 		{
 			if (theLine[index++] == ' ') spacecount++;
 		}
-		if (spacecount < 2) continue;  //  Something wrong - invalid date
+		if (spacecount < 2) continue; //  Something wrong - invalid date
 		// Otherwise, "index" is the length of the datetime substring
-		
-
 
 		//  Now look for a valid date/time in the first "index" chars of the trimmed line
-		CString theDateTime = theLine.Left(index);  
-		theLine = theLine.Right(theLine.GetLength()-index);
+		CString theDateTime = theLine.Left(index);
+		theLine = theLine.Right(theLine.GetLength() - index);
 		int slashcount;
-		if (slashcount = CountChars(theDateTime,'/') == 0) continue;  // Invalid Line
+		if (slashcount = CountChars(theDateTime, '/') == 0) continue; // Invalid Line
 		//  Else assume valid date time
 		ValidLine = true;
 		m_PrevValidLinePos = filepos;
 
-
-		if (slashcount == 1)  // add "1999"
+		if (slashcount == 1) // add "1999"
 		{
 			CString theDate = theDateTime.SpanExcluding(" ");
 			CString theTime = theDateTime.Right(theDateTime.GetLength() - theDate.GetLength());
 			theDate.TrimRight();
 			theDate += "1999 ";
-			theDateTime = theDate+theTime;
+			theDateTime = theDate + theTime;
 		}
-		TRACE("GetValidLine - The Date Stg = ***%s***\n",theDateTime);
+		TRACE("GetValidLine - The Date Stg = ***%s***\n", theDateTime);
 		COleDateTime ODateTime;
 		ODateTime.ParseDateTime(LPCTSTR(theDateTime));
 
-		theTime = COleDateTime(ODateTime.GetYear(),
-						ODateTime.GetMonth(),
-						ODateTime.GetDay(),
-						ODateTime.GetHour(),
-						ODateTime.GetMinute(),0);
+		theTime = COleDateTime(
+		    ODateTime.GetYear(), ODateTime.GetMonth(), ODateTime.GetDay(), ODateTime.GetHour(), ODateTime.GetMinute(),
+		    0);
 	}
 	return true;
-
 }
-
 
 bool CWeatherFile::IsLineValid(CString theLine)
 {
@@ -602,9 +601,9 @@ bool CWeatherFile::IsLineValid(CString theLine)
 	if (len - theLine.GetLength() > 15) return false;
 
 	//  Now look for a valid date in the first 10 chars of the trimmed line
-	CString theDate = theLine.Left(10);  // extracts either mm/dd or ddd formats
-	int slashpos = theDate.Find('/');
-	if (slashpos == -1)  
+	CString theDate = theLine.Left(10); // extracts either mm/dd or ddd formats
+	int     slashpos = theDate.Find('/');
+	if (slashpos == -1)
 	//  A slash was not found, look for either doy or monthname format
 	{
 		// Get first substring
@@ -614,121 +613,122 @@ bool CWeatherFile::IsLineValid(CString theLine)
 			m_DateType = MONTHNAME;
 			return true;
 		}
-		else						// Look for a day of year
+		else // Look for a day of year
 		{
 			int doy = atoi(LPCTSTR(substr));
-			if ((doy >0) && (doy<367)) 
+			if ((doy > 0) && (doy < 367))
 			{
 				m_DateType = DOY;
 				return true;
 			}
-			else return false;
+			else
+				return false;
 		}
 	}
 	else
 	//  Expecting mm/dd format or mm/dd/yy
 	{
-		int slashpos2 = theDate.ReverseFind('/');
-		int month = atoi(theDate.SpanExcluding("/"));
+		int     slashpos2 = theDate.ReverseFind('/');
+		int     month = atoi(theDate.SpanExcluding("/"));
 		CString substr;
-		if (slashpos == slashpos2) substr = theDate.Mid(slashpos+1);  // mm/dd
-		else substr = theDate.Mid(slashpos+1, slashpos2-slashpos -1); // mm/dd/yy
+		if (slashpos == slashpos2) substr = theDate.Mid(slashpos + 1); // mm/dd
+		else
+			substr = theDate.Mid(slashpos + 1, slashpos2 - slashpos - 1); // mm/dd/yy
 		int day = atoi(substr);
 		int year = 0;
-		if (slashpos2!=slashpos)
+		if (slashpos2 != slashpos)
 		{
-			//year = atoi(theDate.Mid(slashpos2 + 1));
+			// year = atoi(theDate.Mid(slashpos2 + 1));
 			CString StgYear = theDate.Right(theDate.GetLength() - slashpos2 - 1);
 			year = atoi(StgYear);
 		}
 
-		if ((month > 0) && (month < 13) && (day > 0) && (day < 32)) 
+		if ((month > 0) && (month < 13) && (day > 0) && (day < 32))
 		{
-			if ((year == 0)&&(theDate.Mid(slashpos2 + 1).Find("00") >=0 )) m_DateType = MMDDYY;  // Year is 2-digit string "00"
+			if ((year == 0) && (theDate.Mid(slashpos2 + 1).Find("00") >= 0))
+				m_DateType = MMDDYY; // Year is 2-digit string "00"
 			else if (year > 0)
 			{
 				if (year < 100) m_DateType = MMDDYY; // A 2-digit year.  Make some assumptions about which century later
-				else m_DateType = MMDDYYYY; // A 4-digit year.
+				else
+					m_DateType = MMDDYYYY; // A 4-digit year.
 			}
-			else m_DateType = MMDD;
+			else
+				m_DateType = MMDD;
 			return true;
 		}
-		else return false;
+		else
+			return false;
 	}
 }
-
-
 
 bool CWeatherFile::IsMonth(CString monthname)
 {
 	if (MonthToNum(monthname) == -1) return false;
-	else return true;
-
+	else
+		return true;
 }
-
 
 int CWeatherFile::MonthToNum(CString monthname)
 {
 	//  Returns the number of the month (i.e. April = 4) if monthname
 	//  is a valid name.  Otherwise returns -1.
 
-	if (monthname.GetLength()==0) return -1;
+	if (monthname.GetLength() == 0) return -1;
 
-	CString MonthNames[12] = {	"JANUARY", "FEBRUARY", "MARCH", "APRIL",
-								"MAY", "JUNE", "JULY", "AUGUST", 
-								"SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
+	CString MonthNames[12] = {"JANUARY", "FEBRUARY", "MARCH",     "APRIL",   "MAY",      "JUNE",
+	                          "JULY",    "AUGUST",   "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
 
-	CString MonthAbbrev[12] = {	"JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-								"JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+	CString MonthAbbrev[12] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
 	bool found = false;
 	monthname.MakeUpper();
 	int i;
-	for (i = 0; i<12 ;i++) 
+	for (i = 0; i < 12; i++)
 	{
-		if ((MonthNames[i].Find(monthname)!=-1)||(MonthAbbrev[i].Find(monthname)!=-1)) 
+		if ((MonthNames[i].Find(monthname) != -1) || (MonthAbbrev[i].Find(monthname) != -1))
 		{
 			found = true;
 			break;
 		}
 	}
-	if (found) return i+1;
-	else return -1;
+	if (found) return i + 1;
+	else
+		return -1;
 }
-
-
 
 CEvent* CWeatherFile::LinesToEvent()
 // Note: This is used for Hourly files.  Since we aren't using them,
 // this has not been updated since mid 1999.
 {
 	COleDateTime tempTime, ThisEventTime;
-	CString tempStg;
-	char TokenStgArray[32][255];
-	char InStg[255];
-	char* token;
-	char delims[] = " ";
+	CString      tempStg;
+	char         TokenStgArray[32][255];
+	char         InStg[255];
+	char*        token;
+	char         delims[] = " ";
 
 	float totalRain = 0, ThisEventRain = 0, DaytimeRain = 0;
 	float totalTemp = 0, ThisEventTemp = 0;
 	float ThisEventWind = 0;
 	float dayhours = 0;
-	bool forage = true;  // assume foraging day, negate if conditions ever fail
+	bool  forage = true; // assume foraging day, negate if conditions ever fail
 
 	int count = 0;
-	do 
+	do
 	{
-		if (!GetValidLine(tempTime, tempStg)) 	// End of File reached during read
+		if (!GetValidLine(tempTime, tempStg)) // End of File reached during read
 		{
-			if (count == 0) return NULL;        // No valid Event lines read
-			else break;                         // Some lines read, go finish event
+			if (count == 0) return NULL; // No valid Event lines read
+			else
+				break; // Some lines read, go finish event
 		}
 
-		if (count == 0)	ThisEventTime = tempTime;  // First time thru
-	
+		if (count == 0) ThisEventTime = tempTime; // First time thru
+
 		// Check to see if we have just scanned a line representing a new day
 		// If so, this is where we leave the loop
-		if (ThisEventTime.GetDay()!=tempTime.GetDay())
+		if (ThisEventTime.GetDay() != tempTime.GetDay())
 		{
 			GoToPrevLine();
 			break;
@@ -737,53 +737,49 @@ CEvent* CWeatherFile::LinesToEvent()
 		count++;
 
 		// Extract the tokens from the input line into TokenStgArray
-		strcpy_s(InStg,LPCTSTR(tempStg));
-		char * NextToken;
+		strcpy_s(InStg, LPCTSTR(tempStg));
+		char* NextToken;
 		token = strtok_s(InStg, delims, &NextToken);
-		if (token != NULL) strcpy_s(TokenStgArray[0],token);
+		if (token != NULL) strcpy_s(TokenStgArray[0], token);
 		int i = 1;
-		while ((token != NULL) && (i<32))
+		while ((token != NULL) && (i < 32))
 		{
-			token = strtok_s(NULL,delims,  &NextToken);
-			if (token != NULL) strcpy_s(TokenStgArray[i],token);
+			token = strtok_s(NULL, delims, &NextToken);
+			if (token != NULL) strcpy_s(TokenStgArray[i], token);
 			i++;
 		}
 
-		ThisEventRain = (float)atof(TokenStgArray[m_HeaderRainCol-2]);
-		ThisEventTemp = (float)atof(TokenStgArray[m_HeaderTempCol-2]);
-		ThisEventWind = (float)atof(TokenStgArray[m_HeaderWindspeedCol-2]);
+		ThisEventRain = (float)atof(TokenStgArray[m_HeaderRainCol - 2]);
+		ThisEventTemp = (float)atof(TokenStgArray[m_HeaderTempCol - 2]);
+		ThisEventWind = (float)atof(TokenStgArray[m_HeaderWindspeedCol - 2]);
 
 		// Convert temp to degC if necessary
-		if (m_HeaderScale == "F") ThisEventTemp = float(ThisEventTemp/float(1.8) - 17.778);
+		if (m_HeaderScale == "F") ThisEventTemp = float(ThisEventTemp / float(1.8) - 17.778);
 
-		if (atof(TokenStgArray[m_HeaderSolarRadCol-2]) > 0) // Daytime
+		if (atof(TokenStgArray[m_HeaderSolarRadCol - 2]) > 0) // Daytime
 		{
 			dayhours += 1;
 			DaytimeRain += ThisEventRain;
 			//  Is this still a foraging day?
-			if ((ThisEventWind > 20) || (ThisEventTemp <= 12.0) ||
-				(ThisEventTemp >= 43.33) || (DaytimeRain > 0.325)) forage = false;
+			if ((ThisEventWind > 20) || (ThisEventTemp <= 12.0) || (ThisEventTemp >= 43.33) || (DaytimeRain > 0.325))
+				forage = false;
 		}
 
 		totalTemp += ThisEventTemp;
 		totalRain += ThisEventRain;
-	}  while (true); //  End do loop.
+	} while (true); //  End do loop.
 	//  Now build the event
-	
+
 	CEvent* tempEvent = new CEvent;
 
-
 	tempEvent->SetTime(ThisEventTime);
-	tempEvent->SetTemp(totalTemp/(float)count);
+	tempEvent->SetTemp(totalTemp / (float)count);
 	tempEvent->SetRainfall(totalRain);
-	tempEvent->SetDaylightHours(dayhours*m_HeaderInterval/60);	// m_HeaderInterval is
-	tempEvent->SetForage(forage);								// either 30 or 60
+	tempEvent->SetDaylightHours(dayhours * m_HeaderInterval / 60); // m_HeaderInterval is
+	tempEvent->SetForage(forage);                                  // either 30 or 60
 
 	return tempEvent;
-
 }
-
-
 
 CEvent* CWeatherFile::LineToEvent()
 {
@@ -792,7 +788,7 @@ CEvent* CWeatherFile::LineToEvent()
 	//  Assume maximum number of columns (fields) = 32 and max field length = 255
 
 	CString theLine;
-	if (!GetLine(theLine)) return NULL;  // End of File reached
+	if (!GetLine(theLine)) return NULL; // End of File reached
 
 	while (!IsLineValid(theLine))
 	{
@@ -801,34 +797,34 @@ CEvent* CWeatherFile::LineToEvent()
 
 	char TokenStgArray[32][255];
 
-	char InStg[255];
+	char  InStg[255];
 	char* token;
-	char delims[] = " /\t";
-	strcpy_s(InStg,LPCTSTR(theLine));
+	char  delims[] = " /\t";
+	strcpy_s(InStg, LPCTSTR(theLine));
 
 	// Extract the tokens from the input line
-	char * NextToken;
+	char* NextToken;
 	token = strtok_s(InStg, delims, &NextToken);
-	if (token != NULL) strcpy_s(TokenStgArray[0],token);
+	if (token != NULL) strcpy_s(TokenStgArray[0], token);
 	int i = 1;
-	while ((token != NULL) && (i<32))
+	while ((token != NULL) && (i < 32))
 	{
-		token = strtok_s(NULL,delims, &NextToken);
-		if (token != NULL) strcpy_s(TokenStgArray[i],token);
+		token = strtok_s(NULL, delims, &NextToken);
+		if (token != NULL) strcpy_s(TokenStgArray[i], token);
 		i++;
 	}
 
 	/*  Check to see if this is a mm/dd, doy, or monthname format and set Offset accordingly.
-		The offset is used to map the file column number
-		to the index into the TokenStgArray[].  The following relationship applies 
+	    The offset is used to map the file column number
+	    to the index into the TokenStgArray[].  The following relationship applies
 
-					#Columns							offset
-					Per Header			#tokens			value
+	                #Columns							offset
+	                Per Header			#tokens			value
 
-			DOY			1					1			  1
-			MMDD		1					2			  0
-			MMDDYY		1					3			 -1
-			MONTHNAME	2					2			  1
+	        DOY			1					1			  1
+	        MMDD		1					2			  0
+	        MMDDYY		1					3			 -1
+	        MONTHNAME	2					2			  1
 
 
 	*/
@@ -836,24 +832,27 @@ CEvent* CWeatherFile::LineToEvent()
 	int Offset;
 	theLine.TrimLeft();
 	if (m_DateType == MMDD) Offset = 0;
-	else if (m_DateType == MMDDYY) Offset = -1;
-	else if (m_DateType == MMDDYYYY) Offset = -1;
-	else if (m_DateType == MONTHNAME) Offset = 1;
-	else Offset = 1;  //  doy
+	else if (m_DateType == MMDDYY)
+		Offset = -1;
+	else if (m_DateType == MMDDYYYY)
+		Offset = -1;
+	else if (m_DateType == MONTHNAME)
+		Offset = 1;
+	else
+		Offset = 1; //  doy
 
 	CEvent* tempEvent = new CEvent;
 
-
 	//  Set the values of the temperatures and the rainfall
-	float maxtemp=(float)atof(TokenStgArray[m_HeaderMaxTempCol-Offset]);
-	float mintemp=(float)atof(TokenStgArray[m_HeaderMinTempCol-Offset]);
-	float windspeed = (float)atof(TokenStgArray[m_HeaderWindspeedCol-Offset]);
+	float maxtemp = (float)atof(TokenStgArray[m_HeaderMaxTempCol - Offset]);
+	float mintemp = (float)atof(TokenStgArray[m_HeaderMinTempCol - Offset]);
+	float windspeed = (float)atof(TokenStgArray[m_HeaderWindspeedCol - Offset]);
 
 	// Convert temp to degC if necessary
-	if (m_HeaderScale == "F") 
+	if (m_HeaderScale == "F")
 	{
-		maxtemp = float(maxtemp/float(1.8) - 17.778);
-		mintemp = float(mintemp/float(1.8) - 17.778);
+		maxtemp = float(maxtemp / float(1.8) - 17.778);
+		mintemp = float(mintemp / float(1.8) - 17.778);
 	}
 
 	tempEvent->SetMaxTemp(maxtemp);
@@ -863,74 +862,69 @@ CEvent* CWeatherFile::LineToEvent()
 	tempEvent->SetRainfall(rainfall); // convert mm to inches
 
 	tempEvent->SetLineNum(m_CurrentLine);
-	tempEvent->SetDaylightHours((float)atof(TokenStgArray[m_HeaderSolarRadCol-Offset]));
-	tempEvent->SetTemp((float)(maxtemp+mintemp)/2);
+	tempEvent->SetDaylightHours((float)atof(TokenStgArray[m_HeaderSolarRadCol - Offset]));
+	tempEvent->SetTemp((float)(maxtemp + mintemp) / 2);
 
 	UpdateForageAttributeForEvent(tempEvent, windspeed);
 
-	//  The m_Time attribute is a little more complicated.  
-	if (m_DateType == DOY) //Day of Year Format
+	//  The m_Time attribute is a little more complicated.
+	if (m_DateType == DOY) // Day of Year Format
 	{
-		COleDateTimeSpan ts(atol(TokenStgArray[0]),0,0,0);
-		COleDateTime YearStart(COleDateTime::GetCurrentTime().GetYear(),1,1,0,0,0);
+		COleDateTimeSpan ts(atol(TokenStgArray[0]), 0, 0, 0);
+		COleDateTime     YearStart(COleDateTime::GetCurrentTime().GetYear(), 1, 1, 0, 0, 0);
 		tempEvent->SetTime(YearStart + ts);
 	}
 	else if (m_DateType == MMDD)
 	{
-		COleDateTime tempTime(COleDateTime::GetCurrentTime().GetYear(),
-			atoi(TokenStgArray[0]),
-			atoi(TokenStgArray[1]),0,0,0);
+		COleDateTime tempTime(
+		    COleDateTime::GetCurrentTime().GetYear(), atoi(TokenStgArray[0]), atoi(TokenStgArray[1]), 0, 0, 0);
 		tempEvent->SetTime(tempTime);
 	}
 	else if (m_DateType == MMDDYY)
 	{
 		int yr = atoi(TokenStgArray[2]);
-		(yr < 50) ? yr += 2000 : yr+=1900;
-		COleDateTime tempTime(yr,
-			atoi(TokenStgArray[0]),
-			atoi(TokenStgArray[1]),0,0,0);
+		(yr < 50) ? yr += 2000 : yr += 1900;
+		COleDateTime tempTime(yr, atoi(TokenStgArray[0]), atoi(TokenStgArray[1]), 0, 0, 0);
 		tempEvent->SetTime(tempTime);
 	}
 	else if (m_DateType == MMDDYYYY)
 	{
-		CString stg = TokenStgArray[2];
-		int yr = atoi(TokenStgArray[2]);
-		COleDateTime tempTime(yr,
-			atoi(TokenStgArray[0]),
-			atoi(TokenStgArray[1]), 0, 0, 0);
+		CString      stg = TokenStgArray[2];
+		int          yr = atoi(TokenStgArray[2]);
+		COleDateTime tempTime(yr, atoi(TokenStgArray[0]), atoi(TokenStgArray[1]), 0, 0, 0);
 		tempEvent->SetTime(tempTime);
 	}
-	else  // Month name, day
+	else // Month name, day
 	{
 		ASSERT(IsMonth(TokenStgArray[0]));
-		COleDateTime tempTime(COleDateTime::GetCurrentTime().GetYear(),
-			MonthToNum(TokenStgArray[0]),
-			atoi(TokenStgArray[1]),0,0,0);
+		COleDateTime tempTime(
+		    COleDateTime::GetCurrentTime().GetYear(), MonthToNum(TokenStgArray[0]), atoi(TokenStgArray[1]), 0, 0, 0);
 		tempEvent->SetTime(tempTime);
-
 	}
 
 	return tempEvent;
 }
 
-
 void CEvent::SetForageInc(double TThresh, double TMax, double TAve)
 {
 
-	/*  Calculates a measure of the amount of foraging for days having 
-		maximum temperatures close to the foraging threshold.
+	/*  Calculates a measure of the amount of foraging for days having
+	    maximum temperatures close to the foraging threshold.
 	*/
 
 	double DaytimeRange = TMax - TAve;
-	double PropThreshold = (TThresh - TAve)/DaytimeRange;
+	double PropThreshold = (TThresh - TAve) / DaytimeRange;
 
 	if (TMax < TThresh) m_ForageInc = 0.0;
-	else if ((0.968<=PropThreshold)&(PropThreshold<1)) m_ForageInc = 0.25;
-	else if ((0.866<=PropThreshold)&(PropThreshold<.968)) m_ForageInc = 0.5;
-	else if ((0.660<=PropThreshold)&(PropThreshold<.866)) m_ForageInc = 0.75;
-	else m_ForageInc = 1.0;
+	else if ((0.968 <= PropThreshold) & (PropThreshold < 1))
+		m_ForageInc = 0.25;
+	else if ((0.866 <= PropThreshold) & (PropThreshold < .968))
+		m_ForageInc = 0.5;
+	else if ((0.660 <= PropThreshold) & (PropThreshold < .866))
+		m_ForageInc = 0.75;
+	else
+		m_ForageInc = 1.0;
 }
-
 
 //////////////////////////////////////////////////////////////////////
 // CWeatherEvents Construction/Destruction
@@ -946,14 +940,12 @@ CWeatherEvents::~CWeatherEvents()
 	ClearAllEvents();
 }
 
-
 //////////////////////////////////////////////////////////////////////
 // CWeatherEvents Member Functions
 //////////////////////////////////////////////////////////////////////
 CString CWeatherEvents::GetFileName()
 {
 	return m_Filename;
-
 }
 
 void CWeatherEvents::ClearAllEvents()
@@ -972,7 +964,7 @@ bool CWeatherEvents::AddEvent(CEvent* theEvent)
 {
 	//  Assumption is that weather events are added sequentially from
 	//  the weather file in ascending order of time. Therefore, each event is added
-	//  to the tail of the m_EventList.  The validity of this assumption is 
+	//  to the tail of the m_EventList.  The validity of this assumption is
 	//  determined later by the CheckSanity() function.
 
 	pos = m_EventList.AddTail(theEvent);
@@ -989,7 +981,6 @@ bool CWeatherEvents::RemoveCurrentEvent()
 	return true;
 }
 
-
 int CWeatherEvents::CheckInterval()
 {
 	//  Verifies that the time interval between each event in m_EventList is equal
@@ -998,15 +989,16 @@ int CWeatherEvents::CheckInterval()
 
 	ASSERT(!m_EventList.IsEmpty());
 	pos = m_EventList.GetHeadPosition();
-	CEvent* start = m_EventList.GetHead();
-	CEvent* temp = m_EventList.GetNext(pos);
+	CEvent*          start = m_EventList.GetHead();
+	CEvent*          temp = m_EventList.GetNext(pos);
 	COleDateTimeSpan diff = temp->m_Time - start->m_Time;
-	CEvent* lastEvent = temp;
-	while (pos!=NULL)
+	CEvent*          lastEvent = temp;
+	while (pos != NULL)
 	{
 		temp = m_EventList.GetNext(pos);
-		if (diff != (temp->m_Time - lastEvent->m_Time)) return temp->GetLineNum(); 
-		else lastEvent = temp;
+		if (diff != (temp->m_Time - lastEvent->m_Time)) return temp->GetLineNum();
+		else
+			lastEvent = temp;
 	}
 	return 0;
 }
@@ -1014,23 +1006,20 @@ int CWeatherEvents::CheckInterval()
 COleDateTime CWeatherEvents::GetBeginningTime()
 {
 	ASSERT(!m_EventList.IsEmpty());
-	CEvent* event = m_EventList.GetHead();
+	CEvent*      event = m_EventList.GetHead();
 	COleDateTime theTime = event->GetTime();
 	TRACE("Read Begining Time from head of eventList = %s\n", theTime.Format("%m/%d/%Y"));
 	return event->GetTime();
 }
 
-
-
 COleDateTime CWeatherEvents::GetEndingTime()
 {
 	ASSERT(!m_EventList.IsEmpty());
-	CEvent* event = m_EventList.GetTail();
+	CEvent*      event = m_EventList.GetTail();
 	COleDateTime theTime = event->GetTime();
 	TRACE("Read ENDING Time from head of eventList = %s\n", theTime.Format("%m/%d/%Y"));
 	return event->GetTime();
 }
-
 
 COleDateTime CWeatherEvents::GetCurrentTime()
 {
@@ -1039,7 +1028,6 @@ COleDateTime CWeatherEvents::GetCurrentTime()
 	return event->GetTime();
 }
 
-
 int CWeatherEvents::GetCurrentLineNumber()
 {
 	ASSERT(!m_EventList.IsEmpty());
@@ -1047,18 +1035,15 @@ int CWeatherEvents::GetCurrentLineNumber()
 	return event->GetLineNum();
 }
 
-
 int CWeatherEvents::GetTotalEvents()
 {
 	return m_EventList.GetCount();
 }
 
-
 int CWeatherEvents::CheckSanity()
 {
 	return 0;
 }
-
 
 void CWeatherEvents::GoToFirstEvent()
 {
@@ -1075,21 +1060,20 @@ CEvent* CWeatherEvents::GetFirstEvent()
 CEvent* CWeatherEvents::GetNextEvent()
 {
 	if (pos == NULL) return NULL;
-	else return(m_EventList.GetNext(pos));
-
+	else
+		return (m_EventList.GetNext(pos));
 }
-
 
 CEvent* CWeatherEvents::GetDayEvent(COleDateTime theTime)
 {
 	POSITION oldposition = pos;
-	CEvent* tempEvent;
+	CEvent*  tempEvent;
 	GoToFirstEvent();
-	while ((tempEvent = GetNextEvent())!=NULL)
+	while ((tempEvent = GetNextEvent()) != NULL)
 	{
-		if ((tempEvent->GetTime().GetYear() == theTime.GetYear())&&
-			(tempEvent->GetTime().GetMonth() == theTime.GetMonth())&&
-			(tempEvent->GetTime().GetDay() == theTime.GetDay()))
+		if ((tempEvent->GetTime().GetYear() == theTime.GetYear()) &&
+		    (tempEvent->GetTime().GetMonth() == theTime.GetMonth()) &&
+		    (tempEvent->GetTime().GetDay() == theTime.GetDay()))
 			return tempEvent;
 	}
 	pos = oldposition;
@@ -1111,17 +1095,17 @@ const char GridDataTypeId::Rcp45[] = "Rcp45";
 
 bool CWeatherEvents::LoadWeatherFile(CString FileName)
 {
-  
+
 	// Open the weather file.  FileName is the fully qualified path for the weather file
-	
-	CString Extension = SplitPath(FileName,EXT);
+
+	CString Extension = SplitPath(FileName, EXT);
 	if (Extension.MakeUpper() == ".DVF") // EPA Weather files have this extension
 	{
-		return(LoadEPAWeatherFileDVF(FileName));
+		return (LoadEPAWeatherFileDVF(FileName));
 	}
 	else if (Extension.MakeUpper() == ".WEA")
 	{
-		return(LoadEPAWeatherFileWEA(FileName));
+		return (LoadEPAWeatherFileWEA(FileName));
 	}
 	else
 	{
@@ -1129,7 +1113,7 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 		const std::string binaryIdentifier = GlobalOptions::Get().BinaryWeatherFileFormatIdentifier();
 		if (!binaryIdentifier.empty())
 		{
-			// loading binary weather 
+			// loading binary weather
 			if (binaryIdentifier == GridDataTypeId::Observed)
 				LoadWeatherGridDataBinaryFile<ObservedHistoricalItem>(FileName);
 			else if (binaryIdentifier == GridDataTypeId::Modeled)
@@ -1142,13 +1126,13 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 			{
 				CString stg = "Error Binary Weather File Identifier Not Supported: ";
 				MyMessageBox(stg + binaryIdentifier.c_str());
-				return false;  //  Header Loading Failed
+				return false; //  Header Loading Failed
 			}
 		}
 		else
 		{
 			// Load legacy VarroaPop weather files .wth
-			CWeatherFile theFile;
+			CWeatherFile   theFile;
 			CFileException ex;
 			if (!theFile.Open(FileName, CFile::modeRead | CFile::shareDenyNone, &ex))
 			{
@@ -1157,7 +1141,7 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 				ex.GetErrorMessage(szCause, 255);
 				strFormatted = _T("The data file could not be opened because of this error: ");
 				strFormatted += szCause;
-				//MyMessageBox(strFormatted);
+				// MyMessageBox(strFormatted);
 				return false;
 			}
 
@@ -1167,13 +1151,14 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 			// Does the file have a header?
 			if (!theFile.IsHeaderPresent())
 			{
-				if ((MyMessageBox("This Weather file has no Header \n Would you Like to Create One?",
-					MB_YESNO) == IDNO)) return false;
+				if ((MyMessageBox("This Weather file has no Header \n Would you Like to Create One?", MB_YESNO) ==
+				     IDNO))
+					return false;
 				if (!theFile.CreateHeader())
 				{
 					CString msg = "Error reading file header: ";
 					if (theFile.GetError().GetLength() != 0) MyMessageBox(msg + theFile.GetError());
-					return false;  //  Header Construction Failed
+					return false; //  Header Construction Failed
 				}
 			}
 
@@ -1182,14 +1167,14 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 			{
 				CString stg = "Error Reading Weather File Header: ";
 				MyMessageBox(stg + theFile.GetError());
-				return false;  //  Header Loading Failed
+				return false; //  Header Loading Failed
 			}
 
 			// Prepare Progress Bar
-			int Step = 0;
-			float val = 0.0;
-			CDialog ProgressDlg;
-			CPoint Offset(10, 10);
+			int            Step = 0;
+			float          val = 0.0;
+			CDialog        ProgressDlg;
+			CPoint         Offset(10, 10);
 			CProgressCtrl* pProgress;
 			if (gl_RunGUI)
 			{
@@ -1197,7 +1182,8 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 				ProgressDlg.SetWindowText("Loading Weather File " + FileName);
 				pProgress = (CProgressCtrl*)ProgressDlg.GetDlgItem(IDC_PROGRESS);
 				if (theFile.m_Size != 0) val = float(10) / theFile.m_Size;
-				else val = 0;
+				else
+					val = 0;
 			}
 
 			std::vector<CEvent*> events;
@@ -1211,7 +1197,7 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 					pProgress->StepIt();
 					Step++;
 				}
-				//TRACE("Adding a weather event \n");
+				// TRACE("Adding a weather event \n");
 				AddEvent(pEvent);
 				events.push_back(pEvent);
 				TRACE("Weather Date: %s\n", pEvent->GetDateStg());
@@ -1231,8 +1217,7 @@ bool CWeatherEvents::LoadWeatherFile(CString FileName)
 	HasBeenInitialized = true;
 	return true;
 }
-	
-	
+
 bool CWeatherEvents::LoadEPAWeatherFileDVF(CString FileName)
 /***********************************************************************************
 The EPA Daily Weather files are described as follows
@@ -1283,146 +1268,146 @@ Years present: 1961-1990
 */
 
 /*
-!	Note:  For EPA ".dxf" files there are corresponding ".txt" files which contain 
+!	Note:  For EPA ".dxf" files there are corresponding ".txt" files which contain
 !	headers like the one in the comment box directly above.  These headers contain
-!	the Weather Station Latitude which is used to calculate daylight hours.  This 
+!	the Weather Station Latitude which is used to calculate daylight hours.  This
 !	function looks for the corresponding ".txt" file in the same directory as the ".dxf"
 !	file  and if found will extract the latitude info.  If not found, a latitude
 !	of N 30 degrees is assumed.
 */
 
 /*
-	The EPA weather files do not have min and max temperature but they do have 24 hour mean and daylight
-	mean.  We estimate the MinTemp and MaxTemp as follows (using sine wave approximation for daily temperatures):
-	
-	Peak Delta = (Daylight Mean - Daily Mean)/0.637
-	MaxTemp = Daily Mean + Peak Delta
-	MinTemp = Daily Mean - Peak Delta
+    The EPA weather files do not have min and max temperature but they do have 24 hour mean and daylight
+    mean.  We estimate the MinTemp and MaxTemp as follows (using sine wave approximation for daily temperatures):
+
+    Peak Delta = (Daylight Mean - Daily Mean)/0.637
+    MaxTemp = Daily Mean + Peak Delta
+    MinTemp = Daily Mean - Peak Delta
 */
 {
-		CWeatherFile theFile;
-		double Latitude;
-		CFileException ex;
-		if (!theFile.Open(FileName,CFile::modeRead|CFile::shareDenyNone, &ex))
+	CWeatherFile   theFile;
+	double         Latitude;
+	CFileException ex;
+	if (!theFile.Open(FileName, CFile::modeRead | CFile::shareDenyNone, &ex))
+	{
+		TCHAR   szCause[255];
+		CString strFormatted;
+		ex.GetErrorMessage(szCause, 255);
+		strFormatted = _T("The data file could not be opened because of this error: ");
+		strFormatted += szCause;
+		// MyMessageBox(strFormatted);
+		return false;
+	}
+
+	Latitude = GetLatitudeFromFile(FileName);
+
+	// Clear the Weather Event List;
+	ClearAllEvents();
+
+	// Prepare Progress Bar
+	int            Step = 0;
+	float          val = 0.0;
+	CPoint         Offset(10, 10);
+	CDialog        ProgressDlg;
+	CProgressCtrl* pProgress;
+	if (gl_RunGUI)
+	{
+		ProgressDlg.Create(IDD_PROGRESS);
+		ProgressDlg.SetWindowText("Loading Weather File " + FileName);
+		pProgress = (CProgressCtrl*)ProgressDlg.GetDlgItem(IDC_PROGRESS);
+		if (theFile.m_Size != 0) val = float(10) / theFile.m_Size;
+		else
+			val = 0;
+	}
+
+	CString InString;
+	int     LineNum = 1;
+	while (theFile.GetLine(InString)) // Read all lines in the weather File
+	{
+		// Update the Progress bar
+		if ((val > float(Step) / theFile.m_BytesRead) && (gl_RunGUI))
 		{
-			TCHAR   szCause[255];
-			CString strFormatted;
-			ex.GetErrorMessage(szCause, 255);
-			strFormatted = _T("The data file could not be opened because of this error: ");
-			strFormatted += szCause;
-			//MyMessageBox(strFormatted);
-			return false;
+			pProgress->StepIt();
+			Step++;
 		}
 
-		Latitude = GetLatitudeFromFile(FileName);
-			
-		// Clear the Weather Event List;
-		ClearAllEvents();
-
-
-		// Prepare Progress Bar
-		int Step = 0;
-		float val = 0.0;
-		CPoint Offset(10,10);
-		CDialog ProgressDlg;
-		CProgressCtrl* pProgress;
-		if (gl_RunGUI)
+		CEvent*      pEvent = new CEvent();
+		int          curPos = 1;
+		CString      ResToken;
+		CStringArray TokenArray;
+		ResToken = InString.Tokenize(" ", curPos);
+		while (ResToken != "") // Load all tokens in to a CStringArray for conversions
 		{
-			ProgressDlg.Create(IDD_PROGRESS);
-			ProgressDlg.SetWindowText("Loading Weather File "+FileName);
-			pProgress = (CProgressCtrl*)ProgressDlg.GetDlgItem(IDC_PROGRESS);
-			if (theFile.m_Size != 0) val = float(10)/theFile.m_Size;
-			else val = 0;
+			TokenArray.Add(LPCTSTR(ResToken));
+			ResToken = InString.Tokenize(" ", curPos);
 		}
-
-		 
-		CString InString;  
-		int LineNum = 1;
-		while (theFile.GetLine(InString))  // Read all lines in the weather File
+		// Now load tbe pEvent
+		// Date
+		int day, month, year;
+		month = atoi(TokenArray[0].Left(2));
+		day = atoi(TokenArray[0].Mid(2, 2));
+		year = atoi(TokenArray[0].Right(2));
+		if ((year < 70) &&
+		    (year >
+		     37)) // This is a filter to skip ranges beyond COleDateTime - need to convert all CTimes to COLEDateTimes
 		{
-			// Update the Progress bar
-			if ((val > float(Step)/theFile.m_BytesRead)&&(gl_RunGUI))
-				{
-					pProgress->StepIt();
-					Step++;
-				}
-
-			CEvent *pEvent = new CEvent();
-			int curPos = 1;
-			CString ResToken;
-			CStringArray TokenArray;
-			ResToken = InString.Tokenize(" ",curPos);
-			while (ResToken != "") // Load all tokens in to a CStringArray for conversions
-			{
-				TokenArray.Add(LPCTSTR(ResToken));
-				ResToken = InString.Tokenize(" ",curPos);
-			}
-			// Now load tbe pEvent
-			// Date
-			int day, month, year;
-			month = atoi(TokenArray[0].Left(2));
-			day = atoi(TokenArray[0].Mid(2,2));
-			year = atoi(TokenArray[0].Right(2));
-			if ((year < 70) && (year > 37)) // This is a filter to skip ranges beyond COleDateTime - need to convert all CTimes to COLEDateTimes
-			{
-				delete pEvent;  // no memory leaks - delete pEvent just created
-			}
+			delete pEvent; // no memory leaks - delete pEvent just created
+		}
+		else
+		{
+			// File data used 2-digit years.  COleDateTime doesn't recognize dates prior to 1970
+			if (year >= 70) year += 1900;
 			else
+				year += 2000;
+			// Validate date or flag error
+			COleDateTime dateCheck;
+
+			if (dateCheck.SetDate(year, month, day) == 1) // check valid date
 			{
-				// File data used 2-digit years.  COleDateTime doesn't recognize dates prior to 1970
-				if (year >= 70) year += 1900;
-				else year += 2000;
-				// Validate date or flag error
-				COleDateTime dateCheck;
-				
-				if (dateCheck.SetDate(year,month,day) == 1)  // check valid date
-				{
-					MyMessageBox("Invalid date format in weather file: "+FileName);
-					return false;
-				}
-				
-					//COleDateTime(year, month, day, 0,0,0);
-					pEvent->SetTime(COleDateTime(year, month, day, 0,0,0));
-				//
-				// Temperatures
-				pEvent->SetTemp(atof(TokenArray[3])); // Mean temperature for 24 hour period
-				double DaylightTemp = atof(TokenArray[10]); // Mean daylight temperature 
-				double PeakDelta = (DaylightTemp - pEvent->GetTemp())/0.637; // Convert from daylight mean to peak - Assume sine wave temp approximation
-				pEvent->SetMaxTemp(pEvent->GetTemp() + PeakDelta);
-				pEvent->SetMinTemp(pEvent->GetTemp() - PeakDelta);
-				
-				// Rainfall
-				pEvent->SetRainfall(atof(TokenArray[1]) / 2.54);  // Convert from cm to inches
-				
-				// Decide if this is a foraging day.  This requires:
-				//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-				//    Windspeed <= 8.94 m/s                AND
-				//    Rainfall <= .197 inches
-				//
-				// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
-				double windspeed = atof(TokenArray[12]);
-				pEvent->SetForage(
-					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
-					(pEvent->GetMaxTemp() <= 43.33) && 
-					(pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
-					
-				pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
-
-				// TEMPORARY until we get the transform function from EPA data.  For now, assume 30 degree latitude
-				double DayHours = CalcDaylightFromLatitude(Latitude, pEvent->m_Time.GetDayOfYear());
-				pEvent->SetDaylightHours(DayHours);  
-
-				pEvent->m_LineNum = LineNum++;
-				AddEvent(pEvent); 
+				MyMessageBox("Invalid date format in weather file: " + FileName);
+				return false;
 			}
-		}  
+
+			// COleDateTime(year, month, day, 0,0,0);
+			pEvent->SetTime(COleDateTime(year, month, day, 0, 0, 0));
+			//
+			// Temperatures
+			pEvent->SetTemp(atof(TokenArray[3]));       // Mean temperature for 24 hour period
+			double DaylightTemp = atof(TokenArray[10]); // Mean daylight temperature
+			double PeakDelta = (DaylightTemp - pEvent->GetTemp()) /
+			                   0.637; // Convert from daylight mean to peak - Assume sine wave temp approximation
+			pEvent->SetMaxTemp(pEvent->GetTemp() + PeakDelta);
+			pEvent->SetMinTemp(pEvent->GetTemp() - PeakDelta);
+
+			// Rainfall
+			pEvent->SetRainfall(atof(TokenArray[1]) / 2.54); // Convert from cm to inches
+
+			// Decide if this is a foraging day.  This requires:
+			//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
+			//    Windspeed <= 8.94 m/s                AND
+			//    Rainfall <= .197 inches
+			//
+			// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
+			double windspeed = atof(TokenArray[12]);
+			pEvent->SetForage(
+			    (pEvent->GetMaxTemp() > 12.0) && (windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
+			    (pEvent->GetMaxTemp() <= 43.33) && (pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
+
+			pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
+
+			// TEMPORARY until we get the transform function from EPA data.  For now, assume 30 degree latitude
+			double DayHours = CalcDaylightFromLatitude(Latitude, pEvent->m_Time.GetDayOfYear());
+			pEvent->SetDaylightHours(DayHours);
+
+			pEvent->m_LineNum = LineNum++;
+			AddEvent(pEvent);
+		}
+	}
 
 	if (gl_RunGUI) ProgressDlg.DestroyWindow();
 	SetFileName(FileName);
 	HasBeenInitialized = true;
 	return true;
-
 }
 
 bool CWeatherEvents::LoadEPAWeatherFileWEA(CString FileName)
@@ -1432,169 +1417,170 @@ The EPA .wea Weather files are described as follows
 The weather files here were created per methods in Fry et al (2016); (see Fry_etal.pdf).
 Formatting is given in the supporting material (see SupportingMaterial_Fryetal.pdf).
 Briefly, the comma-separated fields are:
-mm, dd, yyyy, precipitation (cm/day), ETo (cm/day), mean daily temperature (C), wind speed (cm/s), solar radiation (La/day)
+mm, dd, yyyy, precipitation (cm/day), ETo (cm/day), mean daily temperature (C), wind speed (cm/s), solar radiation
+(La/day)
 
-The .wea filename format is xxxxx_grid_yy.yyy_lat.wea.  The xxxxx string is an identifier which is used to map the weather station to 
-the longitude of the station but we don't need that for this application.  The yy.yyy string is the weather station latitude (assumed to be N) which is
-used to calculate hours of sunlight per day.  If a valid latitude is not found, a latitude of N 30 degrees is assumed.  
+The .wea filename format is xxxxx_grid_yy.yyy_lat.wea.  The xxxxx string is an identifier which is used to map the
+weather station to the longitude of the station but we don't need that for this application.  The yy.yyy string is the
+weather station latitude (assumed to be N) which is used to calculate hours of sunlight per day.  If a valid latitude is
+not found, a latitude of N 30 degrees is assumed.
 
 Reference
-Fry, M.M., Rothman, G., Young, D.F., and Thurman, N., 2016.  Daily gridded weather for exposure modeling, Environmental Modelling & Software, 82, 167-173, doi.org/10.1016/j.envsoft.2016.04.008
+Fry, M.M., Rothman, G., Young, D.F., and Thurman, N., 2016.  Daily gridded weather for exposure modeling, Environmental
+Modelling & Software, 82, 167-173, doi.org/10.1016/j.envsoft.2016.04.008
 
 
 
 */
 {
-		CWeatherFile theFile;
-		double Latitude;
-		CFileException ex;
-		if (!theFile.Open(FileName,CFile::modeRead|CFile::shareDenyNone, &ex))
+	CWeatherFile   theFile;
+	double         Latitude;
+	CFileException ex;
+	if (!theFile.Open(FileName, CFile::modeRead | CFile::shareDenyNone, &ex))
+	{
+		TCHAR   szCause[255];
+		CString strFormatted;
+		ex.GetErrorMessage(szCause, 255);
+		strFormatted = _T("The data file could not be opened because of this error: ");
+		strFormatted += szCause;
+		// MyMessageBox(strFormatted);
+		return false;
+	}
+
+	Latitude = GetLatitudeFromFileName(FileName);
+
+	// Clear the Weather Event List;
+	ClearAllEvents();
+
+	// Prepare Progress Bar
+	int            Step = 0;
+	float          val = 0.0;
+	CPoint         Offset(10, 10);
+	CDialog        ProgressDlg;
+	CProgressCtrl* pProgress;
+	if (gl_RunGUI)
+	{
+		ProgressDlg.Create(IDD_PROGRESS);
+		ProgressDlg.SetWindowText("Loading Weather File " + FileName);
+		pProgress = (CProgressCtrl*)ProgressDlg.GetDlgItem(IDC_PROGRESS);
+		if (theFile.m_Size != 0) val = float(10) / theFile.m_Size;
+		else
+			val = 0;
+	}
+
+	CString InString;
+	int     LineNum = 1;
+	while (theFile.GetLine(InString)) // Read all lines in the weather File
+	{
+		// Update the Progress bar
+		if ((val > float(Step) / theFile.m_BytesRead) && (gl_RunGUI))
 		{
-			TCHAR   szCause[255];
-			CString strFormatted;
-			ex.GetErrorMessage(szCause, 255);
-			strFormatted = _T("The data file could not be opened because of this error: ");
-			strFormatted += szCause;
-			//MyMessageBox(strFormatted);
-			return false;
+			pProgress->StepIt();
+			Step++;
 		}
 
-		Latitude = GetLatitudeFromFileName(FileName);
-			
-		// Clear the Weather Event List;
-		ClearAllEvents();
-
-
-		// Prepare Progress Bar
-		int Step = 0;
-		float val = 0.0;
-		CPoint Offset(10,10);
-		CDialog ProgressDlg;
-		CProgressCtrl* pProgress;
-		if (gl_RunGUI)
+		CEvent*      pEvent = new CEvent();
+		int          curPos = 0;
+		CString      ResToken;
+		CStringArray TokenArray;
+		ResToken = InString.Tokenize(",", curPos); // Comma-separated variables
+		while (ResToken != "")                     // Load all tokens in to a CStringArray for conversions
 		{
-			ProgressDlg.Create(IDD_PROGRESS);
-			ProgressDlg.SetWindowText("Loading Weather File "+FileName);
-			pProgress = (CProgressCtrl*)ProgressDlg.GetDlgItem(IDC_PROGRESS);
-			if (theFile.m_Size != 0) val = float(10)/theFile.m_Size;
-			else val = 0;
+			TokenArray.Add(LPCTSTR(ResToken));
+			ResToken = InString.Tokenize(",", curPos);
 		}
+		// Now load the pEvent
+		// Date
+		int     day, month, year;
+		CString smonth = TokenArray[0];
+		CString sday = TokenArray[1];
+		CString syear = TokenArray[2];
+		TRACE("day: %s,  month: %s, year: %s\n", sday, smonth, syear);
 
-		 
-		CString InString;  
-		int LineNum = 1;
-		while (theFile.GetLine(InString))  // Read all lines in the weather File
+		CString stg = TokenArray[3];
+		stg = TokenArray[4];
+		stg = TokenArray[5];
+		stg = TokenArray[6];
+
+		// month = atoi(TokenArray[0]);
+		// day = atoi(TokenArray[1]);
+		// year = atoi(TokenArray[2]);
+		month = atoi(smonth);
+		day = atoi(sday);
+		year = atoi(syear);
+		// if ((year < 70) && (year > 37)) // This is a filter to skip ranges beyond COleDateTime - need to convert all
+		// CTimes to COLEDateTimes
+		//{
+		//	delete pEvent;  // no memory leaks - delete pEvent just created
+		//}
+		// else
 		{
-			// Update the Progress bar
-			if ((val > float(Step)/theFile.m_BytesRead)&&(gl_RunGUI))
-				{
-					pProgress->StepIt();
-					Step++;
-				}
+			// Validate date or flag error
+			COleDateTime dateCheck;
 
-			CEvent *pEvent = new CEvent();
-			int curPos = 0;
-			CString ResToken;
-			CStringArray TokenArray;
-			ResToken = InString.Tokenize(",",curPos);  // Comma-separated variables
-			while (ResToken != "") // Load all tokens in to a CStringArray for conversions
+			if (dateCheck.SetDate(year, month, day) == 1) // check valid date
 			{
-				TokenArray.Add(LPCTSTR(ResToken));
-				ResToken = InString.Tokenize(",",curPos);
+				MyMessageBox("Invalid date format in weather file: " + FileName);
+				return false;
 			}
-			// Now load the pEvent
-			// Date
-			int day, month, year;
-			CString smonth = TokenArray[0];
-			CString sday = TokenArray[1];
-			CString syear = TokenArray[2];
-			TRACE("day: %s,  month: %s, year: %s\n",sday, smonth, syear);
-			
-			CString stg = TokenArray[3];
-			stg = TokenArray[4];
-			stg = TokenArray[5];
-			stg = TokenArray[6];
 
-			//month = atoi(TokenArray[0]);
-			//day = atoi(TokenArray[1]);
-			//year = atoi(TokenArray[2]);
-			month = atoi(smonth);
-			day = atoi(sday);
-			year = atoi(syear);
-			//if ((year < 70) && (year > 37)) // This is a filter to skip ranges beyond COleDateTime - need to convert all CTimes to COLEDateTimes
-			//{
-			//	delete pEvent;  // no memory leaks - delete pEvent just created
-			//}
-			//else
-			{
-				// Validate date or flag error
-				COleDateTime dateCheck;
-				
-				if (dateCheck.SetDate(year,month,day) == 1)  // check valid date
-				{
-					MyMessageBox("Invalid date format in weather file: "+FileName);
-					return false;
-				}
-				
-					//COleDateTime(year, month, day, 0,0,0);
-					pEvent->SetTime(COleDateTime(year, month, day, 0,0,0));
-				//
-				// Temperatures
-				pEvent->SetTemp(atof(TokenArray[5])); // Mean temperature for 24 hour period
-				pEvent->SetMaxTemp(atof(TokenArray[5]));  // For now, Min and Max set to mean.  Need to determine if there's another waay
-				pEvent->SetMinTemp(atof(TokenArray[5]));
-				
-				// Rainfall
-				pEvent->SetRainfall(atof(TokenArray[3]) / 2.54);  // Convert from cm to inches
-				
-				// Decide if this is a foraging day.  This requires:
-				//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
-				//    Windspeed <= 8.94 m/s                AND
-				//    Rainfall <= .197 inches
-				//
-				// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
-				double windspeed = atof(TokenArray[6])/100;  // Convert from cm/s to m/s
-				pEvent->SetForage(
-					(pEvent->GetMaxTemp() > 12.0) && 
-					(windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
-					(pEvent->GetMaxTemp() <= 43.33) && 
-					(pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
-					
-				pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
+			// COleDateTime(year, month, day, 0,0,0);
+			pEvent->SetTime(COleDateTime(year, month, day, 0, 0, 0));
+			//
+			// Temperatures
+			pEvent->SetTemp(atof(TokenArray[5])); // Mean temperature for 24 hour period
+			pEvent->SetMaxTemp(
+			    atof(TokenArray[5])); // For now, Min and Max set to mean.  Need to determine if there's another waay
+			pEvent->SetMinTemp(atof(TokenArray[5]));
 
-				double DayHours = CalcDaylightFromLatitude(Latitude, pEvent->m_Time.GetDayOfYear());
-				pEvent->SetDaylightHours(DayHours);  
+			// Rainfall
+			pEvent->SetRainfall(atof(TokenArray[3]) / 2.54); // Convert from cm to inches
 
-				pEvent->m_LineNum = LineNum++;
-				AddEvent(pEvent); 
-			}
-		}  
+			// Decide if this is a foraging day.  This requires:
+			//    12.0 Deg C < MaxTemp < 43.33 Deg C    AND
+			//    Windspeed <= 8.94 m/s                AND
+			//    Rainfall <= .197 inches
+			//
+			// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
+			double windspeed = atof(TokenArray[6]) / 100; // Convert from cm/s to m/s
+			pEvent->SetForage(
+			    (pEvent->GetMaxTemp() > 12.0) && (windspeed <= GlobalOptions::Get().WindspeedThreshold()) &&
+			    (pEvent->GetMaxTemp() <= 43.33) && (pEvent->GetRainfall() < GlobalOptions::Get().RainfallThreshold()));
+
+			pEvent->SetForageInc(12.0, pEvent->GetMaxTemp(), pEvent->GetTemp());
+
+			double DayHours = CalcDaylightFromLatitude(Latitude, pEvent->m_Time.GetDayOfYear());
+			pEvent->SetDaylightHours(DayHours);
+
+			pEvent->m_LineNum = LineNum++;
+			AddEvent(pEvent);
+		}
+	}
 
 	if (gl_RunGUI) ProgressDlg.DestroyWindow();
 	SetFileName(FileName);
 	HasBeenInitialized = true;
 	return true;
-
 }
 
-template<typename GridDataType>
-bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
+template <typename GridDataType> bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
 {
 	// Clear the Weather Event List;
 	ClearAllEvents();
 
 	const bool computeHourlyTemperaturesEstimation = GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation();
 
-	WeatherGridData<GridDataType> data = WeatherGridDataNs::LoadGridData<GridDataType>(static_cast<const char*>(FileName));
+	WeatherGridData<GridDataType> data =
+	    WeatherGridDataNs::LoadGridData<GridDataType>(static_cast<const char*>(FileName));
 	auto& items = data.data();
 	if (items.size() > 0)
 	{
 		SetFileName(FileName);
 
-		// Get the latiture based on the filename 
+		// Get the latiture based on the filename
 		double latitude = WeatherGridDataNs::GetLatitudeFromFilename(static_cast<const char*>(GetFileName()));
 
-		COleDateTime date = data.getStartTime();
+		COleDateTime     date = data.getStartTime();
 		COleDateTimeSpan oneDay(1, 0, 0, 0);
 
 		std::vector<CEvent*> events;
@@ -1603,7 +1589,7 @@ bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
 		// Create events using data from binary file
 		for (size_t itemIndex = 0; itemIndex < items.size(); itemIndex++)
 		{
-			auto& item = items[itemIndex];
+			auto&                          item = items[itemIndex];
 			DataItemAccessor<GridDataType> accessor(item);
 
 			CEvent* event = new CEvent();
@@ -1611,7 +1597,8 @@ bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
 			event->SetTime(date);
 			if (!computeHourlyTemperaturesEstimation)
 			{
-				event->SetDaylightHours(WeatherGridDataNs::DayLength(latitude, WeatherGridDataNs::ComputeJDay(date)).daylength);
+				event->SetDaylightHours(
+				    WeatherGridDataNs::DayLength(latitude, WeatherGridDataNs::ComputeJDay(date)).daylength);
 			}
 			event->SetTemp((accessor.TMAX() + accessor.TMIN()) * 0.5);
 			event->SetMaxTemp(accessor.TMAX());
@@ -1641,50 +1628,53 @@ bool CWeatherEvents::LoadWeatherGridDataBinaryFile(CString FileName)
 double CWeatherEvents::GetLatitudeFromFileName(CString WeatherFileName)
 {
 	// For EPA .wea files, the latitude is coded in the file name as follows:
-	// Filename = "xxxxx_grid_yy.yyy_lat.wea"  
-	// This function parses the filename and looks for the substring yy.yyy which is a valid 
+	// Filename = "xxxxx_grid_yy.yyy_lat.wea"
+	// This function parses the filename and looks for the substring yy.yyy which is a valid
 	// number and sets the latitude to this.  If a valid string is not found, the latitude is set to 30.
-	bool ValidLatitude = false;
+	bool   ValidLatitude = false;
 	double Latitude = 0;
 
 	int gloc = WeatherFileName.Find("_grid_");
 	int lloc = WeatherFileName.Find("_lat");
-	if ((gloc == -1) || (lloc == -1)) ValidLatitude = false; // unexpected file name format 
+	if ((gloc == -1) || (lloc == -1)) ValidLatitude = false; // unexpected file name format
 	else
 	{
-		CString LatStg = WeatherFileName.Mid(gloc+6,6);
+		CString LatStg = WeatherFileName.Mid(gloc + 6, 6);
 		Latitude = atof(LatStg);
 		ValidLatitude = true;
 	}
 	if (ValidLatitude) return Latitude;
-	else return 30.0;
+	else
+		return 30.0;
 }
 
 double CWeatherEvents::GetLatitudeFromFile(CString WeatherFileName)
 {
-	double Lat = 30;
-	int Direction = 1; // Either 1 or -1 for North or South latitude
+	double  Lat = 30;
+	int     Direction = 1; // Either 1 or -1 for North or South latitude
 	CString Line;
 	CString LatStg = "Station Latitude:";
 	// Change filename extension from .dxf to .txt
 	WeatherFileName.MakeUpper();
-	WeatherFileName.Replace(".DVF",".TXT");
+	WeatherFileName.Replace(".DVF", ".TXT");
 	try
 	{
-		CStdioFile InputFile(WeatherFileName,CFile::shareDenyNone|CFile::modeRead);
-		bool Found =  false;
+		CStdioFile InputFile(WeatherFileName, CFile::shareDenyNone | CFile::modeRead);
+		bool       Found = false;
 		while (InputFile.ReadString(Line))
 		{
-			if (Line.Find(LatStg) >= 0)  // Found the line with the latitude
+			if (Line.Find(LatStg) >= 0) // Found the line with the latitude
 			{
 				int CurPos = 0;
 				Line = Line.Right(Line.GetLength() - LatStg.GetLength());
 				CString Dirstg = Line.Tokenize(" ", CurPos);
-				if (Dirstg == "N") Direction = 1; else Direction = -1;
+				if (Dirstg == "N") Direction = 1;
+				else
+					Direction = -1;
 				CString LDegStg = Line.Tokenize(" ", CurPos);
 				CString tempstg = Line.Tokenize(" ", CurPos);
 				CString LMinStg = Line.Tokenize(" ", CurPos);
-				Lat = (atof(LDegStg) + atof(LMinStg)/60) * Direction;
+				Lat = (atof(LDegStg) + atof(LMinStg) / 60) * Direction;
 				Found = true;
 				break;
 			}
@@ -1695,37 +1685,35 @@ double CWeatherEvents::GetLatitudeFromFile(CString WeatherFileName)
 			Lat = 30;
 		}
 	}
-	catch(CFileException* e)
+	catch (CFileException* e)
 	{
-		//File not found - use default latitude
+		// File not found - use default latitude
 		Lat = 30;
 	}
-
 
 	return Lat;
 }
 
-
 double CWeatherEvents::CalcDaylightFromLatitude(double Lat, int DayNum)
 {
-	// Reference:  Ecological Modeling, volume 80 (1995) pp. 87-95, called "A Model 
+	// Reference:  Ecological Modeling, volume 80 (1995) pp. 87-95, called "A Model
 	// Comparison for Daylength as a Function of Latitude and Day of the Year."
 	// Lat is in degrees - limited to be between +65 and -65 degrees.  Beyond that, Day is either 24 or 0 hours.
 	// Probably not a lot of honeybee colonies inside the arctic and antarctic circles anyway.
 
 	if (Lat < 0.0)
 	{
-		Lat = - Lat;
-		DayNum = (DayNum + 182)%365;
+		Lat = -Lat;
+		DayNum = (DayNum + 182) % 365;
 	}
 	if (Lat > 65.0) Lat = 65.0;
 
 	double PI = 3.14159265358979;
 	double DaylightHours = 0;
 
-	double P = asin(0.39795*cos(0.2163108 + 2*atan(0.9671396*tan(0.00860*(DayNum-186)))));
+	double P = asin(0.39795 * cos(0.2163108 + 2 * atan(0.9671396 * tan(0.00860 * (DayNum - 186)))));
 	DaylightHours =
-		24 - (24/PI)*acos((sin(0.833*PI/180) + sin(Lat*PI/180)*sin(P))/cos(Lat*PI/180)*cos(P));
+	    24 - (24 / PI) * acos((sin(0.833 * PI / 180) + sin(Lat * PI / 180) * sin(P)) / cos(Lat * PI / 180) * cos(P));
 	return DaylightHours;
 }
 
@@ -1735,7 +1723,7 @@ void CWeatherEvents::ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::v
 	{
 		const size_t eventsCount = events.size();
 
-		// Get the latiture based on the filename 
+		// Get the latiture based on the filename
 		double latitude = WeatherGridDataNs::GetLatitudeFromFilename((const char*)GetFileName());
 
 		// Compute all daylengths as a first step to keep the solstice
@@ -1746,18 +1734,19 @@ void CWeatherEvents::ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::v
 
 		for (auto it = events.begin(); it != events.end(); it++)
 		{
-			const auto dayLength = WeatherGridDataNs::DayLength(latitude, WeatherGridDataNs::ComputeJDay((*it)->GetTime()));
+			const auto dayLength =
+			    WeatherGridDataNs::DayLength(latitude, WeatherGridDataNs::ComputeJDay((*it)->GetTime()));
 			dayLengths.push_back(dayLength);
 			solstice = (std::max)(dayLength.daylength, solstice);
 		}
 
 		CEvent* prevEvent = nullptr;
 		CEvent* event = nullptr;
-		for(size_t eventIndex=0; eventIndex<eventsCount; eventIndex++)
-		{	
-			CEvent* event = events[eventIndex];
+		for (size_t eventIndex = 0; eventIndex < eventsCount; eventIndex++)
+		{
+			CEvent*      event = events[eventIndex];
 			const size_t nextIndex = eventIndex + 1;
-			CEvent* nextEvent = nextIndex < eventsCount? events[nextIndex] : nullptr;
+			CEvent*      nextEvent = nextIndex < eventsCount ? events[nextIndex] : nullptr;
 
 			// alter ForageInc taking into account estimated hourly temperature
 
@@ -1800,9 +1789,9 @@ void CWeatherEvents::ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::v
 			event = nextEvent;
 		}
 	}
-	catch (std::exception & e)
+	catch (std::exception& e)
 	{
-		// This exception only impact the computation of the adjusted Forage Increment, 
+		// This exception only impact the computation of the adjusted Forage Increment,
 		// simulation is able to continue anyway
 		CString stg = "Cannot extract latitude from filename: ";
 		MyMessageBox(stg + GetFileName());
@@ -1821,7 +1810,3 @@ void CWeatherEvents::Serialize(CArchive& ar)
 		// TODO: add loading code here
 	}
 }
-
-
-
-

@@ -6,43 +6,37 @@
 #include "Queen.h"
 #include "WeatherEvents.h"
 
-
 //////////////////////////////////////////////////////////////////////
 // CColdStorageSimulator Member Functions
 //////////////////////////////////////////////////////////////////////
 double CColdStorageSimulator::GetTemp(CEvent& p_Event) const
 {
-	double temperature = p_Event.GetTemp();
-	if (IsActive())
-		temperature = m_Temperature;
+	double temperature = p_Event.GetTemp(*this);
+	if (IsActive()) temperature = m_Temperature;
 	return temperature;
 }
 double CColdStorageSimulator::GetMaxTemp(CEvent& p_Event) const
 {
-	double temperature = p_Event.GetMaxTemp();
-	if (IsActive())
-		temperature = m_Temperature;
+	double temperature = p_Event.GetMaxTemp(*this);
+	if (IsActive()) temperature = m_Temperature;
 	return temperature;
 }
 double CColdStorageSimulator::GetMinTemp(CEvent& p_Event) const
 {
-	double temperature = p_Event.GetMinTemp();
-	if (IsActive())
-		temperature = m_Temperature;
+	double temperature = p_Event.GetMinTemp(*this);
+	if (IsActive()) temperature = m_Temperature;
 	return temperature;
 }
 double CColdStorageSimulator::GetForageInc(CEvent& p_Event) const
 {
-	double forageInc = p_Event.GetForageInc();
-	if (IsActive())
-		forageInc = 0.0;
+	double forageInc = p_Event.GetForageInc(*this);
+	if (IsActive()) forageInc = 0.0;
 	return forageInc;
 }
 bool CColdStorageSimulator::IsForageDay(CEvent& p_Event) const
 {
-	bool forageDay = p_Event.IsForageDay();
-	if (IsActive())
-		forageDay = false;
+	bool forageDay = p_Event.IsForageDay(*this);
+	if (IsActive()) forageDay = false;
 	return forageDay;
 }
 void CColdStorageSimulator::SetStartDate(const COleDateTime& startDate)
@@ -62,11 +56,12 @@ void CColdStorageSimulator::Update(CEvent& p_Event, CColony& p_Colony)
 	{
 		m_IsStarting = true;
 	}
-	// Starting phase is when the bees are placed in cold storage 
+	// Starting phase is when the bees are placed in cold storage
 	// and there are still brood that needs to become Adult
 	if (m_IsStarting)
 	{
-		const bool starting = p_Colony.queen.GetTeggs() > 0 || p_Colony.CapDrn.GetQuantity() > 0 || p_Colony.CapWkr.GetQuantity() > 0;
+		const bool starting =
+		    p_Colony.queen.GetTeggs() > 0 || p_Colony.CapDrn.GetQuantity() > 0 || p_Colony.CapWkr.GetQuantity() > 0;
 		m_IsStarting = starting;
 	}
 	// Ending phase is when the queen starts to lay eggs again while in cold storage
@@ -115,6 +110,6 @@ bool CColdStorageSimulator::IsColdStoragePeriod(CEvent& p_Event) const
 	}
 
 	const std::string currentDateStr = (const char*)p_Event.GetTime().Format("%m%d");
-	return (m_StartDateStr >= m_EndDateStr && (currentDateStr >= m_StartDateStr || currentDateStr <= m_EndDateStr))
-		|| (m_StartDateStr <= m_EndDateStr && currentDateStr >= m_StartDateStr && currentDateStr <= m_EndDateStr);
+	return (m_StartDateStr >= m_EndDateStr && (currentDateStr >= m_StartDateStr || currentDateStr <= m_EndDateStr)) ||
+	       (m_StartDateStr <= m_EndDateStr && currentDateStr >= m_StartDateStr && currentDateStr <= m_EndDateStr);
 }

@@ -161,8 +161,8 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 //
 // CForagerlistA - An update from CForagerlist (created in version 3.2.8.0) to implement a new data structure logic for
-// foragers. The design intent is to maintain the same interface as CForagerlist but implement to the new data structure
-// which is a longer CAdultlist.
+// Foragers()-> The design intent is to maintain the same interface as CForagerlist but implement to the new data
+// structure which is a longer CAdultlist.
 //
 class CForagerlistA : public CAdultlist
 {
@@ -367,9 +367,9 @@ public:
 	// Bee Attributes
 	CQueen queen;
 	// CForagerlist foragers;
-	CAdultlist                    Dadl;
-	CForageBasedAgingAdultList    Wadl;
-	CForageBasedAgingForagersList foragers;
+	CAdultlist                     Dadl;
+	std::unique_ptr<CAdultlist>    m_Wadl;
+	std::unique_ptr<CForagerlistA> m_Foragers;
 
 	CBroodlist CapWkr;
 	CBroodlist CapDrn;
@@ -435,6 +435,12 @@ public:
 
 	// Operations
 public:
+	//! get the adults list and creates it if needed
+	std::unique_ptr<CAdultlist>& Wadl();
+
+	//! get the foragers list and creates it if needed
+	std::unique_ptr<CForagerlistA>& Foragers();
+
 	int  m_MitesDyingThisPeriod;
 	int  GetMitesDyingThisPeriod();
 	void SetStartSamplePeriod();

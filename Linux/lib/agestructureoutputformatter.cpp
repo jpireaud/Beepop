@@ -77,7 +77,7 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 	OutputAgeStructure<CBrood>(colony.CapWkr, m_stream);
 	OutputAgeStructure<CAdult>(colony.Dadl, m_stream);
 	OutputAgeStructure<CAdult>(colony.Wadl, m_stream);
-	m_stream << "," << colony.foragers.GetPendingQuantity();
+	m_stream << "," << colony.Foragers()->GetPendingQuantity();
 	OutputAgeStructure<CAdult>(colony.foragers, m_stream);
 	m_stream << std::endl;
 }
@@ -93,7 +93,7 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 	int  adultsAged0To7Days = 0;
 	int  adultsAged8To13Days = 0;
 	int  adultsAged14To21Days = 0;
-	auto adultList = dynamic_cast<CForageBasedAgingAdultList*>(&colony.Wadl);
+	auto adultList = dynamic_cast<CForageBasedAgingAdultList*>(colony.Wadl().get());
 	if (adultList)
 	{
 		POSITION pos = adultList->GetHeadPosition();
@@ -145,7 +145,7 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 	m_stream << "," << adultsAged0To7Days;
 	m_stream << "," << adultsAged8To13Days;
 	m_stream << "," << adultsAged14To21Days;
-	m_stream << "," << colony.foragers.GetQuantity();
+	m_stream << "," << colony.Foragers()->GetQuantity();
 	m_stream << "," << colony.GetColonySize();
 	m_stream << std::endl;
 }

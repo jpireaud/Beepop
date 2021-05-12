@@ -6,7 +6,7 @@ setlocal EnableDelayedExpansion
 -i ..\..\Simulations\VarroaPy\VarroaPy\files\input\observed.txt -o cold-storage-historical/output.txt ^
 -w ..\..\Simulations\ObservedHistoricalBinary\data_46.03125_-118.34375 ^
 --binaryWeatherFileFormat Observed ^
--f --forageDayNoTemp --hourlyTemperaturesEstimation --foragersAlwaysAgeBasedOnForageInc --adultAgingBasedOnLaidEggs  --inOutEvents 
+-f --forageDayNoTemp --hourlyTemperaturesEstimation --adultsAgingBasedOnForageInc --adultsAgingBasedOnLaidEggs  --inOutEvents 
 
 for %%s in (09/15 09/22 09/29 10/06 10/13 10/20) do (
     for %%e in (02/15 02/22 03/01 03/08 03/15 03/22) do (
@@ -19,7 +19,7 @@ for %%s in (09/15 09/22 09/29 10/06 10/13 10/20) do (
         -i ..\..\Simulations\VarroaPy\VarroaPy\files\input\observed.txt -o cold-storage-historical/output_cold_storage_!start!_!end!.txt ^
         -w ..\..\Simulations\ObservedHistoricalBinary\data_46.03125_-118.34375 ^
         --binaryWeatherFileFormat Observed ^
-        -f --forageDayNoTemp --hourlyTemperaturesEstimation --foragersAlwaysAgeBasedOnForageInc --adultAgingBasedOnLaidEggs  --inOutEvents ^
+        -f --forageDayNoTemp --hourlyTemperaturesEstimation --adultsAgingBasedOnForageInc --adultsAgingBasedOnLaidEggs  --inOutEvents ^
         --coldStorage --coldStorageStartDate %%s --coldStorageEndDate %%e
     )
 )

@@ -43,10 +43,12 @@ int main(int argc, char** argv)
 	    cxxopts::value<bool>()->default_value("false"))(
 	    "hourlyTemperaturesEstimation", "Compute hourly temperatures estimation",
 	    cxxopts::value<bool>()->default_value("false"))(
-	    "foragersAlwaysAgeBasedOnForageInc",
-	    "All new foragers go first in the pending foragers list to improve aging process",
+	    "adultsAgingBasedOnForageInc", "All adults and foragers age based on ForageInc",
 	    cxxopts::value<bool>()->default_value("false"))(
-	    "adultAgingBasedOnLaidEggs", "Adults age only if the Queen is laying eggs",
+	    "adultsAgingBasedOnLaidEggs", "Adults age only if the Queen is laying eggs",
+	    cxxopts::value<bool>()->default_value("false"))(
+	    "climateChangeScenario",
+	    "Activate the following options forageDayNoTemp|hourlyTemperaturesEstimation|adultsAgingBasedOnForageInc",
 	    cxxopts::value<bool>()->default_value("false"))(
 	    "binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85|Rcp45)",
 	    cxxopts::value<std::string>())(
@@ -252,20 +254,25 @@ int main(int argc, char** argv)
 				GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation.Set(
 				    arguments["hourlyTemperaturesEstimation"].as<bool>());
 			}
-			if (arguments.count("foragersAlwaysAgeBasedOnForageInc") == 1)
+			if (arguments.count("adultsAgingBasedOnForageInc") == 1)
 			{
-				GlobalOptions::Get().ShouldForagersAlwaysAgeBasedOnForageInc.Set(
-				    arguments["foragersAlwaysAgeBasedOnForageInc"].as<bool>());
+				GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc.Set(
+				    arguments["adultsAgingBasedOnForageInc"].as<bool>());
 			}
 			if (arguments.count("binaryWeatherFileFormat") == 1)
 			{
 				GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set(
 				    arguments["binaryWeatherFileFormat"].as<std::string>());
 			}
-			if (arguments.count("adultAgingBasedOnLaidEggs") == 1)
+			if (arguments.count("adultsAgingBasedOnLaidEggs") == 1)
 			{
-				GlobalOptions::Get().ShouldAdultsAgeBasedLaidEggs.Set(
-				    arguments["adultAgingBasedOnLaidEggs"].as<bool>());
+				GlobalOptions::Get().ShouldAdultsAgeBasedOnLaidEggs.Set(
+				    arguments["adultsAgingBasedOnLaidEggs"].as<bool>());
+			}
+			if (arguments.count("climateChangeScenario") == 1)
+			{
+				GlobalOptions::Get().ShouldAgingBasedOnHourlyTemperatureEstimate.Set(
+				    arguments["climateChangeScenario"].as<bool>());
 			}
 			if (arguments.count("windspeed") == 1)
 			{

@@ -403,7 +403,7 @@ void CVarroaPopSession::UpdateResults(int DayCount, CEvent* pEvent)
 	}
 	if (m_AW) // Adult Workers
 	{
-		m_SimResults[seriesID++][DayCount - 1] = theColony.Wadl.GetQuantity();
+		m_SimResults[seriesID++][DayCount - 1] = theColony.Wadl()->GetQuantity();
 		if (m_FirstResultEntry) m_SimLabels.AddTail("Adult Workers");
 	}
 	if (m_CS) // Colony Size
@@ -428,8 +428,8 @@ void CVarroaPopSession::UpdateResults(int DayCount, CEvent* pEvent)
 	}
 	if (m_F) // Foragers
 	{
-		// m_SimResults[seriesID++][DayCount-1] = theColony.foragers.GetQuantity();
-		m_SimResults[seriesID++][DayCount - 1] = theColony.foragers.GetActiveQuantity();
+		// m_SimResults[seriesID++][DayCount-1] = theColony.Foragers()->GetQuantity();
+		m_SimResults[seriesID++][DayCount - 1] = theColony.Foragers()->GetActiveQuantity();
 		if (m_FirstResultEntry) m_SimLabels.AddTail("Active Foragers");
 	}
 	if (m_TM) // Total Mites In Colony
@@ -2057,7 +2057,7 @@ void CVarroaPopSession::ProcessInputFile(CString FileName)
 			}
 			if (Name == "foragermaxprop")
 			{
-				theColony.foragers.SetPropActualForagers(atof(Value));
+				theColony.Foragers()->SetPropActualForagers(atof(Value));
 				continue;
 			}
 			if (Name == "needresourcestolive")

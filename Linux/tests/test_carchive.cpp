@@ -162,11 +162,11 @@ TEST_CASE("CArchive operations", "[port]")
 			CHECK(session.GetColony()->GetColonySize() == 20000);
 
 			CHECK(session.GetColony()->GetForagerLifespan() == 10);
-			CHECK(session.GetColony()->foragers.GetPropActualForagers() == Catch::Detail::Approx(0.3));
-			CHECK(session.GetColony()->foragers.GetQuantity() == 6455);
-			CHECK(session.GetColony()->foragers.GetLength() == session.GetColony()->GetForagerLifespan());
+			CHECK(session.GetColony()->Foragers()->GetPropActualForagers() == Catch::Detail::Approx(0.3));
+			CHECK(session.GetColony()->Foragers()->GetQuantity() == 6455);
+			CHECK(session.GetColony()->Foragers()->GetLength() == session.GetColony()->GetForagerLifespan());
 
-			CHECK(session.GetColony()->Wadl.GetQuantity() == 20000 - 6455);
+			CHECK(session.GetColony()->Wadl()->GetQuantity() == 20000 - 6455);
 
 			CHECK(session.GetColony()->queen.GetQueenStrength() == Catch::Detail::Approx(4.0));
 			CHECK(session.m_RQEnableReQueen == true);
@@ -187,11 +187,11 @@ TEST_CASE("CArchive operations", "[port]")
 			CHECK(session.GetColony()->GetColonySize() == 20000);
 
 			CHECK(session.GetColony()->GetForagerLifespan() == 10);
-			CHECK(session.GetColony()->foragers.GetPropActualForagers() == Catch::Detail::Approx(0.3));
-			CHECK(session.GetColony()->foragers.GetQuantity() == 6455);
-			CHECK(session.GetColony()->foragers.GetLength() == session.GetColony()->GetForagerLifespan());
+			CHECK(session.GetColony()->Foragers()->GetPropActualForagers() == Catch::Detail::Approx(0.3));
+			CHECK(session.GetColony()->Foragers()->GetQuantity() == 6455);
+			CHECK(session.GetColony()->Foragers()->GetLength() == session.GetColony()->GetForagerLifespan());
 
-			CHECK(session.GetColony()->Wadl.GetQuantity() == 20000 - 6455);
+			CHECK(session.GetColony()->Wadl()->GetQuantity() == 20000 - 6455);
 
 			CHECK(session.GetColony()->queen.GetQueenStrength() == Catch::Detail::Approx(3.0));
 			CHECK(session.m_RQEnableReQueen == true);
@@ -226,6 +226,9 @@ TEST_CASE("CArchive operations", "[port]")
 
 		GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set("Rcp85");
 		bfs::path weatherFile = simulationsDir / "Rcp85Binary" / "data_46.03125_-118.34375";
+        
+        // force forage inc aging
+        GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc.Set(true);
 
 		bfs::path snapshotsDirectory = bfs::path(GetTempDirectory()) / "snapshots";
 		if (!bfs::exists(snapshotsDirectory)) bfs::create_directories(snapshotsDirectory);
@@ -302,8 +305,8 @@ TEST_CASE("CArchive operations", "[port]")
 			CHECK(colony.Weggs.GetQuantity() == eggs);
 			CHECK(colony.Wlarv.GetQuantity() == larvae);
 			CHECK(colony.CapWkr.GetQuantity() == broods);
-			CHECK(colony.Wadl.GetQuantity() == adults);
-			CHECK(colony.foragers.GetQuantity() == foragers);
+			CHECK(colony.Wadl()->GetQuantity() == adults);
+			CHECK(colony.Foragers()->GetQuantity() == foragers);
 			CHECK(colony.GetColonySize() == colonySize);
 		}
 		{
@@ -328,8 +331,8 @@ TEST_CASE("CArchive operations", "[port]")
 			CHECK(colony.Weggs.GetQuantity() == eggs);
 			CHECK(colony.Wlarv.GetQuantity() == larvae);
 			CHECK(colony.CapWkr.GetQuantity() == broods);
-			CHECK(colony.Wadl.GetQuantity() == adults);
-			CHECK(colony.foragers.GetQuantity() == foragers);
+			CHECK(colony.Wadl()->GetQuantity() == adults);
+			CHECK(colony.Foragers()->GetQuantity() == foragers);
 			CHECK(colony.GetColonySize() == colonySize);
 		}
 	}
@@ -451,7 +454,7 @@ TEST_CASE("CArchive operations", "[port]")
 
 		auto snapshotDate = (CSnapshotInfo*)session.m_SnapshotsResets.GetHead();
 		CHECK_FALSE(snapshotDate->IsScheduled());
-		CHECK(snapshotDate->GetDate().GetYear() == 2010);
+		CHECK(snapshotDate->GetDate().GetYear() == 2006);
 		CHECK(snapshotDate->GetDate().GetMonth() == 1);
 		CHECK(snapshotDate->GetDate().GetDay() == 1);
 
@@ -482,7 +485,7 @@ TEST_CASE("CArchive operations", "[port]")
 		// set global options
 		GlobalOptions::Get().ShouldForageDayElectionBasedOnTemperatures.Set(false);
 		GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation.Set(true);
-		GlobalOptions::Get().ShouldForagersAlwaysAgeBasedOnForageInc.Set(true);
+		GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc.Set(true);
 
 		bfs::path snapshotsDirectory = testsDir / "data" / "snapshots";
 		if (!bfs::exists(snapshotsDirectory)) bfs::create_directories(snapshotsDirectory);
@@ -590,9 +593,9 @@ TEST_CASE("CArchive operations", "[port]")
 			CHECK(items[365].eggs == 0);
 			CHECK(items[365].larvae == 0);
 			CHECK(items[365].broods == 0);
-			CHECK(items[365].adults == 30242);
-			CHECK(items[365].foragers == 8296);
-			CHECK(items[365].colonySize == 38651);
+			CHECK(items[365].adults == 31618);
+			CHECK(items[365].foragers == 8706);
+			CHECK(items[365].colonySize == 40453);
 		}
 	}
 }

@@ -138,9 +138,9 @@ TEST_CASE("Aging")
 		adults.SetColony(colony.get());
 
 		CForageBasedAgingForagersList foragers;
-		foragers.SetColony(colony.get());
-		foragers.SetPropTransition(1.0);
-		foragers.SetLength(3);
+        foragers.SetColony(colony.get());
+        foragers.SetPropTransition(1.0);
+        foragers.SetLength(3);
 		colony->m_CurrentForagerLifespan = 3.0;
 
 		const int numberOfAdultsBox = 20;
@@ -155,7 +155,7 @@ TEST_CASE("Aging")
 			CHECK(adults.GetQuantityAt(0, 1) == quantity[i]);
 			CHECK(adults.GetCabooseQuantity() == cabooses[i]);
 
-			foragers.Update(adults.GetCabooseQueue(), colony.get(), event.get());
+            foragers.Update(adults.GetCabooseQueue(), colony.get(), event.get());
 			CHECK(foragers.GetQuantity() == foragersQuantity[i]);
 		}
 	}

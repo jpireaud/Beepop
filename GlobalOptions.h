@@ -57,7 +57,7 @@ public:
 
 	// This option changes the way adult are aged. Adults will be aging only during the time frame where the
 	// Queen is laying eggs.
-	Option<bool> ShouldAdultsAgeBasedLaidEggs = false;
+	Option<bool> ShouldAdultsAgeBasedOnLaidEggs = false;
 
 	// Forager aging options
 
@@ -82,12 +82,12 @@ public:
 	// This option changes the way forager are processed on non foraging days.
 	// On non-Foraging days, foragers when added to the Foragers list will not age and they will age
 	// of ForageInc on the next Foraging day instead of aging 1 full day.
-	Option<bool> ShouldForagersAlwaysAgeBasedOnForageInc = false;
+	Option<bool> ShouldAdultsAgeBasedOnForageInc = false;
 
 	// This options controls ShouldForageDayElectionBasedOnTemperatures, ShouldComputeHourlyTemperatureEstimation and
-	// ShouldForagersAlwaysAgeBasedOnForageInc when it is set
+	// ShouldAdultsAgeBasedOnForageInc when it is set
 	typedef bool                                                ForagerAgingBasedHourlyTemperatureEstimate;
-	AggregateOption<ForagerAgingBasedHourlyTemperatureEstimate> ShouldForagerAgingBasedOnHourlyTemperatureEstimate;
+	AggregateOption<ForagerAgingBasedHourlyTemperatureEstimate> ShouldAgingBasedOnHourlyTemperatureEstimate;
 
 	// Weather file options
 
@@ -104,7 +104,7 @@ public:
 
 	// Apply winter mortality to colony
 	//
-	// Right now winter mortality is only applied to foragers.
+	// Right now winter mortality is only applied to Foragers()->
 	// This would need to evolve to be apply to all bees, with different impact of different age of adult bees.
 	Option<bool> ShouldApplyWinterMortality = true;
 };

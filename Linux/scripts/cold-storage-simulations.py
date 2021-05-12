@@ -109,8 +109,8 @@ if __name__ == '__main__':
     exec_configurations = []
 
     default_command = arguments.exe + ' -f -v ' + to_normalize_path(arguments.vrp) + \
-                      ' --forageDayNoTemp --hourlyTemperaturesEstimation --foragersAlwaysAgeBasedOnForageInc' + \
-                      ' --adultAgingBasedOnLaidEggs  --inOutEvents'
+                      ' --forageDayNoTemp --hourlyTemperaturesEstimation --adultsAgingBasedOnForageInc' + \
+                      ' --adultsAgingBasedOnLaidEggs  --inOutEvents'
 
     if os.path.isdir(arguments.snapshots_directory):
         default_command += ' -s ' + arguments.snapshots_directory

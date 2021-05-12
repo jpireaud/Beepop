@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+class CColdStorageSimulator;
+
 class CEvent : public CObject
 {
 	friend class CWeatherEvents;
@@ -54,6 +56,13 @@ public:
 	void                SetLineNum(int line) { m_LineNum = line; }
 	void                SetDaylightHours(double hrs) { m_DaylightHours = hrs; }
 	void                Serialize(CArchive& ar);
+
+	//  use this methods with a specific ColdStorageSimulator instance
+	double GetTemp(const CColdStorageSimulator& coldStorage);
+	double GetMaxTemp(const CColdStorageSimulator& coldStorage);
+	double GetMinTemp(const CColdStorageSimulator& coldStorage);
+	bool   IsForageDay(const CColdStorageSimulator& coldStorage);
+	double GetForageInc(const CColdStorageSimulator& coldStorage);
 
 	//  Overloaded Operators
 	CEvent operator=(CEvent& event);

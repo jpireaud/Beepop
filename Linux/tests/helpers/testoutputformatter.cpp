@@ -54,8 +54,8 @@ void TestOutputFormatter::Record(CColony& colony, CEvent& event)
 		m_stream << "," << colony.Weggs.GetQuantity();
 		m_stream << "," << colony.Wlarv.GetQuantity();
 		m_stream << "," << colony.CapWkr.GetQuantity();
-		m_stream << "," << colony.Wadl.GetQuantity();
-		m_stream << "," << colony.foragers.GetQuantity();
+		m_stream << "," << colony.Wadl()->GetQuantity();
+		m_stream << "," << colony.Foragers()->GetQuantity();
 		m_stream << "," << colony.GetColonySize();
 		m_stream << "," << colony.queen.GetDayOne();
 		m_stream << "," << colony.queen.GetDD();

@@ -58,26 +58,26 @@ if __name__ == '__main__':
     '''
     configurations = [
         {'Name': 'Current', 'Options': []},
-        {'Name': 'AdultAgingWhenEggLaid', 'Options': ['adultAgingBasedOnLaidEggs']},
-        {'Name': 'AdultAgingWhenEggLaidFixedLarvaeAndBrood', 'Options': ['adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']},
-        {'Name': 'AdultAgingWhenEggLaidFixedLarvaeAndBroodFixedAdults', 'Options': ['adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'forageIncThresholdForAdultsAgingWhenLaidEggs 0.5']},
+        {'Name': 'AdultAgingWhenEggLaid', 'Options': ['adultsAgingBasedOnLaidEggs']},
+        {'Name': 'AdultAgingWhenEggLaidFixedLarvaeAndBrood', 'Options': ['adultsAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']},
+        {'Name': 'AdultAgingWhenEggLaidFixedLarvaeAndBroodFixedAdults', 'Options': ['adultsAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'forageIncThresholdForAdultsAgingWhenLaidEggs 0.5']},
         {'Name': 'HourlyTemp', 'Options': ['hourlyTemperaturesEstimation']},
         {'Name': 'HourlyTempForageDayWindAndRain', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation']},
         {'Name': 'ForagersFirst', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst']},
         {'Name': 'AdultAgingAsForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging']},
         {'Name': 'AdultAgingAsForagersProgressiveForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'foragersFinerAging']},
-        {'Name': 'ForagersAgingAdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']},
-        {'Name': 'ForagersAgingAdultAgingWhenEggLaidProgressiveForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'foragersFinerAging']},
-        {'Name': 'ForagersAgingAdultAgingWhenEggLaidFixedLarvaeAndBroodFixedAdults', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'forageIncThresholdForAdultsAgingWhenLaidEggs 0.5']}
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultsAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaidProgressiveForagers', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultsAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'foragersFinerAging']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaidFixedLarvaeAndBroodFixedAdults', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'pendingForagerFirst', 'forageDayAdultBeesAging', 'adultsAgingBasedOnLaidEggs', 'larvaeAndBroodBecomeBeesAfterAdultsStopedAging', 'forageIncThresholdForAdultsAgingWhenLaidEggs 0.5']}
     ]
     '''
 
     # let's simulate for the different options we have
     configurations = [
         {'Name': 'Current', 'Options': []},
-        {'Name': 'ForagersAging', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'foragersAlwaysAgeBasedOnForageInc']},
-        {'Name': 'ForagersAgingAdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'foragersAlwaysAgeBasedOnForageInc', 'adultAgingBasedOnLaidEggs']},
-        {'Name': 'ForagersAgingAdultAgingWhenEggLaid_InOut', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'foragersAlwaysAgeBasedOnForageInc', 'adultAgingBasedOnLaidEggs', 'inOutEvents']}
+        {'Name': 'ForagersAging', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'adultsAgingBasedOnForageInc']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaid', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'adultsAgingBasedOnForageInc', 'adultsAgingBasedOnLaidEggs']},
+        {'Name': 'ForagersAgingAdultAgingWhenEggLaid_InOut', 'Options': ['forageDayNoTemp', 'hourlyTemperaturesEstimation', 'adultsAgingBasedOnForageInc', 'adultsAgingBasedOnLaidEggs', 'inOutEvents']}
     ]
 
     # set prefix for output data

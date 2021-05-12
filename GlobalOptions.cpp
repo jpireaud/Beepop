@@ -7,7 +7,7 @@ GlobalOptions& GlobalOptions::Get()
 	return sGlobalOptions;
 }
 
-GlobalOptions::GlobalOptions() : ShouldForagerAgingBasedOnHourlyTemperatureEstimate(*this)
+GlobalOptions::GlobalOptions() : ShouldAgingBasedOnHourlyTemperatureEstimate(*this)
 {
 }
 
@@ -18,5 +18,5 @@ void GlobalOptions::AggregateOption<GlobalOptions::ForagerAgingBasedHourlyTemper
 	m_value = value;
 	m_options.ShouldForageDayElectionBasedOnTemperatures.Set(!m_value);
 	m_options.ShouldComputeHourlyTemperatureEstimation.Set(m_value);
-	m_options.ShouldForagersAlwaysAgeBasedOnForageInc.Set(m_value);
+	m_options.ShouldAdultsAgeBasedOnForageInc.Set(m_value);
 }
