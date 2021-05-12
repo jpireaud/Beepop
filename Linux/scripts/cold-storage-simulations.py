@@ -3,6 +3,7 @@ import datetime
 import multiprocessing as mp
 import os
 import utilities
+import shutil
 
 
 class ExecConfiguration:
@@ -67,6 +68,8 @@ if __name__ == '__main__':
                         metavar='IN_DIR', required=True)
     parser.add_argument('--weather_directory', type=str, help='Get weather files from WEATHER_DIRECTORY',
                         metavar='WEATHER_DIRECTORY', required=True)
+    parser.add_argument('--snapshots_directory', type=str, help='Get snapshots files from SNAPSHOTS_DIRECTORY',
+                        metavar='SNAPSHOTS_DIRECTORY', required=False)
     parser.add_argument('--skip_default', type=bool, help='Skip the simulation without cold storage',
                         metavar='SKIP_DEFAULT', default=False)
     arguments = parser.parse_args()
@@ -109,7 +112,32 @@ if __name__ == '__main__':
                       ' --forageDayNoTemp --hourlyTemperaturesEstimation --foragersAlwaysAgeBasedOnForageInc' + \
                       ' --adultAgingBasedOnLaidEggs  --inOutEvents'
 
+    if os.path.isdir(arguments.snapshots_directory):
+        default_command += ' -s ' + arguments.snapshots_directory
+
     input_files_exists = {}
+
+    # one setting for each location
+    snapshots_auto = {
+        'Omak': "snapshot-omak-inmcm4-1983",
+        'Richland': "snapshot-richland-bcc-csm1-1-m-1976",
+        'Walla Walla': "snapshot-wallawalla-hadgem2-cc365-1975",
+        'Wenatchee': "snapshot-wenatchee-bcc-csm1-1-m-1992"
+    }
+
+    # same setting for every locations
+    snapshots_auto = {
+        'Omak': "snapshot-autoreset-omak-ccsm4-2001",
+        'Richland': "snapshot-autoreset-omak-ccsm4-2001",
+        'Walla Walla': "snapshot-autoreset-omak-ccsm4-2001",
+        'Wenatchee': "snapshot-autoreset-omak-ccsm4-2001"
+    }
+
+    snapshots_init_year = {
+        'modeled': "1950",
+        'rcp45': "2006",
+        'rcp85': "2006"
+    }
 
     # gather configurations for simulations
     weather_files = os.listdir(arguments.weather_directory)
@@ -118,7 +146,8 @@ if __name__ == '__main__':
             continue
 
         info = utilities.parse_weather_filename(weather_file)
-        output_directory = os.path.join(arguments.output_directory, os.path.join(info.location, info.scenario))
+        location_output_directory = os.path.join(arguments.output_directory, info.location)
+        output_directory = os.path.join(location_output_directory, info.scenario)
 
         # get input filename and check if it exists
         input_file = os.path.join(arguments.input_directory, info.scenario + '.txt')
@@ -128,7 +157,23 @@ if __name__ == '__main__':
             print('Missing input file ' + input_file)
             exit(-1)
 
-        command = default_command + ' -i ' + to_normalize_path(input_file)
+        if not os.path.exists(location_output_directory):
+            os.makedirs(location_output_directory)
+
+        location_input_file = os.path.join(location_output_directory, info.scenario + '.txt')
+        if not os.path.exists(location_input_file):
+            shutil.copy(input_file, location_input_file)
+            with open(location_input_file, 'a+') as file:
+                file.writelines(
+                    ['CREnabled=True\n',
+                     'CRResetScheduled=False\n',
+                     'CRResetDate=01/01/'+snapshots_init_year[info.scenario]+'\n',
+                     'CRResetName=snapshot-initial-omak-ccsm4-2001\n',
+                     'CRResetScheduled=True\n',
+                     'CRResetDate=06/15/'+snapshots_init_year[info.scenario]+'\n',
+                     'CRResetName='+snapshots_auto[info.location]+'\n'])
+
+        command = default_command + ' -i ' + to_normalize_path(location_input_file)
         command += ' -w ' + to_normalize_path(os.path.join(arguments.weather_directory, weather_file))
         command += ' --binaryWeatherFileFormat ' + utilities.get_valid_binary_format_identifier(info.scenario)
 
