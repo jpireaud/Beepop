@@ -761,23 +761,27 @@ void CForageBasedAgingForagersList::Update(
 		}
 	}
 
-	//  Is this a winter mortality day?
-	if ((theEvent->GetTime().GetMonth() >= 11) || (theEvent->GetTime().GetMonth() < 4))
+	const bool isWinterMortalityActivated = GlobalOptions::Get().ShouldApplyWinterMortality();
+	if (isWinterMortalityActivated)
 	{
-		POSITION pos = GetHeadPosition();
-		CAdult*  theForager;
-		int      Number;
-		while (pos != NULL)
+		//  Is this a winter mortality day?
+		if ((theEvent->GetTime().GetMonth() >= 11) || (theEvent->GetTime().GetMonth() < 4))
 		{
-			theForager = (CAdult*)GetNext(pos);
-			Number = theForager->GetNumber();
-			int NewNumber = Number * (1 - WINTER_MORTALITY_PER_DAY);
+			POSITION pos = GetHeadPosition();
+			CAdult*  theForager;
+			int      Number;
+			while (pos != NULL)
+			{
+				theForager = (CAdult*)GetNext(pos);
+				Number = theForager->GetNumber();
+				int NewNumber = Number * (1 - WINTER_MORTALITY_PER_DAY);
 
-			// Update stats for Foragers killed due to winter mortality
-			theColony->m_InOutEvent.m_WinterMortalityForagersLoss += Number - NewNumber;
+				// Update stats for Foragers killed due to winter mortality
+				theColony->m_InOutEvent.m_WinterMortalityForagersLoss += Number - NewNumber;
 
-			Number = NewNumber;
-			theForager->SetNumber(Number);
+				Number = NewNumber;
+				theForager->SetNumber(Number);
+			}
 		}
 	}
 }

@@ -120,11 +120,11 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 	else
 	{
 		int      index = 0;
-		POSITION pos = adultList->GetHeadPosition();
+		POSITION pos = colony.Wadl()->GetHeadPosition();
 		while (pos != nullptr)
 		{
 			index++;
-			auto adult = (CAdult*)adultList->GetNext(pos);
+			auto adult = (CAdult*)colony.Wadl()->GetNext(pos);
 			if (adult->IsAlive())
 			{
 				if (index < 8)

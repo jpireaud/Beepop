@@ -50,6 +50,8 @@ int main(int argc, char** argv)
 	    "climateChangeScenario",
 	    "Activate the following options forageDayNoTemp|hourlyTemperaturesEstimation|adultsAgingBasedOnForageInc",
 	    cxxopts::value<bool>()->default_value("false"))(
+	    "applyWinterMortality", "Activate/Deactivate winter mortality for adults population",
+	    cxxopts::value<bool>()->default_value("true"))(
 	    "binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85|Rcp45)",
 	    cxxopts::value<std::string>())(
 	    "windspeed",
@@ -273,6 +275,10 @@ int main(int argc, char** argv)
 			{
 				GlobalOptions::Get().ShouldAgingBasedOnHourlyTemperatureEstimate.Set(
 				    arguments["climateChangeScenario"].as<bool>());
+			}
+			if (arguments.count("applyWinterMortality") == 1)
+			{
+				GlobalOptions::Get().ShouldApplyWinterMortality.Set(arguments["applyWinterMortality"].as<bool>());
 			}
 			if (arguments.count("windspeed") == 1)
 			{
