@@ -5,6 +5,7 @@
 #include "agestructureoutputformatter.h"
 #include "colonysizeoutputformatter.h"
 #include "customoutputformatter.h"
+#include "mapdataoutputformatter.h"
 
 #include "stdafx.h"
 
@@ -72,7 +73,7 @@ int main(int argc, char** argv)
 	    "coldStorageEndDate", "Date at which colony is removed from cold storage with format MM/DD",
 	    cxxopts::value<std::string>())(
 	    "z,compress", "Compress output in a gzip file", cxxopts::value<bool>()->default_value("false"))(
-	    "outputFormat", "Output format can be default / colony / age_structure ",
+	    "outputFormat", "Output format can be default / colony / age_structure / mapdata ",
 	    cxxopts::value<std::string>()->default_value("default"));
 
 	options.add_options("help")("h,help", "Displays help message")("u,usage", "Displays help message");
@@ -367,10 +368,10 @@ int main(int argc, char** argv)
 
 		auto outputFormat = arguments["outputFormat"].as<std::string>();
 
-		const std::vector<std::string> validOutputFormats = {"default", "colony", "age_structure"};
+		const std::vector<std::string> validOutputFormats = {"default", "colony", "age_structure", "mapdata"};
 		if (std::find(validOutputFormats.begin(), validOutputFormats.end(), outputFormat) == validOutputFormats.end())
 		{
-			std::cerr << "output format should be default, colony or age_structure, using default" << std::endl;
+			std::cerr << "output format should be default, colony, age_structure or mapdata, using default" << std::endl;
 		}
 		else
 		{
@@ -378,10 +379,14 @@ int main(int argc, char** argv)
 			{
 				outputFormatter.reset(new ColonySizeOutputFormatter(session));
 			}
-			else if (outputFormat == "age_structure")
-			{
-				outputFormatter.reset(new AgeStructureOutputFormatter(session));
-			}
+            else if (outputFormat == "age_structure")
+            {
+                outputFormatter.reset(new AgeStructureOutputFormatter(session));
+            }
+            else if (outputFormat == "mapdata")
+            {
+                outputFormatter.reset(new MapDataOutputFormatter(session));
+            }
 
 			if (outputFormatter)
 			{

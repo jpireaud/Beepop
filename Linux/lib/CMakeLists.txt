@@ -8,12 +8,14 @@ set(SOURCES agestructureoutputformatter.cpp
             colonysizeoutputformatter.cpp
             csv.cpp
             customoutputformatter.cpp
+            mapdataoutputformatter.cpp
             varroapopcmdbridge.cpp )
 
 set(INCLUDES    agestructureoutputformatter.h
                 colonysizeoutputformatter.h
                 csv.h
                 customoutputformatter.h
+                mapdataoutputformatter.h
                 varroapopcmdbridge.h )
 
 add_library(VarroaPopCmdLib ${SOURCES} ${INCLUDES})
