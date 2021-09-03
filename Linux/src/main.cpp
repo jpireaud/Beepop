@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	    "adultsAgingBasedOnLaidEggs", "Adults age only if the Queen is laying eggs",
 	    cxxopts::value<bool>()->default_value("false"))(
 	    "climateChangeScenario",
-	    "Activate the following options forageDayNoTemp|hourlyTemperaturesEstimation|adultsAgingBasedOnForageInc",
+	    "Activate the following options forageDayNoTemp | hourlyTemperaturesEstimation | adultsAgingBasedOnForageInc",
 	    cxxopts::value<bool>()->default_value("false"))(
 	    "applyWinterMortality", "Activate/Deactivate winter mortality for adults population",
 	    cxxopts::value<bool>()->default_value("true"))(
@@ -355,7 +355,8 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			std::cout << options.help({"usage"}) << std::endl;
+            const std::string help = options.help({"usage"});
+			std::cout << help << std::endl;
 		}
 
 		// now that we processed input arguments let's proceed with the simulation
