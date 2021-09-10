@@ -75,10 +75,11 @@ public:
 class CAdultlist : public CBeelist
 {
 protected:
-	CAdult* Caboose;
+	std::unique_ptr<CAdultlist> PendingAdults;
+	CAdult*                     Caboose;
 
 public:
-	CAdultlist() { Caboose = NULL; }
+	CAdultlist();
 	virtual ~CAdultlist();
 
 	//! Add method simply add theBrood to the Adults without making the adults age
@@ -87,10 +88,13 @@ public:
 	virtual void UpdateLength(int len, bool bWorker = true);
 	virtual int  MoveToEnd(int QuantityToMove, int MinAge);
 
+	int          GetQuantity();
 	CAdult*      GetCaboose() { return Caboose; }
 	virtual int  GetCabooseQuantity() const;
 	virtual int  GetCabooseBoxCardsCount() const { return Caboose != NULL ? 1 : 0; }
 	virtual void ClearCaboose();
+
+	CAdultlist* GetPendingAdults() { return PendingAdults.get(); }
 
 	void Serialize(CArchive& ar);
 	void KillAll();
@@ -417,19 +421,20 @@ public:
 	{
 		void Reset() { memset(this, 0, sizeof(InOutEvent)); }
 
-		int m_NewWEggs = -1;                    //!< new worker eggs
-		int m_NewDEggs = -1;                    //!< new drone eggs
-		int m_WEggsToLarv = -1;                 //!< worker eggs moving to larvae
-		int m_DEggsToLarv = -1;                 //!< drone eggs moving to larvae
-		int m_WLarvToBrood = -1;                //!< worker larvae moving to brood
-		int m_DLarvToBrood = -1;                //!< drone larvae moving to brood
-		int m_WBroodToAdult = -1;               //!< worker drone moving to adult
-		int m_DBroodToAdult = -1;               //!< drone drone moving to adult
-		int m_DeadDAdults = -1;                 //!< drone adult dying
-		int m_ForagersKilledByPesticide = -1;   //!< forager killed by pesticide
-		int m_WAdultToForagers = -1;            //!< worker adult moving to forager
-		int m_WinterMortalityForagersLoss = -1; //!< forager dying to due winter mortality
-		int m_DeadForagers = -1;                //!< forager dying
+		int m_NewWEggs = -1;                       //!< new worker eggs
+		int m_NewDEggs = -1;                       //!< new drone eggs
+		int m_WEggsToLarv = -1;                    //!< worker eggs moving to larvae
+		int m_DEggsToLarv = -1;                    //!< drone eggs moving to larvae
+		int m_WLarvToBrood = -1;                   //!< worker larvae moving to brood
+		int m_DLarvToBrood = -1;                   //!< drone larvae moving to brood
+		int m_WBroodToAdult = -1;                  //!< worker drone moving to adult
+		int m_DBroodToAdult = -1;                  //!< drone drone moving to adult
+		int m_DeadDAdults = -1;                    //!< drone adult dying
+		int m_ForagersKilledByPesticide = -1;      //!< forager killed by pesticide
+		int m_WAdultToForagers = -1;               //!< worker adult moving to forager
+		int m_ForagersAtTheBeginningOfTheDay = -1; //!< forager at the beginning of the day
+		int m_WinterMortalityForagersLoss = -1;    //!< forager dying to due winter mortality
+		int m_DeadForagers = -1;                   //!< forager dying
 	};
 	InOutEvent m_InOutEvent;
 

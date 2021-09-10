@@ -50,7 +50,7 @@ void AgeStructureOutputFormatter::Init(CColony& colony)
 	m_stream << std::endl;
 #endif // AGE_STRUCTURE_ONE_COLUMN_FOR_EACH_BOX_CARD
 #if AGE_STRUCTURE_AGGREGATED_COLUMNS
-	m_stream << "Date, Eggs, Larvae, Broods, Adults 0-7, Adults 8-13, Adults 14-21, Foragers, Colony Size";
+	m_stream << "Date, Broods, Nurse Bees, House Bees, Foragers, Colony Size, Foragers Loss Rate";
 	m_stream << std::endl;
 #endif
 }
@@ -87,12 +87,9 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 {
 	m_stream << event.GetDateStg("%m/%d/%Y");
-	m_stream << "," << colony.Weggs.GetQuantity();
-	m_stream << "," << colony.Wlarv.GetQuantity();
-	m_stream << "," << colony.CapWkr.GetQuantity();
-	int  adultsAged0To7Days = 0;
-	int  adultsAged8To13Days = 0;
-	int  adultsAged14To21Days = 0;
+	m_stream << "," << colony.Weggs.GetQuantity() + colony.Wlarv.GetQuantity() + colony.CapWkr.GetQuantity();
+	int  nurseBees = 0;
+	int  houseBees = 0;
 	auto adultList = dynamic_cast<CForageBasedAgingAdultList*>(colony.Wadl().get());
 	if (adultList)
 	{
@@ -104,15 +101,11 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 			{
 				if (adult->GetCurrentAge() < 8.0)
 				{
-					adultsAged0To7Days += adult->GetNumber();
-				}
-				else if (adult->GetCurrentAge() < 14.0)
-				{
-					adultsAged8To13Days += adult->GetNumber();
+					nurseBees += adult->GetNumber();
 				}
 				else
 				{
-					adultsAged14To21Days += adult->GetNumber();
+					houseBees += adult->GetNumber();
 				}
 			}
 		}
@@ -129,24 +122,23 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 			{
 				if (index < 8)
 				{
-					adultsAged0To7Days += adult->GetNumber();
-				}
-				else if (index < 14)
-				{
-					adultsAged8To13Days += adult->GetNumber();
+					nurseBees += adult->GetNumber();
 				}
 				else
 				{
-					adultsAged14To21Days += adult->GetNumber();
+					houseBees += adult->GetNumber();
 				}
 			}
 		}
 	}
-	m_stream << "," << adultsAged0To7Days;
-	m_stream << "," << adultsAged8To13Days;
-	m_stream << "," << adultsAged14To21Days;
+	m_stream << "," << nurseBees;
+	m_stream << "," << houseBees;
 	m_stream << "," << colony.Foragers()->GetQuantity();
 	m_stream << "," << colony.GetColonySize();
+	m_stream << ","
+	         << (colony.m_InOutEvent.m_ForagersAtTheBeginningOfTheDay > 0
+	                 ? float(colony.m_InOutEvent.m_DeadForagers) / colony.m_InOutEvent.m_ForagersAtTheBeginningOfTheDay
+	                 : 0);
 	m_stream << std::endl;
 }
 #endif // AGE_STRUCTURE_AGGREGATED_COLUMNS

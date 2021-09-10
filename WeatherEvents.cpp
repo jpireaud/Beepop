@@ -567,8 +567,8 @@ bool CWeatherFile::GetValidLine(COleDateTime& theTime, CString& theLine)
 		//  Now look for a valid date/time in the first "index" chars of the trimmed line
 		CString theDateTime = theLine.Left(index);
 		theLine = theLine.Right(theLine.GetLength() - index);
-		int slashcount;
-		if (slashcount = CountChars(theDateTime, '/') == 0) continue; // Invalid Line
+		const int slashcount = CountChars(theDateTime, '/');
+		if (slashcount == 0) continue; // Invalid Line
 		//  Else assume valid date time
 		ValidLine = true;
 		m_PrevValidLinePos = filepos;

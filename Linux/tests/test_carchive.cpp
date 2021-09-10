@@ -226,9 +226,10 @@ TEST_CASE("CArchive operations", "[port]")
 
 		GlobalOptions::Get().BinaryWeatherFileFormatIdentifier.Set("Rcp85");
 		bfs::path weatherFile = simulationsDir / "Rcp85Binary" / "data_46.03125_-118.34375";
-        
-        // force forage inc aging
-        GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc.Set(true);
+
+		// force forage inc aging
+		GlobalOptions::Get().ShouldAdultsAndForagersAgeBasedOnForageInc.Set(true);
+		GlobalOptions::Get().ShouldForagersAgeBasedOnForageInc.Set(true);
 
 		bfs::path snapshotsDirectory = bfs::path(GetTempDirectory()) / "snapshots";
 		if (!bfs::exists(snapshotsDirectory)) bfs::create_directories(snapshotsDirectory);
@@ -485,7 +486,8 @@ TEST_CASE("CArchive operations", "[port]")
 		// set global options
 		GlobalOptions::Get().ShouldForageDayElectionBasedOnTemperatures.Set(false);
 		GlobalOptions::Get().ShouldComputeHourlyTemperatureEstimation.Set(true);
-		GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc.Set(true);
+		GlobalOptions::Get().ShouldAdultsAndForagersAgeBasedOnForageInc.Set(true);
+		GlobalOptions::Get().ShouldForagersAgeBasedOnForageInc.Set(true);
 
 		bfs::path snapshotsDirectory = testsDir / "data" / "snapshots";
 		if (!bfs::exists(snapshotsDirectory)) bfs::create_directories(snapshotsDirectory);

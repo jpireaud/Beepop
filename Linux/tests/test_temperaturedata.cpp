@@ -143,9 +143,7 @@ TEST_CASE("Temperature Data", "[input]")
 
 	SECTION("Load Rcp85Binary - Check last day data")
 	{
-
-		bfs::path weatherFile(
-		    "/Users/julien/Downloads/binary-temperature-data-modeled/Richland_bcc-csm1-1_rcp85_46.28125_-119.34375");
+		bfs::path weatherFile(bfs::path(GetTestsDir()) / "data" / "Richland_bcc-csm1-1_rcp85_46.28125_-119.34375");
 
 		CHECK(bfs::exists(weatherFile));
 

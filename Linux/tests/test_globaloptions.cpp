@@ -14,7 +14,7 @@ TEST_CASE("GlobalOptions operations", "[settings]")
 
 		CHECK(options.ShouldForageDayElectionBasedOnTemperatures());
 		CHECK_FALSE(options.ShouldComputeHourlyTemperatureEstimation());
-		CHECK_FALSE(options.ShouldAdultsAgeBasedOnForageInc());
+		CHECK_FALSE(options.ShouldAdultsAndForagersAgeBasedOnForageInc());
 
 		CHECK_THROWS(options.ShouldAgingBasedOnHourlyTemperatureEstimate());
 
@@ -22,6 +22,6 @@ TEST_CASE("GlobalOptions operations", "[settings]")
 
 		CHECK_FALSE(options.ShouldForageDayElectionBasedOnTemperatures());
 		CHECK(options.ShouldComputeHourlyTemperatureEstimation());
-		CHECK(options.ShouldAdultsAgeBasedOnForageInc());
+		CHECK(options.ShouldAdultsAndForagersAgeBasedOnForageInc());
 	}
 }

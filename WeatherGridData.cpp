@@ -186,16 +186,16 @@ double ComputeDaylightHours(const std::string& filename, const COleDateTime& dat
 class malformated_latitude_exception : public std::exception
 {
 public:
-	malformated_latitude_exception(const std::string& filename) : m_filename(filename) {}
-	virtual ~malformated_latitude_exception() {}
-	virtual const char* what() const noexcept
+	malformated_latitude_exception(const std::string& filename) : m_filename(filename), m_message()
 	{
-		std::string message = "can't find latitude in file named: " + m_filename;
-		return message.c_str();
+		m_message = "can't find latitude in file named: " + m_filename;
 	}
+	virtual ~malformated_latitude_exception() {}
+	virtual const char* what() const noexcept { return m_message.c_str(); }
 
 private:
 	std::string m_filename;
+	std::string m_message;
 };
 
 double GetLatitudeFromFilename(const std::string& filename)
@@ -283,7 +283,6 @@ int HourlyTempraturesEstimator::count_dayligth(
 // Explicit instanciations of template classes
 
 #define INSTANCIATE_WEATHER_GRID_DATA_TEMPLATES(TypeName)                                                              \
-	template struct DataItemAccessor<TypeName>;                                                                        \
 	template class WeatherGridData<TypeName>;                                                                          \
 	template WeatherGridData<TypeName> WeatherGridDataNs::LoadGridData(const std::string& filename);
 

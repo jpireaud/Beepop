@@ -19,14 +19,15 @@ TEST_CASE("Aging")
 		auto colony = std::unique_ptr<CColony>(new CColony);
 
 		auto event = std::unique_ptr<CEvent>(new CEvent);
-		event->SetForageInc(0.1);
 
 		CForageBasedAgingAdultList adults;
 		adults.SetLength(2);
 		adults.SetPropTransition(1.0);
 
 		auto brood = new CBrood(10);
-		adults.Update(brood, colony.get(), event.get(), true);
+
+        event->SetForageInc(0.5);
+        adults.Update(brood, colony.get(), event.get(), true);
 
 		CHECK(adults.GetQuantity() == 10);
 		CHECK(adults.GetQuantityAt(0) == 10);
@@ -35,26 +36,32 @@ TEST_CASE("Aging")
 		CHECK(adults.GetCabooseQueue().size() == 0);
 
 		brood = new CBrood(15);
-		adults.Update(brood, colony.get(), event.get(), true);
+
+        event->SetForageInc(0.7);
+        adults.Update(brood, colony.get(), event.get(), true);
 
 		CHECK(adults.GetQuantity() == 25);
-		CHECK(adults.GetQuantityAt(0) == 25);
-		CHECK(adults.GetQuantityAt(1) == 0);
+		CHECK(adults.GetQuantityAt(0) == 15);
+		CHECK(adults.GetQuantityAt(1) == 10);
 		CHECK(adults.GetQuantityAt(2) == 0);
 		CHECK(adults.GetCabooseQueue().size() == 0);
 
-		event->SetForageInc(2.0);
-
 		brood = new CBrood(2);
+        event->SetForageInc(0.5);
 		adults.Update(brood, colony.get(), event.get(), true);
 
-		CHECK(adults.GetQuantity() == 2);
+		CHECK(adults.GetQuantity() == 27);
 		CHECK(adults.GetQuantityAt(0) == 2);
-		CHECK(adults.GetQuantityAt(1) == 0);
+		CHECK(adults.GetQuantityAt(1) == 25);
 		CHECK(adults.GetQuantityAt(2) == 0);
-		CHECK(adults.GetCabooseQueue().size() == 2);
-		CHECK(adults.GetCabooseQueue()[0]->GetCurrentAge() == Approx(0.0));
-		CHECK(adults.GetCabooseQueue()[1]->GetCurrentAge() == Approx(0.1));
+		CHECK(adults.GetCabooseQueue().size() == 0);
+
+        event->SetForageInc(2.0);
+        adults.Update(NULL, colony.get(), event.get(), true);
+        CHECK(adults.GetCabooseQueue().size() == 3);
+		CHECK(adults.GetCabooseQueue()[0]->GetCurrentAge() == Approx(0.5));
+        CHECK(adults.GetCabooseQueue()[1]->GetCurrentAge() == Approx(1.2));
+        CHECK(adults.GetCabooseQueue()[2]->GetCurrentAge() == Approx(1.7));
 	}
 
 	SECTION("Update List Length")

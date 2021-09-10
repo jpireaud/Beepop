@@ -5,6 +5,7 @@
 #include "agestructureoutputformatter.h"
 #include "colonysizeoutputformatter.h"
 #include "customoutputformatter.h"
+#include "debugoutputformatter.h"
 #include "mapdataoutputformatter.h"
 
 #include "stdafx.h"
@@ -46,12 +47,18 @@ int main(int argc, char** argv)
 	    cxxopts::value<bool>()->default_value("false"))(
 	    "adultsAgingBasedOnForageInc", "All adults and foragers age based on ForageInc",
 	    cxxopts::value<bool>()->default_value("false"))(
+	    "workersAgingBasedOnForageInc", "Adults workers age based on ForageInc",
+	    cxxopts::value<bool>()->default_value("false"))(
+	    "foragersAgingBasedOnForageInc", "Foragers age based on ForageInc",
+	    cxxopts::value<bool>()->default_value("false"))(
 	    "adultsAgingBasedOnLaidEggs", "Adults age only if the Queen is laying eggs",
 	    cxxopts::value<bool>()->default_value("false"))(
 	    "climateChangeScenario",
 	    "Activate the following options forageDayNoTemp | hourlyTemperaturesEstimation | adultsAgingBasedOnForageInc",
 	    cxxopts::value<bool>()->default_value("false"))(
 	    "applyWinterMortality", "Activate/Deactivate winter mortality for adults population",
+	    cxxopts::value<bool>()->default_value("true"))(
+	    "applyLifespanReduction", "Activate/Deactivate lifespan reduction for adults population",
 	    cxxopts::value<bool>()->default_value("true"))(
 	    "binaryWeatherFileFormat", "Specifies the binary format of the weather file (Observed|Modeled|Rcp85|Rcp45)",
 	    cxxopts::value<std::string>())(
@@ -73,7 +80,7 @@ int main(int argc, char** argv)
 	    "coldStorageEndDate", "Date at which colony is removed from cold storage with format MM/DD",
 	    cxxopts::value<std::string>())(
 	    "z,compress", "Compress output in a gzip file", cxxopts::value<bool>()->default_value("false"))(
-	    "outputFormat", "Output format can be default / colony / age_structure / mapdata ",
+	    "outputFormat", "Output format can be default / colony / age_structure / mapdata / debug ",
 	    cxxopts::value<std::string>()->default_value("default"));
 
 	options.add_options("help")("h,help", "Displays help message")("u,usage", "Displays help message");
@@ -259,8 +266,18 @@ int main(int argc, char** argv)
 			}
 			if (arguments.count("adultsAgingBasedOnForageInc") == 1)
 			{
-				GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc.Set(
+				GlobalOptions::Get().ShouldAdultsAndForagersAgeBasedOnForageInc.Set(
 				    arguments["adultsAgingBasedOnForageInc"].as<bool>());
+			}
+			if (arguments.count("foragersAgingBasedOnForageInc") == 1)
+			{
+				GlobalOptions::Get().ShouldForagersAgeBasedOnForageInc.Set(
+				    arguments["foragersAgingBasedOnForageInc"].as<bool>());
+			}
+			if (arguments.count("workersAgingBasedOnForageInc") == 1)
+			{
+				GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc.Set(
+				    arguments["workersAgingBasedOnForageInc"].as<bool>());
 			}
 			if (arguments.count("binaryWeatherFileFormat") == 1)
 			{
@@ -280,6 +297,10 @@ int main(int argc, char** argv)
 			if (arguments.count("applyWinterMortality") == 1)
 			{
 				GlobalOptions::Get().ShouldApplyWinterMortality.Set(arguments["applyWinterMortality"].as<bool>());
+			}
+			if (arguments.count("applyLifespanReduction") == 1)
+			{
+				GlobalOptions::Get().ShouldApplyLifespanReduction.Set(arguments["applyLifespanReduction"].as<bool>());
 			}
 			if (arguments.count("windspeed") == 1)
 			{
@@ -355,7 +376,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-            const std::string help = options.help({"usage"});
+			const std::string help = options.help({"usage"});
 			std::cout << help << std::endl;
 		}
 
@@ -369,10 +390,11 @@ int main(int argc, char** argv)
 
 		auto outputFormat = arguments["outputFormat"].as<std::string>();
 
-		const std::vector<std::string> validOutputFormats = {"default", "colony", "age_structure", "mapdata"};
+		const std::vector<std::string> validOutputFormats = {"default", "colony", "age_structure", "mapdata", "debug"};
 		if (std::find(validOutputFormats.begin(), validOutputFormats.end(), outputFormat) == validOutputFormats.end())
 		{
-			std::cerr << "output format should be default, colony, age_structure or mapdata, using default" << std::endl;
+			std::cerr << "output format should be default, colony, age_structure or mapdata, using default"
+			          << std::endl;
 		}
 		else
 		{
@@ -380,15 +402,18 @@ int main(int argc, char** argv)
 			{
 				outputFormatter.reset(new ColonySizeOutputFormatter(session));
 			}
-            else if (outputFormat == "age_structure")
-            {
-                outputFormatter.reset(new AgeStructureOutputFormatter(session));
-            }
+			else if (outputFormat == "age_structure")
+			{
+				outputFormatter.reset(new AgeStructureOutputFormatter(session));
+			}
             else if (outputFormat == "mapdata")
             {
                 outputFormatter.reset(new MapDataOutputFormatter(session));
             }
-
+            else if (outputFormat == "debug")
+            {
+                outputFormatter.reset(new DebugOutputFormatter(session));
+            }
 			if (outputFormatter)
 			{
 				session.SetOutputFormatter(outputFormatter.get());

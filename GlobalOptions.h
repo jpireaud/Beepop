@@ -82,10 +82,20 @@ public:
 	// This option changes the way forager are processed on non foraging days.
 	// On non-Foraging days, foragers when added to the Foragers list will not age and they will age
 	// of ForageInc on the next Foraging day instead of aging 1 full day.
+	Option<bool> ShouldAdultsAndForagersAgeBasedOnForageInc = false;
+	// This option changes the way forager are processed on non foraging days.
+	// On non-Foraging days, foragers when added to the Foragers list will not age and they will age
+	// of ForageInc on the next Foraging day instead of aging 1 full day.
+	Option<bool> ShouldForagersAgeBasedOnForageInc = false;
+
 	Option<bool> ShouldAdultsAgeBasedOnForageInc = false;
 
-	// This options controls ShouldForageDayElectionBasedOnTemperatures, ShouldComputeHourlyTemperatureEstimation and
-	// ShouldAdultsAgeBasedOnForageInc when it is set
+	// This options controls:
+	// - ShouldForageDayElectionBasedOnTemperatures set to !value
+	// - ShouldComputeHourlyTemperatureEstimation set to value
+	// - ShouldAdultsAndForagersAgeBasedOnForageInc set to value
+	// - ShouldApplyWinterMortality set to !value
+	// - ShouldApplyLifespanReduction set to !value
 	typedef bool                                                ForagerAgingBasedHourlyTemperatureEstimate;
 	AggregateOption<ForagerAgingBasedHourlyTemperatureEstimate> ShouldAgingBasedOnHourlyTemperatureEstimate;
 
@@ -107,4 +117,7 @@ public:
 	// Right now winter mortality is only applied to Foragers()->
 	// This would need to evolve to be apply to all bees, with different impact of different age of adult bees.
 	Option<bool> ShouldApplyWinterMortality = true;
+
+	// Apply lifespan reduction
+	Option<bool> ShouldApplyLifespanReduction = true;
 };
