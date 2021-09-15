@@ -712,6 +712,19 @@ void CForagerlistA::SetLength(int len)
 void CForageBasedAgingForagersList::Update(
     CForageBasedAgingAdultList::CabooseQueue& theAdult, CColony* theColony, CEvent* theEvent)
 {
+	// Age foragers
+	if (theEvent->IsForageDay())
+	{
+		POSITION pos = GetHeadPosition();
+		while (pos != nullptr)
+		{
+			auto forager = (CAdult*)GetNext(pos);
+			forager->SetCurrentAge(forager->GetCurrentAge() + theEvent->GetForageInc());
+		}
+
+		KillOldForagers();
+	}
+
 	// Add new foragers
 	while (!theAdult.empty())
 	{
@@ -725,19 +738,6 @@ void CForageBasedAgingForagersList::Update(
 		AddHead(adult);
 		theAdult.pop_back();
 	}
-
-	// Age foragers
-	if (theEvent->IsForageDay())
-	{
-		POSITION pos = GetHeadPosition();
-		while (pos != nullptr)
-		{
-			auto forager = (CAdult*)GetNext(pos);
-			forager->SetCurrentAge(forager->GetCurrentAge() + theEvent->GetForageInc());
-		}
-	}
-
-	KillOldForagers();
 
 	// Check for lifespan reduction
 	if (GlobalOptions::Get().ShouldApplyLifespanReduction()) // Turn on or off
@@ -802,21 +802,17 @@ void CForageBasedAgingForagersList::KillOldForagers()
 	while (pos != nullptr)
 	{
 		auto forager = (CAdult*)GetPrev(pos);
-		if (forager->GetCurrentAge() >= foragersLifespan)
-		{
-			Caboose = (CAdult*)RemoveTail();
-			ForagerCount--;
 
-			// Update stats for dead Foragers
-			m_pColony->m_InOutEvent.m_DeadForagers = Caboose->GetNumber();
-			delete Caboose;
-			Caboose = NULL;
-		}
-		else
-		{
-			// end loop no forager can be older than the current one
-			break;
-		}
+		// end loop no forager can be older than the current one
+		if (forager->GetCurrentAge() < foragersLifespan) break;
+
+		Caboose = (CAdult*)RemoveTail();
+		ForagerCount--;
+
+		// Update stats for dead Foragers
+		m_pColony->m_InOutEvent.m_DeadForagers = Caboose->GetNumber();
+		delete Caboose;
+		Caboose = NULL;
 	}
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -1273,6 +1269,22 @@ void CForageBasedAgingAdultList::Update(CBrood* theBrood, CColony* theColony, CE
 	// unless aging occurs if (( theBrood->GetNumber() > 0) || (NumberOfNonAdults > 0) || (theEvent->IsForageDay())) //
 	// Age if any of these are true
 	{
+		// Age all adults
+		if (theEvent->IsForageDay())
+		{
+			// Age all adults
+			POSITION pos = GetHeadPosition();
+			CAdult*  adult = nullptr;
+			while (pos != nullptr)
+			{
+				adult = (CAdult*)GetNext(pos);
+				adult->IncCurrentAge(theEvent->GetForageInc());
+			}
+
+			// Update adults that will become foragers and those that will die
+			UpdateCaboose(bWorker, theColony);
+		}
+
 		// Add freshly breed new adults
 		if (theBrood)
 		{
@@ -1287,21 +1299,6 @@ void CForageBasedAgingAdultList::Update(CBrood* theBrood, CColony* theColony, CE
 			delete theBrood; // These brood are now  gone
 
 			AddHead(theAdult);
-		}
-
-		if (theEvent->IsForageDay())
-		{
-			// Age all adults
-			POSITION pos = GetHeadPosition();
-			CAdult*  adult = nullptr;
-			while (pos != nullptr)
-			{
-				adult = (CAdult*)GetNext(pos);
-				adult->IncCurrentAge(theEvent->GetForageInc());
-			}
-
-			// Update adults that will become foragers and those that will die
-			UpdateCaboose(bWorker, theColony);
 		}
 
 		// Check for age beyond reduced lifespan in workers

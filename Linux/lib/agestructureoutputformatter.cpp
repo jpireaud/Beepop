@@ -50,7 +50,7 @@ void AgeStructureOutputFormatter::Init(CColony& colony)
 	m_stream << std::endl;
 #endif // AGE_STRUCTURE_ONE_COLUMN_FOR_EACH_BOX_CARD
 #if AGE_STRUCTURE_AGGREGATED_COLUMNS
-	m_stream << "Date, Broods, Nurse Bees, House Bees, Foragers, Colony Size, Foragers Loss Rate";
+	m_stream << "Date, Broods, Nurse Bees, House Bees, Foragers, Colony Size, Foragers SOD, Foragers EOD";
 	m_stream << std::endl;
 #endif
 }
@@ -135,10 +135,8 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 	m_stream << "," << houseBees;
 	m_stream << "," << colony.Foragers()->GetQuantity();
 	m_stream << "," << colony.GetColonySize();
-	m_stream << ","
-	         << (colony.m_InOutEvent.m_ForagersAtTheBeginningOfTheDay > 0
-	                 ? float(colony.m_InOutEvent.m_DeadForagers) / colony.m_InOutEvent.m_ForagersAtTheBeginningOfTheDay
-	                 : 0);
+    m_stream << "," << colony.m_InOutEvent.m_ForagersAtTheBeginningOfTheDay;
+    m_stream << "," << colony.m_InOutEvent.m_DeadForagers;
 	m_stream << std::endl;
 }
 #endif // AGE_STRUCTURE_AGGREGATED_COLUMNS

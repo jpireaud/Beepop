@@ -41,8 +41,8 @@ TEST_CASE("Aging")
         adults.Update(brood, colony.get(), event.get(), true);
 
 		CHECK(adults.GetQuantity() == 25);
-		CHECK(adults.GetQuantityAt(0) == 15);
-		CHECK(adults.GetQuantityAt(1) == 10);
+		CHECK(adults.GetQuantityAt(0) == 25);
+		CHECK(adults.GetQuantityAt(1) == 0);
 		CHECK(adults.GetQuantityAt(2) == 0);
 		CHECK(adults.GetCabooseQueue().size() == 0);
 
@@ -51,17 +51,17 @@ TEST_CASE("Aging")
 		adults.Update(brood, colony.get(), event.get(), true);
 
 		CHECK(adults.GetQuantity() == 27);
-		CHECK(adults.GetQuantityAt(0) == 2);
-		CHECK(adults.GetQuantityAt(1) == 25);
+		CHECK(adults.GetQuantityAt(0) == 17);
+		CHECK(adults.GetQuantityAt(1) == 10);
 		CHECK(adults.GetQuantityAt(2) == 0);
 		CHECK(adults.GetCabooseQueue().size() == 0);
 
         event->SetForageInc(2.0);
         adults.Update(NULL, colony.get(), event.get(), true);
         CHECK(adults.GetCabooseQueue().size() == 3);
-		CHECK(adults.GetCabooseQueue()[0]->GetCurrentAge() == Approx(0.5));
-        CHECK(adults.GetCabooseQueue()[1]->GetCurrentAge() == Approx(1.2));
-        CHECK(adults.GetCabooseQueue()[2]->GetCurrentAge() == Approx(1.7));
+		CHECK(adults.GetCabooseQueue()[0]->GetCurrentAge() == Approx(0.0));
+        CHECK(adults.GetCabooseQueue()[1]->GetCurrentAge() == Approx(0.5));
+        CHECK(adults.GetCabooseQueue()[2]->GetCurrentAge() == Approx(1.2));
 	}
 
 	SECTION("Update List Length")
@@ -136,8 +136,8 @@ TEST_CASE("Aging")
 		std::vector<int> countAtAge0 = {20, 39, 57, 35, 16, 15, 29, 27, 39, 50, 60, 69, 77, 15, 6, 5, 4, 3, 5, 3};
 		std::vector<int> countAtAge1 = {0, 0, 0, 39, 35, 16, 16, 15, 15, 15, 15, 15, 15, 69, 15, 6, 5, 4, 4, 3};
 
-		std::vector<int> foragersQuantity = {0,  0,  0,  0,  39, 54, 54, 51, 51, 51,
-		                                     51, 51, 51, 48, 30, 24, 21, 18, 18, 15};
+		std::vector<int> foragersQuantity = {0,  0,  0,  0,  39, 74, 74, 90, 90, 90,
+		                                     90, 90, 70, 48, 100, 99, 90, 26, 18, 15};
 
 		CForageBasedAgingAdultList adults;
 		adults.SetPropTransition(1.0);
