@@ -23,6 +23,8 @@
 #include "Spores.h"
 #include "WeatherEvents.h"
 
+#include <queue>
+
 class CColony; // Forward declaration
 
 /////////////////////////////////////////////////////////////////////////////

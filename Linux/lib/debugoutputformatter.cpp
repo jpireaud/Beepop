@@ -84,7 +84,7 @@ void DebugOutputFormatter::Record(CColony& colony, CEvent& event)
 	if (GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc())
 	{
 		auto pendingAdults = colony.Wadl()->GetPendingAdults();
-		auto values = Helper().getValues(pendingAdults, ^(CAdult* adult) {
+		auto values = Helper().getValues(pendingAdults, [](CAdult* adult) {
 		  return std::to_string(adult->GetForageInc());
 		});
 		std::for_each(values.rbegin(), values.rend(), [this](const std::string& value) { m_stream << ", " + value; });
@@ -92,7 +92,7 @@ void DebugOutputFormatter::Record(CColony& colony, CEvent& event)
 	else if (GlobalOptions::Get().ShouldAdultsAndForagersAgeBasedOnForageInc())
 	{
 		auto&    adults = colony.Wadl();
-        auto values = Helper().getValues(adults.get(), ^(CAdult* adult) {
+        auto values = Helper().getValues(adults.get(), [](CAdult* adult) {
           return std::to_string(adult->GetCurrentAge());
         });
         std::for_each(values.rbegin(), values.rend(), [this](const std::string& value) { m_stream << ", " + value; });
