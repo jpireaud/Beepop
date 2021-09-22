@@ -18,8 +18,7 @@ void GlobalOptions::AggregateOption<GlobalOptions::ForagerAgingBasedHourlyTemper
 	m_value = value;
 	m_options.ShouldForageDayElectionBasedOnTemperatures.Set(!m_value);
 	m_options.ShouldComputeHourlyTemperatureEstimation.Set(m_value);
-	m_options.ShouldForagersAgeBasedOnForageInc.Set(m_value);
-	m_options.ShouldAdultsAgeBasedOnForageInc.Set(m_value);
+	m_options.ShouldAdultsAndForagersAgeBasedOnForageInc.Set(m_value);
 	m_options.ShouldApplyWinterMortality.Set(!m_value);
 	m_options.ShouldApplyLifespanReduction.Set(!m_value);
 }

@@ -55,8 +55,7 @@ public:
 
 	// Adult aging options
 
-	// This option changes the way adult are aged. Adults will be aging only during the time frame where the
-	// Queen is laying eggs.
+	// This option changes the way adult are aged. Adults will be age only when the Queen is laying eggs.
 	Option<bool> ShouldAdultsAgeBasedOnLaidEggs = false;
 
 	// Forager aging options
@@ -72,22 +71,31 @@ public:
 	//
 	// 5/21/2020: Changed the Windspeed from 21.13 meters/sec to 8.94 meters/sec
 	Option<bool> ShouldForageDayElectionBasedOnTemperatures = true;
+
 	// This option affect the Windspeed threshold to determinate if the current day can be a Forage Day
 	Option<double> WindspeedThreshold = 8.94;
+
 	// This option affect the Rainfall threshold to determinate if the current day can be a Forage Day
 	Option<double> RainfallThreshold = 0.197;
+
 	// This option will affect wth weather file data (Observed, Historical, and RCP)
 	// Hourly temperature estimation will be used to enhance ForagerInc aging increment.
 	Option<bool> ShouldComputeHourlyTemperatureEstimation = false;
-	// This option changes the way forager are processed on non foraging days.
-	// On non-Foraging days, foragers when added to the Foragers list will not age and they will age
-	// of ForageInc on the next Foraging day instead of aging 1 full day.
+
+	// This option changes aging for both Adults and Foragers at the same time using,
+	// a progressive aging based on age only.
+	// Instead of using a finite number of boxcars we have unlimited number of boxcars which are based
+	// on age only.
 	Option<bool> ShouldAdultsAndForagersAgeBasedOnForageInc = false;
-	// This option changes the way forager are processed on non foraging days.
+
+	// This option activate forage inc based aging for Foragers using the PendingList implementation.
 	// On non-Foraging days, foragers when added to the Foragers list will not age and they will age
 	// of ForageInc on the next Foraging day instead of aging 1 full day.
 	Option<bool> ShouldForagersAgeBasedOnForageInc = false;
 
+	// This option activate forage inc based aging for Adults using the PendingList implementation.
+	// On non-Foraging days, foragers when added to the Foragers list will not age and they will age
+	// of ForageInc on the next Foraging day instead of aging 1 full day.
 	Option<bool> ShouldAdultsAgeBasedOnForageInc = false;
 
 	// This options controls:

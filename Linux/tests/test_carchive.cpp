@@ -20,6 +20,10 @@
 
 #include <boost/filesystem.hpp>
 namespace bfs = boost::filesystem;
+#include <boost/optional.hpp>
+
+// this will be set in the simulation test
+boost::optional<std::string> s_snapshotGenerationOutput;
 
 TEST_CASE("CArchive operations", "[port]")
 {
@@ -275,7 +279,9 @@ TEST_CASE("CArchive operations", "[port]")
 
 		session.Simulate();
 
-		outputFormatter->WriteToFile(GetFileInTempDirectory("results-snapshot.csv").c_str());
+        s_snapshotGenerationOutput = GetFileInTempDirectory("results-snapshot.csv");
+
+		outputFormatter->WriteToFile(s_snapshotGenerationOutput.get().c_str());
 	}
 
 	SECTION("Colony snapshot - loading")
@@ -297,18 +303,19 @@ TEST_CASE("CArchive operations", "[port]")
 			CColony    colony;
 			colony.Serialize(archive, session.GetFileVersion());
 
-			const int eggs = 399;
-			const int larvae = 311;
-			const int broods = 654;
-			const int adults = 4428;
-			const int foragers = 803;
-			const int colonySize = 5231;
+			const int eggs = 560;
+			const int larvae = 390;
+			const int broods = 3846;
+			const int adults = 5458;
+			const int foragers = 1246;
+			const int colonySize = 6714;
+            INFO((s_snapshotGenerationOutput? s_snapshotGenerationOutput.get():"unknown file"));
 			CHECK(colony.Weggs.GetQuantity() == eggs);
-			CHECK(colony.Wlarv.GetQuantity() == larvae);
-			CHECK(colony.CapWkr.GetQuantity() == broods);
-			CHECK(colony.Wadl()->GetQuantity() == adults);
-			CHECK(colony.Foragers()->GetQuantity() == foragers);
-			CHECK(colony.GetColonySize() == colonySize);
+            CHECK(colony.Wlarv.GetQuantity() == larvae);
+            CHECK(colony.CapWkr.GetQuantity() == broods);
+            CHECK(colony.Wadl()->GetQuantity() == adults);
+            CHECK(colony.Foragers()->GetQuantity() == foragers);
+            CHECK(colony.GetColonySize() == colonySize);
 		}
 		{
 			bfs::path snapshot = snapshotsDirectory / "snapshot-initial";
@@ -326,15 +333,16 @@ TEST_CASE("CArchive operations", "[port]")
 			const int eggs = 0;
 			const int larvae = 0;
 			const int broods = 0;
-			const int adults = 3249;
-			const int foragers = 3427;
-			const int colonySize = 6676;
+			const int adults = 3346;
+			const int foragers = 6149;
+			const int colonySize = 9495;
+            INFO((s_snapshotGenerationOutput? s_snapshotGenerationOutput.get():"unknown file"));
 			CHECK(colony.Weggs.GetQuantity() == eggs);
-			CHECK(colony.Wlarv.GetQuantity() == larvae);
-			CHECK(colony.CapWkr.GetQuantity() == broods);
-			CHECK(colony.Wadl()->GetQuantity() == adults);
-			CHECK(colony.Foragers()->GetQuantity() == foragers);
-			CHECK(colony.GetColonySize() == colonySize);
+            CHECK(colony.Wlarv.GetQuantity() == larvae);
+            CHECK(colony.CapWkr.GetQuantity() == broods);
+            CHECK(colony.Wadl()->GetQuantity() == adults);
+            CHECK(colony.Foragers()->GetQuantity() == foragers);
+            CHECK(colony.GetColonySize() == colonySize);
 		}
 	}
 
@@ -397,19 +405,22 @@ TEST_CASE("CArchive operations", "[port]")
 
 		session.Simulate();
 
-		outputFormatter->WriteToFile(GetFileInTempDirectory("results-reset.csv").c_str());
+        const std::string resultFilePath = GetFileInTempDirectory("results-reset.csv");
 
-		auto items = GetItemsFromFile(GetFileInTempDirectory("results-reset.csv"));
+		outputFormatter->WriteToFile(resultFilePath.c_str());
 
+		auto items = GetItemsFromFile(resultFilePath);
+
+        INFO(resultFilePath);
 		REQUIRE(items.size() == 11323);
 		CHECK(items[11151].date == "07/13/2040");
 		CHECK(items[11151].queenStrength == Catch::Detail::Approx(3.0));
-		CHECK(items[11151].eggs == 660);
-		CHECK(items[11151].larvae == 478);
-		CHECK(items[11151].broods == 75);
-		CHECK(items[11151].adults == 172);
-		CHECK(items[11151].foragers == 944);
-		CHECK(items[11151].colonySize == 1116);
+		CHECK(items[11151].eggs == 1336);
+		CHECK(items[11151].larvae == 1185);
+		CHECK(items[11151].broods == 413);
+		CHECK(items[11151].adults == 7211);
+		CHECK(items[11151].foragers == 2668);
+		CHECK(items[11151].colonySize == 9912);
 	}
 
 	SECTION("Colony snapshot - reset scheduled")
@@ -547,9 +558,9 @@ TEST_CASE("CArchive operations", "[port]")
 			CHECK(items[365].eggs == 0);
 			CHECK(items[365].larvae == 0);
 			CHECK(items[365].broods == 0);
-			CHECK(items[365].adults == 30242);
-			CHECK(items[365].foragers == 8296);
-			CHECK(items[365].colonySize == 38651);
+			CHECK(items[365].adults == 33176);
+			CHECK(items[365].foragers == 12127);
+			CHECK(items[365].colonySize == 45458);
 		}
 
 		// reset
@@ -589,15 +600,16 @@ TEST_CASE("CArchive operations", "[port]")
 			outputFormatter->WriteToFile(resultsFile.c_str());
 			auto items = GetItemsFromFile(resultsFile);
 
-			REQUIRE(items.size() == 366);
-			CHECK(items[365].date == "01/01/2031");
+            INFO(resultsFile);
+            REQUIRE(items.size() == 366);
+            CHECK(items[365].date == "01/01/2031");
 			CHECK(items[365].queenStrength == Catch::Detail::Approx(3.0));
 			CHECK(items[365].eggs == 0);
 			CHECK(items[365].larvae == 0);
 			CHECK(items[365].broods == 0);
-			CHECK(items[365].adults == 31618);
-			CHECK(items[365].foragers == 8706);
-			CHECK(items[365].colonySize == 40453);
+			CHECK(items[365].adults == 34549);
+			CHECK(items[365].foragers == 12563);
+			CHECK(items[365].colonySize == 47282);
 		}
 	}
 }

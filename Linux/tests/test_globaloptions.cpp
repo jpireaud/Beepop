@@ -21,7 +21,9 @@ TEST_CASE("GlobalOptions operations", "[settings]")
 		options.ShouldAgingBasedOnHourlyTemperatureEstimate.Set(true);
 
 		CHECK_FALSE(options.ShouldForageDayElectionBasedOnTemperatures());
-		CHECK(options.ShouldComputeHourlyTemperatureEstimation());
-		CHECK(options.ShouldAdultsAndForagersAgeBasedOnForageInc());
+        CHECK(options.ShouldComputeHourlyTemperatureEstimation());
+        CHECK(options.ShouldAdultsAndForagersAgeBasedOnForageInc());
+		CHECK_FALSE(options.ShouldApplyWinterMortality());
+		CHECK_FALSE(options.ShouldApplyLifespanReduction());
 	}
 }
