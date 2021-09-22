@@ -810,7 +810,7 @@ void CForageBasedAgingForagersList::KillOldForagers()
 		ForagerCount--;
 
 		// Update stats for dead Foragers
-		m_pColony->m_InOutEvent.m_DeadForagers = Caboose->GetNumber();
+		m_pColony->m_InOutEvent.m_DeadForagers += Caboose->GetNumber();
 		delete Caboose;
 		Caboose = NULL;
 	}
