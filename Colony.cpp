@@ -2745,8 +2745,12 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	// At the begining of cold storage all eggs are lost
 	if (coldStorage.IsStarting())
 	{
+		// eggs do not survive to move in Cold Storage
 		l_DEggs->SetNumber(0);
 		l_WEggs->SetNumber(0);
+		// Kill all existing eggs
+		Deggs.KillAll();
+		Weggs.KillAll();
 	}
 
 	// Update stats for new eggs
@@ -2759,8 +2763,9 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 	// At the begining of cold storage no eggs become larvae
 	if (coldStorage.IsStarting())
 	{
-		Weggs.GetCaboose()->SetNumber(0);
-		Deggs.GetCaboose()->SetNumber(0);
+		// Kill all existing larvae
+		Dlarv.KillAll();
+		Wlarv.KillAll();
 	}
 
 	// Update stats for new larvae
@@ -2769,13 +2774,6 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 
 	Dlarv.Update((CEgg*)Deggs.GetCaboose());
 	Wlarv.Update((CEgg*)Weggs.GetCaboose());
-
-	// At the begining of cold storage no larvae become brood
-	if (coldStorage.IsStarting())
-	{
-		Wlarv.GetCaboose()->SetNumber(0);
-		Dlarv.GetCaboose()->SetNumber(0);
-	}
 
 	// Update stats for new brood
 	m_InOutEvent.m_WLarvToBrood = Wlarv.GetCaboose()->GetNumber();
@@ -2832,9 +2830,9 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 		{
 			// Options of aging Adults based on Laid Eggs
 			// Aging of adults is actually function of DaylightHours
-			const bool agingAdults =
-			    !coldStorage.IsActive() && (!GlobalOptions::Get().ShouldAdultsAgeBasedOnLaidEggs() ||
-			                                queen.ComputeL(pEvent->GetDaylightHours()) > 0);
+			const bool agingAdults = !coldStorage.IsActive() ||
+			                         !GlobalOptions::Get().ShouldAdultsAgeBasedOnLaidEggs() ||
+			                         queen.ComputeL(pEvent->GetDaylightHours()) > 0;
 			if (agingAdults)
 			{
 				// TRACE("Date: %s\n",pEvent->GetDateStg());
@@ -2851,7 +2849,7 @@ void CColony::UpdateBees(CEvent* pEvent, int DayNum)
 			}
 			else
 			{
-				if (NumberOfNonAdults > 0 && GlobalOptions::Get().ShouldAdultsAgeBasedOnLaidEggs())
+				if (NumberOfNonAdults > 0)
 				{
 					// Let's make sure brood are becoming adults
 					Dadl.Add((CBrood*)CapDrn.GetCaboose(), this, pEvent, false);

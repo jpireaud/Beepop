@@ -1,6 +1,7 @@
 #include "agestructureoutputformatter.h"
 
 #include "colony.h"
+#include "globaloptions.h"
 #include "weatherevents.h"
 
 #define AGE_STRUCTURE_ONE_COLUMN_FOR_EACH_BOX_CARD false
@@ -116,7 +117,6 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 		POSITION pos = colony.Wadl()->GetHeadPosition();
 		while (pos != nullptr)
 		{
-			index++;
 			auto adult = (CAdult*)colony.Wadl()->GetNext(pos);
 			if (adult->IsAlive())
 			{
@@ -129,14 +129,30 @@ void AgeStructureOutputFormatter::Record(CColony& colony, CEvent& event)
 					houseBees += adult->GetNumber();
 				}
 			}
+			index++;
+		}
+
+		// Add pending adults if needed
+		if (GlobalOptions::Get().ShouldAdultsAgeBasedOnForageInc())
+		{
+			const auto pendingAdults = colony.Wadl()->GetPendingAdults();
+			if (pendingAdults)
+			{
+				POSITION pos = pendingAdults->GetHeadPosition();
+				while (pos != nullptr)
+				{
+					auto adult = (CAdult*)pendingAdults->GetNext(pos);
+					nurseBees += adult->GetNumber();
+				}
+			}
 		}
 	}
 	m_stream << "," << nurseBees;
 	m_stream << "," << houseBees;
 	m_stream << "," << colony.Foragers()->GetQuantity();
 	m_stream << "," << colony.GetColonySize();
-    m_stream << "," << colony.m_InOutEvent.m_ForagersAtTheBeginningOfTheDay;
-    m_stream << "," << colony.m_InOutEvent.m_DeadForagers;
+	m_stream << "," << colony.m_InOutEvent.m_ForagersAtTheBeginningOfTheDay;
+	m_stream << "," << colony.m_InOutEvent.m_DeadForagers;
 	m_stream << std::endl;
 }
 #endif // AGE_STRUCTURE_AGGREGATED_COLUMNS

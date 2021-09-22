@@ -81,7 +81,8 @@ int main(int argc, char** argv)
 	    cxxopts::value<std::string>())(
 	    "z,compress", "Compress output in a gzip file", cxxopts::value<bool>()->default_value("false"))(
 	    "outputFormat", "Output format can be default / colony / age_structure / mapdata / debug ",
-	    cxxopts::value<std::string>()->default_value("default"));
+	    cxxopts::value<std::string>()->default_value("default"))(
+	    "outputEvents", "Output colony events to the standard output", cxxopts::value<bool>()->default_value("false"));
 
 	options.add_options("help")("h,help", "Displays help message")("u,usage", "Displays help message");
 
@@ -406,14 +407,14 @@ int main(int argc, char** argv)
 			{
 				outputFormatter.reset(new AgeStructureOutputFormatter(session));
 			}
-            else if (outputFormat == "mapdata")
-            {
-                outputFormatter.reset(new MapDataOutputFormatter(session));
-            }
-            else if (outputFormat == "debug")
-            {
-                outputFormatter.reset(new DebugOutputFormatter(session));
-            }
+			else if (outputFormat == "mapdata")
+			{
+				outputFormatter.reset(new MapDataOutputFormatter(session));
+			}
+			else if (outputFormat == "debug")
+			{
+				outputFormatter.reset(new DebugOutputFormatter(session));
+			}
 			if (outputFormatter)
 			{
 				session.SetOutputFormatter(outputFormatter.get());
@@ -447,6 +448,18 @@ int main(int argc, char** argv)
 		else
 		{
 			session.StoreResultsFile(outputFile.string().c_str());
+		}
+
+		if (arguments["outputEvents"].count() > 0 && arguments["outputEvents"].as<bool>())
+		{
+			// Output colony events
+			const auto events = session.GetColony()->m_ColonyEventList;
+			POSITION   pos = events.GetHeadPosition();
+			while (pos != NULL)
+			{
+				const CString& event = events.GetNext(pos);
+				std::cout << event.ToString() << std::endl;
+			}
 		}
 	}
 	catch (const std::exception& e)
