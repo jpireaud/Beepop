@@ -9,6 +9,7 @@ set(SOURCES agestructureoutputformatter.cpp
             csv.cpp
             customoutputformatter.cpp
             debugoutputformatter.cpp
+            inouteventsoutputformatter.cpp
             mapdataoutputformatter.cpp
             varroapopcmdbridge.cpp )
 
@@ -17,6 +18,7 @@ set(INCLUDES    agestructureoutputformatter.h
                 csv.h
                 customoutputformatter.h
                 debugoutputformatter.h
+                inouteventsoutputformatter.h
                 mapdataoutputformatter.h
                 varroapopcmdbridge.h )
 

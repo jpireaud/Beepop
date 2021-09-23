@@ -6,6 +6,7 @@
 #include "colonysizeoutputformatter.h"
 #include "customoutputformatter.h"
 #include "debugoutputformatter.h"
+#include "inouteventsoutputformatter.h"
 #include "mapdataoutputformatter.h"
 
 #include "stdafx.h"
@@ -80,7 +81,7 @@ int main(int argc, char** argv)
 	    "coldStorageEndDate", "Date at which colony is removed from cold storage with format MM/DD",
 	    cxxopts::value<std::string>())(
 	    "z,compress", "Compress output in a gzip file", cxxopts::value<bool>()->default_value("false"))(
-	    "outputFormat", "Output format can be default / colony / age_structure / mapdata / debug ",
+	    "outputFormat", "Output format can be default / colony / age_structure / mapdata / inout_events / debug ",
 	    cxxopts::value<std::string>()->default_value("default"))(
 	    "outputEvents", "Output colony events to the standard output", cxxopts::value<bool>()->default_value("false"));
 
@@ -391,11 +392,13 @@ int main(int argc, char** argv)
 
 		auto outputFormat = arguments["outputFormat"].as<std::string>();
 
-		const std::vector<std::string> validOutputFormats = {"default", "colony", "age_structure", "mapdata", "debug"};
+		const std::vector<std::string> validOutputFormats = {"default", "colony",       "age_structure",
+		                                                     "mapdata", "inout_events", "debug"};
 		if (std::find(validOutputFormats.begin(), validOutputFormats.end(), outputFormat) == validOutputFormats.end())
 		{
-			std::cerr << "output format should be default, colony, age_structure or mapdata, using default"
-			          << std::endl;
+			std::cerr
+			    << "output format should be default, colony, age_structure, mapdata or inout_events, using default"
+			    << std::endl;
 		}
 		else
 		{
@@ -410,6 +413,10 @@ int main(int argc, char** argv)
 			else if (outputFormat == "mapdata")
 			{
 				outputFormatter.reset(new MapDataOutputFormatter(session));
+			}
+			else if (outputFormat == "inout_events")
+			{
+				outputFormatter.reset(new InOutEventsOutputFormatter(session));
 			}
 			else if (outputFormat == "debug")
 			{
