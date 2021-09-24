@@ -105,7 +105,9 @@ CEvent::CEvent()
 	m_MaxTemp = 0;
 	m_MinTemp = 0;
 	m_Rainfall = 0;
+	m_Solstice = 0;
 	m_DaylightHours = 0;
+	m_FlightHours = 0;
 }
 
 CEvent::~CEvent()
@@ -134,7 +136,9 @@ void CEvent::Serialize(CArchive& ar)
 		ar << m_MinTemp;
 		ar << m_Rainfall;
 		ar << (m_ForageDay ? 1 : 0);
+		ar << m_Solstice;
 		ar << m_DaylightHours;
+		ar << m_FlightHours;
 	}
 	else
 	{
@@ -146,7 +150,9 @@ void CEvent::Serialize(CArchive& ar)
 		ar >> m_Rainfall;
 		ar >> iforage;
 		m_ForageDay = (iforage == 1);
+		ar >> m_Solstice;
 		ar >> m_DaylightHours;
+		ar >> m_FlightHours;
 	}
 }
 
@@ -158,7 +164,9 @@ CEvent::CEvent(CEvent& event) // Copy Constructor
 	m_Rainfall = event.m_Rainfall;
 	m_ForageDay = event.m_ForageDay;
 	m_ForageInc = event.m_ForageInc;
+	m_Solstice = event.m_Solstice;
 	m_DaylightHours = event.m_DaylightHours;
+	m_FlightHours = event.m_FlightHours;
 }
 
 double CEvent::GetTemp()
@@ -181,9 +189,19 @@ bool CEvent::IsForageDay()
 	return IsForageDay(CColdStorageSimulator::Get());
 }
 
+double CEvent::GetSolstice()
+{
+	return m_Solstice;
+}
+
 double CEvent::GetDaylightHours()
 {
 	return m_DaylightHours;
+}
+
+int CEvent::GetFlightHours()
+{
+	return m_FlightHours;
 }
 
 double CEvent::GetForageInc()
@@ -260,7 +278,9 @@ CEvent CEvent::operator=(CEvent& event)
 	m_Rainfall = event.m_Rainfall;
 	m_ForageDay = event.m_ForageDay;
 	m_ForageInc = event.m_ForageInc;
+	m_Solstice = event.m_Solstice;
 	m_DaylightHours = event.m_DaylightHours;
+	m_FlightHours = event.m_FlightHours;
 	return temp;
 }
 
@@ -277,7 +297,9 @@ CEvent CEvent::operator+(CEvent event)
 	CEvent temp;
 	temp.m_Time = m_Time;
 	temp.m_Rainfall = m_Rainfall + event.m_Rainfall;
+	temp.m_Solstice = m_Solstice + event.m_Solstice;
 	temp.m_DaylightHours = m_DaylightHours + event.m_DaylightHours;
+	temp.m_FlightHours = m_FlightHours + event.m_FlightHours;
 	temp.m_MaxTemp = (m_MaxTemp > event.m_MaxTemp) ? m_MaxTemp : event.m_MaxTemp;
 	temp.m_MinTemp = (m_MinTemp < event.m_MinTemp) ? m_MinTemp : event.m_MinTemp;
 	temp.m_ForageDay = (m_ForageDay && event.m_ForageDay);
@@ -288,7 +310,9 @@ CEvent CEvent::operator+(CEvent event)
 void CEvent::operator+=(CEvent event)
 {
 	m_Rainfall += event.m_Rainfall;
+	m_Solstice += event.m_Solstice;
 	m_DaylightHours += event.m_DaylightHours;
+	m_FlightHours += event.m_FlightHours;
 	m_MaxTemp = (m_MaxTemp > event.m_MaxTemp) ? m_MaxTemp : event.m_MaxTemp;
 	m_MinTemp = (m_MinTemp < event.m_MinTemp) ? m_MinTemp : event.m_MinTemp;
 	m_ForageDay = (m_ForageDay && event.m_ForageDay);
@@ -1740,6 +1764,10 @@ void CWeatherEvents::ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::v
 			solstice = (std::max)(dayLength.daylength, solstice);
 		}
 
+		// let's get the closest integer bellow the current value to have a better
+		// forage increment computation
+		solstice = std::floor(solstice);
+
 		CEvent* prevEvent = nullptr;
 		CEvent* event = nullptr;
 		for (size_t eventIndex = 0; eventIndex < eventsCount; eventIndex++)
@@ -1780,10 +1808,12 @@ void CWeatherEvents::ComputeHourlyTemperatureEstimationAndUpdateForageInc(std::v
 
 			estimator.compute();
 
+			// here we have an integer while the solstice is the longest daylength of the year in double
 			int flighingDayLightHours = estimator.count_dayligth();
-
+			event->SetSolstice(solstice);
 			event->SetDaylightHours(estimator.daylength);
-			event->SetForageInc((std::min)(static_cast<float>(flighingDayLightHours), dayData.daylength) / solstice);
+			event->SetFlightHours(flighingDayLightHours);
+			event->SetForageInc(static_cast<float>(flighingDayLightHours) / solstice);
 
 			prevEvent = event;
 			event = nextEvent;

@@ -25,6 +25,7 @@ set(SOURCES main.cpp
             test_cuintarray.cpp
             test_globaloptions.cpp
             test_temperaturedata.cpp
+            test_validatealgorithms.cpp
             test_varroapop.cpp )
 
 set(INCLUDES    helpers/common.h

@@ -26,7 +26,9 @@ private:
 	double       m_Rainfall; //  Rainfall in inches
 	bool         m_ForageDay;
 	double       m_ForageInc; //  Increment of a Forage Day
+	double       m_Solstice;
 	double       m_DaylightHours;
+	int          m_FlightHours;
 	int          m_LineNum;
 
 public:
@@ -43,7 +45,9 @@ public:
 	bool                IsForageDay();
 	bool                IsWinterDay();
 	int                 GetLineNum() { return m_LineNum; }
+	double              GetSolstice();
 	double              GetDaylightHours();
+	int                 GetFlightHours();
 	void                SetTime(COleDateTime time) { m_Time = time; }
 	void                SetTemp(double temp) { m_Temp = temp; }
 	void                SetMaxTemp(double maxTemp) { m_MaxTemp = maxTemp; }
@@ -54,7 +58,9 @@ public:
 	void                SetForageInc(double TThresh, double TMax, double TAve);
 	double              GetForageInc();
 	void                SetLineNum(int line) { m_LineNum = line; }
+	void                SetSolstice(double hrs) { m_Solstice = hrs; }
 	void                SetDaylightHours(double hrs) { m_DaylightHours = hrs; }
+	void                SetFlightHours(int hrs) { m_FlightHours = hrs; }
 	void                Serialize(CArchive& ar);
 
 	//  use this methods with a specific ColdStorageSimulator instance
