@@ -86,6 +86,7 @@ def get_data_model_files():
         "OutputFormatter.cpp",
         "Queen.h",
         "Queen.cpp",
+        "resource.h",
         "SnapshotInfo.h",
         "SnapshotInfo.cpp",
         "Spores.h",
