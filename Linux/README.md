@@ -43,10 +43,10 @@ The options that we keep for now are:
 
 ## Weather format supported
 
--   ObservedHistorical starting 1/1/1979
--   ModeledHistorical starting 1/1/1950
--   Rcp85 starting 1/1/2006
--   Rcp45 starting 1/1/2006
+-   ObservedHistorical (1/1/1979 - 12/31/2016) 
+-   ModeledHistorical (1/1/1950 - 12/31/2005)
+-   Rcp85 starting (1/1/2006 - 12/31/2099)
+-   Rcp45 starting (1/1/2006 - 12/31/2099)
 
 ## Changes made to the original VarroaPop codebase
 
@@ -55,7 +55,7 @@ The options that we keep for now are:
 -   Adult
     -   Changed current age from being an Integer to a Float number. Currently the m_CurrentAge attribute is not used, but it would be useful if we want to use it and age Adults with a portion of a day;
     -   Added missing attributes initialisation in constructors.
--   Beed
+-   Bee
     -   Added missing attributes initialisation in constructor.
 -   Colony
     -   Added a CAdultList::Add method to be able to add new Adults to the first box card without making other Adults age;
@@ -91,7 +91,7 @@ The options that we keep for now are:
 
 ## Roadmap
 
--   Change the POSITION wrapper which makes allocations and I think there is a better way to do
--   Change the Implementation of the COleDateTime which is not portable on Windows (not using Windows SDK) by using Boost::DateTime library
--   Enhance Binary serialization feedback to reject invalid files (check if eof is reached in >> operators)
--   Add a logger to have several logging levels INFO/WARNING/ERROR so that it can be easily disabled
+- Refactor to remove dependency on port code to make the VarroaPop library solely based on standard library (using Poco libraries as a base framework)
+- Enhance Binary serialization feedback to reject invalid files (check if eof is reached in >> operators)
+- Introduce endianess support to the binary serialization
+- Add a logger to have several logging levels INFO/WARNING/ERROR so that it can be easily disabled
