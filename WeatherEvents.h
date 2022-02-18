@@ -43,6 +43,8 @@ public:
 	double              GetMinTemp();
 	double              GetRainfall() { return m_Rainfall; }
 	bool                IsForageDay();
+	//! Returns true if the current day is a forage day and that forage increment is valid
+	bool                IsForagingDay() { return IsForageDay() && GetForageInc() > 0.0; }
 	bool                IsWinterDay();
 	int                 GetLineNum() { return m_LineNum; }
 	double              GetSolstice();

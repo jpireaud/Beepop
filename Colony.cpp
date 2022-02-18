@@ -3664,7 +3664,7 @@ void CColony::ConsumeFood(CEvent* pEvent, int DayNum)
 
 	SResourceItem theResource;
 
-	if (pEvent->IsForageDay())
+	if (pEvent->IsForagingDay())
 	{
 		// Pollen
 		if (IsPollenFeedingDay(pEvent))
@@ -3968,7 +3968,7 @@ double CColony::GetPollenNeeds(CEvent* pEvent)
 
 		// Add Forager need
 		double ForagerNeed = 0;
-		if (pEvent->IsForageDay())
+		if (pEvent->IsForagingDay() )
 		{
 			ForagerNeed = Foragers()->GetActiveQuantity() * m_EPAData.m_C_Forager_Pollen / 1000; // grams
 			ForagerNeed += (Foragers()->GetQuantity() - Foragers()->GetActiveQuantity()) * m_EPAData.m_C_A1120_Pollen /
@@ -3989,7 +3989,7 @@ double CColony::GetPollenNeeds(CEvent* pEvent)
 
 		// Adult needs
 		double ANeeds;
-		if (pEvent->IsForageDay())
+		if (pEvent->IsForagingDay())
 		{
 			ANeeds = Wadl()->GetQuantityAt(0, 2) * m_EPAData.m_C_A13_Pollen +
 			         Wadl()->GetQuantityAt(3, 9) * m_EPAData.m_C_A410_Pollen +
@@ -4033,7 +4033,7 @@ double CColony::GetNectarNeeds(CEvent* pEvent)
 			}
 			else //  8.5 < AveTemp < 18.0
 			{
-				if (pEvent->IsForageDay()) // In this case, foragers need normal forager nutrition
+				if (pEvent->IsForagingDay()) // In this case, foragers need normal forager nutrition
 				{
 					double NonForagers = GetColonySize() - Foragers()->GetActiveQuantity();
 					Need = (Foragers()->GetActiveQuantity() * m_EPAData.m_C_Forager_Nectar) / 1000 +
@@ -4056,7 +4056,7 @@ double CColony::GetNectarNeeds(CEvent* pEvent)
 
 		// Adult needs
 		double ANeeds;
-		if (pEvent->IsForageDay())
+		if (pEvent->IsForagingDay())
 		{
 			ANeeds = Wadl()->GetQuantityAt(0, 2) * m_EPAData.m_C_A13_Nectar +
 			         Wadl()->GetQuantityAt(3, 9) * m_EPAData.m_C_A410_Nectar +
