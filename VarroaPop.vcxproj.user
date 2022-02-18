@@ -5,7 +5,17 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>.\Simulations\VarroaPy\VarroaPy\files</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommandArguments>.\exe\simplified.vrp /b /or output\vp_output_win_hourly_fdnt_pff_adult_aging.txt /i input\vp_input_binary_weather.txt /BinaryWeatherFileFormat Observed /HourlyTempEstimation /ForageDayNoTemp /PendingForagersFirst</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>.\Simulations\VarroaPy\VarroaPy\files</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerCommandArguments>.\exe\simplified.vrp /b /or output\vp_output_win_hourly_fdnt_pff_adult_aging.txt /i input\vp_input_binary_weather.txt /BinaryWeatherFileFormat Observed /HourlyTempEstimation /ForageDayNoTemp /PendingForagersFirst</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>.\Simulations\VarroaPy\VarroaPy\files</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>.\exe\simplified.vrp /b /or output\vp_output_win_hourly_fdnt_pff_adult_aging.txt /i input\vp_input_binary_weather.txt /BinaryWeatherFileFormat Observed /HourlyTempEstimation /ForageDayNoTemp /PendingForagersFirst</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>.\Simulations\VarroaPy\VarroaPy\files</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>

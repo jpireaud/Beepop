@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32126.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VarroaPop", "VarroaPop.vcxproj", "{85A6451C-0B03-4E89-B865-833D8DC2A3F7}"
 EndProject
@@ -10,18 +10,29 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Debug|Win32.ActiveCfg = Debug|Win32
 		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Debug|Win32.Build.0 = Debug|Win32
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Debug|x64.ActiveCfg = Debug|x64
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Debug|x64.Build.0 = Debug|x64
 		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Release|Win32.ActiveCfg = Release|Win32
 		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Release|Win32.Build.0 = Release|Win32
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Release|x64.ActiveCfg = Release|x64
+		{85A6451C-0B03-4E89-B865-833D8DC2A3F7}.Release|x64.Build.0 = Release|x64
 		{3B8BC684-11BC-41AC-B64F-3BF46D8EDB5B}.Debug|Win32.ActiveCfg = Debug
+		{3B8BC684-11BC-41AC-B64F-3BF46D8EDB5B}.Debug|x64.ActiveCfg = Debug
 		{3B8BC684-11BC-41AC-B64F-3BF46D8EDB5B}.Release|Win32.ActiveCfg = Release
 		{3B8BC684-11BC-41AC-B64F-3BF46D8EDB5B}.Release|Win32.Build.0 = Release
+		{3B8BC684-11BC-41AC-B64F-3BF46D8EDB5B}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {38B154D6-A603-46B4-9048-37378F5C0264}
 	EndGlobalSection
 EndGlobal
