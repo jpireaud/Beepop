@@ -9,6 +9,7 @@
 
 #include "Colony.h"
 #include "VarroaPopDoc.h"
+#include "Resource.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CColonyDataPage dialog

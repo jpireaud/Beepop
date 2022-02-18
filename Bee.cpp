@@ -1,9 +1,10 @@
 // Bee.cpp : implementation file
 //
-
+/////////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
-#include "VarroaPop.h"
+
 #include "Bee.h"
+#include "VarroaPop.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -18,6 +19,8 @@ IMPLEMENT_DYNCREATE(CBee, CCmdTarget)
 
 CBee::CBee()
 {
+	number = 0;
+	age = 0.0;
 	Alive = true;
 }
 
@@ -25,45 +28,47 @@ CBee::~CBee()
 {
 }
 
-CBee CBee::operator = (CBee& bee)
+CBee CBee::operator=(CBee& bee)
 {
 	CBee temp;
-	temp.Alive = bee.Alive;
 	temp.number = bee.number;
+	temp.age = bee.age;
+	temp.Alive = bee.Alive;
 	return temp;
 }
 
 CBee::CBee(int Num)
 {
+	age = 0.0;
 	number = Num;
+	Alive = true;
 }
 
 CBee::CBee(CBee& bee)
 {
-	Alive = bee.Alive;
 	number = bee.number;
+	age = bee.age;
+	Alive = bee.Alive;
 }
 
-
-
 BEGIN_MESSAGE_MAP(CBee, CCmdTarget)
-	//{{AFX_MSG_MAP(CBee)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CBee)
+// NOTE - the ClassWizard will add and remove mapping macros here.
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CBee message handlers
 
-void CBee::Serialize(CArchive& ar) 
+void CBee::Serialize(CArchive& ar)
 {
 	if (ar.IsStoring())
-	{	// storing code
+	{ // storing code
 		ar << number;
 		ar << age;
 	}
 	else
-	{	// loading code
+	{ // loading code
 		ar >> number;
 		ar >> age;
 	}

@@ -24,6 +24,10 @@
 
 extern bool gl_RunGUI;
 
+#include <iostream>
+
+#define NOT_IMPLEMENTED()                                                                                              \
+	std::cerr << __FUNCTION__ << ": NOT IMPLEMENTED in " << __FILE__ << "(" << __LINE__ << ")" << std::endl;
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.

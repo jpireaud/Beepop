@@ -7,8 +7,6 @@
 // Bee.h : header file
 //
 
-
-
 /////////////////////////////////////////////////////////////////////////////
 // CBee command target
 
@@ -17,38 +15,41 @@ class CBee : public CCmdTarget
 	DECLARE_DYNCREATE(CBee)
 
 protected:
-	CBee();           // protected constructor used by dynamic creation
+	CBee(); // protected constructor used by dynamic creation
 
-// Attributes
+	// Attributes
 public:
-	int number;
-	float age;  // days
-	bool Alive;
+	int   number;
+	float age; // days
+	bool  Alive;
 
-// Operations
+	// Operations
 public:
 	virtual ~CBee();
-	CBee operator = (CBee& bee);
+	CBee operator=(CBee& bee);
 	CBee(CBee& bee);
 	CBee(int Num);
-	void SetNumber(int Num) {number = Num;}
-	int GetNumber() {return number;}
-	void Kill() {Alive = false; number = 0;}
-	bool IsAlive() {return Alive;}
+	void SetNumber(int Num) { number = Num; }
+	int  GetNumber() const { return number; }
+	void Kill()
+	{
+		Alive = false;
+		number = 0;
+	}
+	bool IsAlive() const { return Alive; }
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CBee)
-	public:
+public:
 	virtual void Serialize(CArchive& ar);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
-
 	// Generated message map functions
 	//{{AFX_MSG(CBee)
-		// NOTE - the ClassWizard will add and remove member functions here.
+	// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()

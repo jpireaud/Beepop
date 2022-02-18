@@ -6,6 +6,7 @@
 #endif // _MSC_VER > 1000
 // CreateWeatherHdr.h : header file
 //
+#include "Resource.h"
 #include "WeatherEvents.h"
 /////////////////////////////////////////////////////////////////////////////
 // CCreateWeatherHdr dialog
